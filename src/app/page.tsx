@@ -70,28 +70,34 @@ export default function Home() {
   };
 
   const exportCommentImage = async () => {
-    const element = previewRef.current;
-    if (element && isReady) {
-      try {
-        await new Promise(resolve => setTimeout(resolve, 300));
-        const canvas = await html2canvas(element, { 
-          backgroundColor: null, 
-          scale: 2, 
-          useCORS: true, 
-          allowTaint: false, 
-          logging: false,
-          windowWidth: element.scrollWidth,
-          windowHeight: element.scrollHeight
-        });
-        const link = document.createElement('a');
-        link.download = `tiktok-${commentMode}-${username}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-      } catch (err: any) {
-        alert("Gagal export gambar. Pastikan gambar profil valid.");
-      }
-    }
-  };
+  const element = previewRef.current;
+  if (!element) return;
+
+  try {
+    await document.fonts.ready;
+    await new Promise((r) => setTimeout(r, 200));
+
+    const canvas = await html2canvas(element, {
+      backgroundColor: null,
+      scale: 3,
+      useCORS: true,
+      allowTaint: false,
+
+      width: element.offsetWidth,
+      height: element.scrollHeight,
+      windowWidth: element.offsetWidth,
+      windowHeight: element.scrollHeight,
+    });
+
+    const link = document.createElement('a');
+    link.download = `tiktok-${commentMode}-${username}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+
+  } catch (err) {
+    alert("Export gagal");
+  }
+};
 
   if (!isReady) return null;
 
@@ -192,7 +198,7 @@ export default function Home() {
             <div ref={previewRef} style={{ 
               backgroundColor: 'transparent',
               padding: commentMode === 'sticker' ? '30px 30px 60px 30px' : '30px', // Extra padding bawah untuk sticker
-              display: 'inline-flex',
+              display: 'block', width: commentMode === 'sticker' ? '600px' : '600px',
               flexDirection: 'column',
               fontFamily: 'Arial, Helvetica, sans-serif'
             }}>
@@ -205,7 +211,7 @@ export default function Home() {
                     borderRadius: '16px 16px 16px 0px', 
                     padding: '16px 20px', 
                     display: 'flex',
-                    width: 'fit-content',
+                    width: '100%',
                     maxWidth: '600px', // Mengatur max-width agar tidak melebar tak terhingga
                     gap: '12px', 
                     alignItems: 'flex-start', 
