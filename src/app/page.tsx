@@ -3,33 +3,30 @@
 import { useState, useRef, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 
-// Placeholder Avatar (Base64 Solid Gray)
+// Placeholder Avatar
 const DEFAULT_AVATAR = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk8A8AAQsAzQ/8/GkAAAAASUVORK5CYII=";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'downloader' | 'comment'>('comment');
-  const [commentMode, setCommentMode] = useState<'sticker' | 'thread'>('sticker');
+  const [commentMode, setCommentMode] = useState<'sticker' | 'thread'>('thread'); // Default ke thread buat test
   const [threadTheme, setThreadTheme] = useState<'dark' | 'light'>('dark');
   
-  // State Downloader
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState('');
 
-  // State Komentar Utama
-  const [username, setUsername] = useState('jethro');
-  const [commentText, setCommentText] = useState('KAPAN KAKKK DISKONNYA\nAHSBDHASBDH KUTUNGGU');
-  const [likes, setLikes] = useState('3352');
-  const [date, setDate] = useState('2025-11-17');
+  const [username, setUsername] = useState('sienna');
+  const [commentText, setCommentText] = useState("Although I'm not a medical student, I still want to remind you to pay attention to the muscles in your left shoulder, especially the trapezius area to avoid strain.");
+  const [likes, setLikes] = useState('52');
+  const [date, setDate] = useState('2025-11-16');
   const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
   const [replyTo, setReplyTo] = useState('creator');
 
-  // State Balasan
   const [showReply, setShowReply] = useState(true);
-  const [replyUsername, setReplyUsername] = useState('Timephoria');
-  const [replyText, setReplyText] = useState('GASSS!');
-  const [replyLikes, setReplyLikes] = useState('2116');
+  const [replyUsername, setReplyUsername] = useState('maria');
+  const [replyText, setReplyText] = useState('this is a good one perioddd');
+  const [replyLikes, setReplyLikes] = useState('5');
   const [replyDate, setReplyDate] = useState('2025-11-17');
   const [replyAvatar, setReplyAvatar] = useState(DEFAULT_AVATAR);
 
@@ -126,7 +123,7 @@ export default function Home() {
                 <h3 className="font-bold text-slate-800 text-xl mb-4 line-clamp-2">{result.title}</h3>
                 <div className="flex flex-col sm:flex-row gap-3">
                   {result.play && <a href={result.play} target="_blank" rel="noreferrer" className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl text-center shadow-lg">Unduh Video (MP4)</a>}
-                  {result.music && <a href={result.music} target="_blank" rel="noreferrer" className="flex-1 bg-slate-800 hover:bg-black text-white font-bold py-3 rounded-xl text-center shadow-lg">Unduh Musik (MP3)</a>}
+                  {result.music && <a href={result.music} target="_blank" rel="noreferrer" className="flex-1 bg-slate-800 hover:bg-black text-white font-bold py-3 rounded-xl text-center shadow-lg">Unduh MP3</a>}
                 </div>
               </div>
             </div>
@@ -137,7 +134,7 @@ export default function Home() {
       {activeTab === 'comment' && (
         <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in zoom-in duration-300">
           
-          <div className="bg-white shadow-xl rounded-3xl p-6 border border-slate-100 space-y-6">
+          <div className="bg-white shadow-xl rounded-3xl p-6 border border-slate-100 space-y-6 h-fit">
             <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
               <button onClick={() => setCommentMode('sticker')} className={`flex-1 py-2 rounded-md font-bold text-xs ${commentMode === 'sticker' ? 'bg-white shadow text-blue-600' : 'text-slate-500'}`}>STICKER BUBBLE</button>
               <button onClick={() => setCommentMode('thread')} className={`flex-1 py-2 rounded-md font-bold text-xs ${commentMode === 'thread' ? 'bg-white shadow text-blue-600' : 'text-slate-500'}`}>THREAD COMMENT</button>
@@ -162,7 +159,7 @@ export default function Home() {
                   <input type="text" value={date} onChange={(e) => setDate(e.target.value)} placeholder="Date" className="p-3 bg-slate-50 border rounded-xl" />
                 </div>
               )}
-              <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl min-h-[80px]" />
+              <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl min-h-[100px]" />
             </div>
 
             {commentMode === 'thread' && (
@@ -187,26 +184,27 @@ export default function Home() {
             <button onClick={exportCommentImage} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-[0.98]">📸 Export PNG HD</button>
           </div>
 
-          <div className="bg-[#0f172a] rounded-3xl p-10 flex items-center justify-center min-h-[500px]">
-            {/* WADAH UTAMA PREVIEW */}
+          <div className="bg-[#0f172a] rounded-3xl p-10 flex items-center justify-center min-h-[500px] overflow-hidden">
+            
+            {/* WADAH UTAMA YANG DIFOTO (Ditambahkan padding besar agar tidak terpotong saat export) */}
             <div ref={previewRef} style={{ 
-              backgroundColor: 'transparent', // Wadah luar selalu transparan
-              padding: '24px', // Memberikan ruang aman agar html2canvas tidak memotong
+              backgroundColor: 'transparent',
+              padding: '30px', // ✅ SOLUSI ANTI POTONG: Memberikan ruang aman 30px di segala sisi
               display: 'inline-flex',
               flexDirection: 'column',
               fontFamily: 'Arial, Helvetica, sans-serif'
             }}>
               
-              {/* STICKER MODE UPDATE: Padding dan Wrapper diperbaiki agar teks panjang aman saat diexport */}
+              {/* STICKER MODE */}
               {commentMode === 'sticker' && (
-                <div style={{ position: 'relative', display: 'inline-flex', paddingBottom: '16px' /* Ruang untuk ekor */ }}>
+                <div style={{ position: 'relative', display: 'inline-flex', paddingBottom: '16px' }}>
                   <div style={{ 
                     backgroundColor: '#ffffff', 
                     borderRadius: '16px 16px 16px 0px', 
                     padding: '16px 20px', 
                     display: 'flex',
                     width: 'fit-content',
-                    maxWidth: '380px', // Batasan lebar
+                    maxWidth: '400px',
                     gap: '12px', 
                     alignItems: 'flex-start', 
                     boxShadow: '0 10px 30px rgba(0,0,0,0.10)' 
@@ -229,10 +227,9 @@ export default function Home() {
                     </div>
                   </div>
                   
-                  {/* Ekor Sticker diletakkan menempel pada kotak */}
                   <div style={{
                     position: 'absolute',
-                    bottom: '4px', // Disesuaikan karena ada paddingBottom di wrapper
+                    bottom: '4px',
                     left: '0px',
                     width: '0px',
                     height: '0px',
@@ -242,24 +239,23 @@ export default function Home() {
                 </div>
               )}
 
-              {/* THREAD MODE UPDATE: Background fix mengikuti konten */}
+              {/* THREAD MODE UPDATE: Lebar Dibuat Tetap (Fixed Width) */}
               {commentMode === 'thread' && (
                 <div style={{ 
                   backgroundColor: threadTheme === 'dark' ? TIKTOK_DARK_BG : TIKTOK_LIGHT_BG,
-                  padding: '16px 20px', // Memberikan jarak agar avatar/teks tidak berdempetan dengan ujung background
+                  padding: '20px 24px', 
                   borderRadius: '12px',
-                  display: 'inline-flex',
+                  display: 'flex',
                   flexDirection: 'column', 
                   gap: '20px', 
-                  maxWidth: '420px',
-                  width: 'fit-content' // Background akan mengikuti lebar konten
+                  width: '420px', // ✅ SOLUSI FIXED WIDTH: Kotak akan selalu berukuran 420px ke samping
+                  minHeight: '100px' // Tinggi menyesuaikan konten
                 }}>
-                  {/* Komentar Pertama */}
+                  {/* Komentar Utama */}
                   <div style={{ display: 'flex', gap: '12px' }}>
                     <img key={avatar} src={avatar} style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                     <div style={{ flex: 1, overflow: 'hidden' }}>
                       <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif' }}>{username}</p>
-                      
                       <p style={{ 
                         color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, 
                         fontSize: '15px', margin: '3px 0', lineHeight: 1.4, 
@@ -269,12 +265,12 @@ export default function Home() {
                       }}>
                         {commentText}
                       </p>
-                      <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 600, marginTop: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                      <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 600, marginTop: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                         <span>{date}</span>
                         <span>Reply</span>
                       </div>
                     </div>
-                    <div style={{ textAlign: 'center', color: TIKTOK_GRAY_TEXT }}>
+                    <div style={{ textAlign: 'center', color: TIKTOK_GRAY_TEXT, flexShrink: 0, marginLeft: '8px' }}>
                       <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                       <p style={{ fontSize: '12px', margin: '4px 0 0 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>{likes}</p>
                     </div>
@@ -286,7 +282,6 @@ export default function Home() {
                       <img key={replyAvatar} src={replyAvatar} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                       <div style={{ flex: 1, overflow: 'hidden' }}>
                         <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif' }}>{replyUsername}</p>
-                        
                         <p style={{ 
                           color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, 
                           fontSize: '15px', margin: '3px 0', lineHeight: 1.4, 
@@ -296,12 +291,12 @@ export default function Home() {
                         }}>
                           {replyText}
                         </p>
-                        <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 600, marginTop: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                        <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 600, marginTop: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                           <span>{replyDate}</span>
                           <span>Reply</span>
                         </div>
                       </div>
-                      <div style={{ textAlign: 'center', color: TIKTOK_GRAY_TEXT }}>
+                      <div style={{ textAlign: 'center', color: TIKTOK_GRAY_TEXT, flexShrink: 0, marginLeft: '8px' }}>
                         <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                         <p style={{ fontSize: '11px', margin: '4px 0 0 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>{replyLikes}</p>
                       </div>
