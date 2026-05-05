@@ -36,13 +36,13 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gray-50 flex flex-col items-center py-20 px-4">
       <h1 className="text-4xl font-bold text-gray-800 mb-2">TikTok Downloader</h1>
-      <p className="text-gray-600 mb-8">Unduh video TikTok tanpa watermark</p>
+      <p className="text-gray-600 mb-8 text-center">Unduh video & lagu TikTok tanpa watermark</p>
 
       <div className="w-full max-w-2xl bg-white p-6 rounded-lg shadow-md">
         <form onSubmit={handleDownload} className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
-            placeholder="Tempel tautan video TikTok di sini..."
+            placeholder="Tempel tautan video atau lagu TikTok di sini..."
             className="flex-1 px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
@@ -59,30 +59,42 @@ export default function Home() {
 
         {error && <p className="text-red-500 mt-4 text-center">{error}</p>}
 
-        {result && result.play && (
+        {/* Kondisi diubah: Akan muncul jika ada Video ATAU Music */}
+        {result && (result.play || result.music) && (
           <div className="mt-8 flex flex-col items-center gap-4">
             <h3 className="font-semibold text-lg text-black">Hasil Unduhan:</h3>
-            {/* Thumbnail Video (Opsional, agar lebih keren) */}
-            <img src={result.cover} alt="Thumbnail" className="w-48 rounded-md shadow-sm mb-2" />
+            
+            {result.cover && (
+              <img src={result.cover} alt="Thumbnail" className="w-48 rounded-md shadow-sm mb-2" />
+            )}
+            
             <p className="text-gray-700 text-center text-sm">{result.title}</p>
             
             <div className="flex flex-col sm:flex-row gap-3 w-full mt-4">
-              <a
-                href={result.hdplay || result.play}
-                target="_blank"
-                rel="noreferrer"
-                className="flex-1 text-center bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-md"
-              >
-                Download Video (HD)
-              </a>
-              <a
-                href={result.music}
-                target="_blank"
-                rel="noreferrer"
-                className="flex-1 text-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-4 rounded-md"
-              >
-                Download MP3
-              </a>
+              
+              {/* Tombol ini HANYA muncul jika berupa video */}
+              {result.play && (
+                <a
+                  href={result.play}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 text-center bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-md"
+                >
+                  Download Video
+                </a>
+              )}
+
+              {/* Tombol ini akan selalu muncul jika ada audionya */}
+              {result.music && (
+                <a
+                  href={result.music}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 text-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-4 rounded-md"
+                >
+                  Download MP3
+                </a>
+              )}
             </div>
           </div>
         )}
