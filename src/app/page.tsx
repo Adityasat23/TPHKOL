@@ -8,7 +8,7 @@ const DEFAULT_AVATAR = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCA
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'downloader' | 'comment'>('comment');
-  const [commentMode, setCommentMode] = useState<'sticker' | 'thread'>('thread'); // Default ke thread buat test
+  const [commentMode, setCommentMode] = useState<'sticker' | 'thread'>('sticker'); 
   const [threadTheme, setThreadTheme] = useState<'dark' | 'light'>('dark');
   
   const [url, setUrl] = useState('');
@@ -70,15 +70,19 @@ export default function Home() {
   };
 
   const exportCommentImage = async () => {
-    if (previewRef.current && isReady) {
+    const element = previewRef.current;
+    if (element && isReady) {
       try {
         await new Promise(resolve => setTimeout(resolve, 300));
-        const canvas = await html2canvas(previewRef.current, { 
+        const canvas = await html2canvas(element, { 
           backgroundColor: null, 
           scale: 2, 
           useCORS: true, 
           allowTaint: false, 
-          logging: false 
+          logging: false,
+          // ✅ FIX 3: Tambah windowWidth & windowHeight agar tidak terpotong oleh viewport
+          windowWidth: element.scrollWidth,
+          windowHeight: element.scrollHeight
         });
         const link = document.createElement('a');
         link.download = `tiktok-${commentMode}-${username}.png`;
@@ -186,18 +190,17 @@ export default function Home() {
 
           <div className="bg-[#0f172a] rounded-3xl p-10 flex items-center justify-center min-h-[500px] overflow-hidden">
             
-            {/* WADAH UTAMA YANG DIFOTO (Ditambahkan padding besar agar tidak terpotong saat export) */}
+            {/* ✅ FIX 2: Tambah padding-bottom 50px saat di mode sticker agar ekor aman */}
             <div ref={previewRef} style={{ 
               backgroundColor: 'transparent',
-              padding: '30px', // ✅ SOLUSI ANTI POTONG: Memberikan ruang aman 30px di segala sisi
+              padding: commentMode === 'sticker' ? '30px 30px 50px 30px' : '30px', 
               display: 'inline-flex',
               flexDirection: 'column',
               fontFamily: 'Arial, Helvetica, sans-serif'
             }}>
               
-              {/* STICKER MODE */}
               {commentMode === 'sticker' && (
-                <div style={{ position: 'relative', display: 'inline-flex', paddingBottom: '16px' }}>
+                <div style={{ position: 'relative', display: 'inline-flex' }}>
                   <div style={{ 
                     backgroundColor: '#ffffff', 
                     borderRadius: '16px 16px 16px 0px', 
@@ -227,19 +230,23 @@ export default function Home() {
                     </div>
                   </div>
                   
-                  <div style={{
-                    position: 'absolute',
-                    bottom: '4px',
-                    left: '0px',
-                    width: '0px',
-                    height: '0px',
-                    borderTop: '12px solid #ffffff',
-                    borderRight: '16px solid transparent'
-                  }}></div>
+                  {/* ✅ FIX 1: Mengganti Border CSS dengan SVG Polygon Murni */}
+                  <svg 
+                    width="16" 
+                    height="16" 
+                    viewBox="0 0 16 16" 
+                    style={{
+                      position: 'absolute',
+                      bottom: '-15px',
+                      left: '0px'
+                    }}
+                  >
+                    <polygon points="0,0 16,0 0,16" fill="#ffffff" />
+                  </svg>
+
                 </div>
               )}
 
-              {/* THREAD MODE UPDATE: Lebar Dibuat Tetap (Fixed Width) */}
               {commentMode === 'thread' && (
                 <div style={{ 
                   backgroundColor: threadTheme === 'dark' ? TIKTOK_DARK_BG : TIKTOK_LIGHT_BG,
@@ -248,10 +255,9 @@ export default function Home() {
                   display: 'flex',
                   flexDirection: 'column', 
                   gap: '20px', 
-                  width: '420px', // ✅ SOLUSI FIXED WIDTH: Kotak akan selalu berukuran 420px ke samping
-                  minHeight: '100px' // Tinggi menyesuaikan konten
+                  width: '420px', 
+                  minHeight: '100px'
                 }}>
-                  {/* Komentar Utama */}
                   <div style={{ display: 'flex', gap: '12px' }}>
                     <img key={avatar} src={avatar} style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                     <div style={{ flex: 1, overflow: 'hidden' }}>
@@ -276,7 +282,6 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Komentar Balasan */}
                   {showReply && (
                     <div style={{ display: 'flex', gap: '12px', marginLeft: '50px' }}>
                       <img key={replyAvatar} src={replyAvatar} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
