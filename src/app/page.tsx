@@ -32,8 +32,8 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-slate-50 flex flex-col items-center py-16 px-4 font-sans">
       <div className="max-w-3xl w-full text-center mb-10">
-        <h1 className="text-5xl font-black text-slate-900 mb-4 tracking-tight">TikTok<span className="text-blue-600">DL</span></h1>
-        <p className="text-slate-500 text-lg">Unduh Video HD & MP3 Musik tanpa limit</p>
+        <h1 className="text-5xl font-black text-slate-900 mb-4 tracking-tight">TikTok<span className="text-blue-600">TPH</span></h1>
+        <p className="text-slate-500 text-lg">Buat download video sama lagu tiktok</p>
       </div>
 
       <div className="w-full max-w-2xl bg-white shadow-2xl shadow-blue-100 rounded-3xl p-8 border border-slate-100">
