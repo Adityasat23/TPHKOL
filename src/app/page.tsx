@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import html2canvas from 'html2canvas';
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'downloader' | 'comment'>('comment'); // Default langsung ke tab Comment untuk mempermudah testing
+  const [activeTab, setActiveTab] = useState<'downloader' | 'comment'>('comment');
 
   // State Downloader
   const [url, setUrl] = useState('');
@@ -19,6 +19,7 @@ export default function Home() {
   const [likes, setLikes] = useState('3352');
   const [date, setDate] = useState('2025-11-17');
   const [replyTo, setReplyTo] = useState('creator');
+  // Default avatar kita biarkan, tapi akan langsung terganti aman saat upload
   const [avatar, setAvatar] = useState('https://ui-avatars.com/api/?name=bronwyn&background=random');
   
   const previewRef = useRef<HTMLDivElement>(null);
@@ -42,30 +43,34 @@ export default function Home() {
     }
   };
 
+  // ✅ PERBAIKAN: Menggunakan FileReader (Base64) agar 100% tembus CORS html2canvas
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setAvatar(imageUrl);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // Hasilnya berupa string base64 (data:image/png;base64,...)
+        setAvatar(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  // ✅ PERBAIKAN MASALAH 1: Tambahkan useCORS agar bisa mendownload gambar
   const exportCommentImage = async () => {
     if (previewRef.current) {
       try {
         const canvas = await html2canvas(previewRef.current, { 
           backgroundColor: null, 
-          scale: 4, // Kualitas super HD
-          useCORS: true, // Kunci agar tombol export berfungsi
-          allowTaint: true
+          scale: 4, 
+          useCORS: true, 
+          allowTaint: true 
         });
         const link = document.createElement('a');
         link.download = `tiktok-${commentMode}-${username}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
-      } catch (err) {
-        alert("Gagal export. Pastikan kamu sudah mengupload foto profil dari perangkatmu sendiri.");
+      } catch (err: any) {
+        alert("Gagal export. Terjadi kesalahan pada rendering gambar: " + err.message);
       }
     }
   };
@@ -112,7 +117,6 @@ export default function Home() {
       {activeTab === 'comment' && (
         <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in zoom-in duration-300">
           
-          {/* KONTROL EDIT */}
           <div className="bg-white shadow-xl shadow-blue-100/50 rounded-3xl p-6 border border-slate-100 flex flex-col gap-4">
             <h2 className="text-xl font-bold mb-2">⚙️ Kustomisasi Komentar</h2>
             
@@ -122,7 +126,7 @@ export default function Home() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-600 mb-1">Foto Profil (Penting: Wajib Upload Sendiri)</label>
+              <label className="block text-sm font-semibold text-slate-600 mb-1">Foto Profil</label>
               <input type="file" accept="image/*" onChange={handleAvatarUpload} className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
             </div>
 
@@ -156,25 +160,22 @@ export default function Home() {
               </div>
             )}
 
-            <button onClick={exportCommentImage} className="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-green-100">
-              📸 Export Gambar (PNG Transparan)
+            <button onClick={exportCommentImage} className="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-green-100 flex items-center justify-center gap-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+              Export Gambar (PNG Transparan)
             </button>
           </div>
 
-          {/* LIVE PREVIEW TIKTOK */}
           <div className="bg-[#121212] rounded-3xl p-8 flex flex-col items-center justify-center overflow-hidden relative shadow-inner border border-slate-800">
             <h3 className="absolute top-4 left-6 text-slate-500 font-semibold text-sm">👁️ Live Preview</h3>
             
-            {/* INI ADALAH AREA YANG AKAN DIFOTO OLEH HTML2CANVAS */}
             <div ref={previewRef} className="p-4 flex justify-center w-full">
               
-              {/* ✅ PERBAIKAN MASALAH 2: Layout presisi Single Comment TikTok Dark Mode */}
               {commentMode === 'standard' && (
                 <div className="flex gap-3 w-full max-w-[380px] bg-transparent font-sans text-left">
-                  {/* Avatar */}
-                  <img src={avatar} alt="PFP" crossOrigin="anonymous" className="w-[36px] h-[36px] rounded-full object-cover shrink-0 mt-0.5" />
+                  {/* ✅ Menghapus crossOrigin="anonymous" karena base64 tidak membutuhkannya */}
+                  <img src={avatar} alt="PFP" className="w-[36px] h-[36px] rounded-full object-cover shrink-0 mt-0.5" />
                   
-                  {/* Konten Komentar */}
                   <div className="flex-1 min-w-0 pr-2">
                     <p className="text-[#8a8b91] text-[14px] font-medium mb-[2px]">{username}</p>
                     <p className="text-white text-[15px] leading-[1.3] break-words">{commentText}</p>
@@ -184,7 +185,6 @@ export default function Home() {
                     </div>
                   </div>
                   
-                  {/* Ikon Love dikanan */}
                   <div className="flex flex-col items-center justify-start shrink-0 ml-1 mt-1">
                     <svg className="w-[18px] h-[18px] text-[#8a8b91] mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                     <span className="text-[#8a8b91] text-[12px] font-medium">{likes}</span>
@@ -192,13 +192,11 @@ export default function Home() {
                 </div>
               )}
 
-              {/* ✅ PERBAIKAN MASALAH 3: Layout presisi Sticker Video TikTok */}
               {commentMode === 'video' && (
                 <div className="bg-white rounded-[14px] rounded-bl-[4px] py-2.5 px-3 shadow-md flex gap-2.5 items-center max-w-[320px] font-sans">
-                  {/* Avatar */}
-                  <img src={avatar} alt="PFP" crossOrigin="anonymous" className="w-[36px] h-[36px] rounded-full object-cover shrink-0" />
+                  {/* ✅ Menghapus crossOrigin="anonymous" di sini juga */}
+                  <img src={avatar} alt="PFP" className="w-[36px] h-[36px] rounded-full object-cover shrink-0" />
                   
-                  {/* Teks Stiker */}
                   <div className="flex flex-col justify-center">
                     <p className="text-[#8a8b91] text-[13px] font-bold tracking-tight">Reply to {replyTo}'s comment</p>
                     <p className="text-black text-[16px] font-bold leading-tight mt-[1px]">{commentText}</p>
