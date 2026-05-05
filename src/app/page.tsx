@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 
+// Placeholder Avatar
 const DEFAULT_AVATAR = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk8A8AAQsAzQ/8/GkAAAAASUVORK5CYII=";
 
 export default function Home() {
@@ -16,7 +17,7 @@ export default function Home() {
   const [error, setError] = useState('');
 
   const [username, setUsername] = useState('sienna');
-  const [commentText, setCommentText] = useState("Although I'm not a medical student, I still want to remind you to pay attention to the muscles in your left shoulder.");
+  const [commentText, setCommentText] = useState("Although I'm not a medical student, I still want to remind you to pay attention to the muscles in your left shoulder, especially the trapezius area to avoid strain.");
   const [likes, setLikes] = useState('52');
   const [date, setDate] = useState('2025-11-16');
   const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
@@ -30,6 +31,13 @@ export default function Home() {
   const [replyAvatar, setReplyAvatar] = useState(DEFAULT_AVATAR);
 
   const previewRef = useRef<HTMLDivElement>(null);
+
+  const TIKTOK_DARK_BG = "#121212";
+  const TIKTOK_LIGHT_BG = "#ffffff";
+  const TIKTOK_GRAY_TEXT = "#8a8b91";
+  const TIKTOK_WHITE_TEXT = "#ffffff";
+  const TIKTOK_BLACK_TEXT = "#161823";
+
   const [isReady, setIsReady] = useState(false);
   useEffect(() => { setIsReady(true); }, []);
 
@@ -61,49 +69,26 @@ export default function Home() {
     }
   };
 
-  // ==========================================
-  // FIX EXPORT - ANTI CROP & FONT STABLE
-  // ==========================================
   const exportCommentImage = async () => {
     const element = previewRef.current;
     if (element && isReady) {
       try {
-        // 1. Tunggu font di-load sempurna agar line-break tidak berantakan
-        await document.fonts.ready;
-
-        // 2. Beri jeda sedikit untuk render reflow
-        await new Promise(resolve => setTimeout(resolve, 200));
-
-        // 3. Simpan style asli & paksa auto-height
-        const originalHeight = element.style.height;
-        const originalMaxHeight = element.style.maxHeight;
-        element.style.height = 'auto';
-        element.style.maxHeight = 'none';
-
+        await new Promise(resolve => setTimeout(resolve, 300));
         const canvas = await html2canvas(element, { 
           backgroundColor: null, 
-          scale: 3, // Kualitas HD
+          scale: 2, 
           useCORS: true, 
           allowTaint: false, 
           logging: false,
-          // Gunakan scrollHeight agar mencakup area yang tidak terlihat/terpotong
-          height: element.scrollHeight,
-          windowHeight: element.scrollHeight,
-          scrollX: 0,
-          scrollY: -window.scrollY // Fix offset jika user sedang scroll
+          windowWidth: element.scrollWidth,
+          windowHeight: element.scrollHeight
         });
-
-        // 4. Kembalikan style asli
-        element.style.height = originalHeight;
-        element.style.maxHeight = originalMaxHeight;
-
         const link = document.createElement('a');
         link.download = `tiktok-${commentMode}-${username}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
       } catch (err: any) {
-        alert("Gagal export gambar.");
-        console.error(err);
+        alert("Gagal export gambar. Pastikan gambar profil valid.");
       }
     }
   };
@@ -111,34 +96,37 @@ export default function Home() {
   if (!isReady) return null;
 
   return (
-    <main className="min-h-screen bg-[#f1f5f9] flex flex-col items-center py-10 px-4 font-sans">
+    <main className="min-h-screen bg-[#f8fafc] flex flex-col items-center py-10 px-4 font-sans text-[#1e293b]">
+      
       <div className="max-w-3xl w-full text-center mb-8">
-        <h1 className="text-4xl font-black text-slate-900 mb-2">TPH <span className="text-blue-600">Editor</span></h1>
-        <p className="text-slate-500">Fix Export & Downloader Version</p>
+        <h1 className="text-5xl font-black text-[#0f172a] mb-2 tracking-tight">
+          TPH <span className="text-[#94a3b8]">Editor Tools</span>
+        </h1>
+        <p className="text-[#64748b] text-lg">Semoga membantu guys</p>
       </div>
 
-      <div className="flex bg-white rounded-full shadow-sm border p-1 mb-8">
+      <div className="flex bg-white rounded-full shadow-sm border border-slate-200 p-1 mb-8">
         <button onClick={() => setActiveTab('downloader')} className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${activeTab === 'downloader' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500'}`}>📥 DOWNLOADER</button>
         <button onClick={() => setActiveTab('comment')} className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${activeTab === 'comment' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500'}`}>💬 FAKE COMMENT</button>
       </div>
 
       {activeTab === 'downloader' && (
-        <div className="w-full max-w-2xl bg-white shadow-xl rounded-3xl p-8 border animate-in fade-in zoom-in duration-300">
+        <div className="w-full max-w-2xl bg-white shadow-xl shadow-blue-100/50 rounded-3xl p-8 border border-slate-100 animate-in fade-in zoom-in duration-300">
           <form onSubmit={handleDownload} className="space-y-4">
             <div className="relative">
-              <input type="text" placeholder="YouTube, Pinterest, TikTok..." className="w-full pl-5 pr-32 py-4 bg-slate-50 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500" value={url} onChange={(e) => setUrl(e.target.value)} required />
+              <input type="text" placeholder="Link TikTok, YouTube (MP3), atau Pinterest (Video)..." className="w-full pl-5 pr-32 py-5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-blue-500 text-slate-800" value={url} onChange={(e) => setUrl(e.target.value)} required />
               <button type="submit" disabled={loading} className="absolute right-2 top-2 bottom-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 rounded-xl disabled:opacity-50">{loading ? '...' : 'Download'}</button>
             </div>
           </form>
-          {error && <div className="mt-6 p-4 bg-red-50 text-red-700 rounded-lg text-sm">{error}</div>}
+          {error && <div className="mt-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-lg text-sm">{error}</div>}
           {result && (
-            <div className="mt-8 flex gap-6 items-center">
-              {result.cover && <img src={result.cover} alt="thumb" className="w-32 h-32 object-cover rounded-xl shadow" />}
-              <div className="flex-1">
-                <h3 className="font-bold text-slate-800 mb-4">{result.title}</h3>
-                <div className="flex gap-2">
-                  {result.play && <a href={result.play} target="_blank" className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-bold">Video MP4</a>}
-                  {result.music && <a href={result.music} target="_blank" className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-bold">Audio MP3</a>}
+            <div className="mt-10 flex flex-col md:flex-row gap-6 items-center">
+              {result.cover && <img src={result.cover} alt="thumbnail" className="w-40 h-40 object-cover rounded-2xl shadow-lg border-4 border-white" />}
+              <div className="flex-1 text-center md:text-left w-full">
+                <h3 className="font-bold text-slate-800 text-xl mb-4 line-clamp-2">{result.title}</h3>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  {result.play && <a href={result.play} target="_blank" rel="noreferrer" className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl text-center shadow-lg">Unduh Video (MP4)</a>}
+                  {result.music && <a href={result.music} target="_blank" rel="noreferrer" className="flex-1 bg-slate-800 hover:bg-black text-white font-bold py-3 rounded-xl text-center shadow-lg">Unduh MP3</a>}
                 </div>
               </div>
             </div>
@@ -147,74 +135,203 @@ export default function Home() {
       )}
 
       {activeTab === 'comment' && (
-        <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Controls */}
-          <div className="bg-white shadow-xl rounded-3xl p-6 space-y-6">
+        <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in zoom-in duration-300">
+          
+          <div className="bg-white shadow-xl rounded-3xl p-6 border border-slate-100 space-y-6 h-fit">
             <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
-              <button onClick={() => setCommentMode('sticker')} className={`flex-1 py-2 rounded-md font-bold text-xs ${commentMode === 'sticker' ? 'bg-white shadow text-blue-600' : 'text-slate-500'}`}>STICKER</button>
-              <button onClick={() => setCommentMode('thread')} className={`flex-1 py-2 rounded-md font-bold text-xs ${commentMode === 'thread' ? 'bg-white shadow text-blue-600' : 'text-slate-500'}`}>THREAD</button>
+              <button onClick={() => setCommentMode('sticker')} className={`flex-1 py-2 rounded-md font-bold text-xs ${commentMode === 'sticker' ? 'bg-white shadow text-blue-600' : 'text-slate-500'}`}>STICKER BUBBLE</button>
+              <button onClick={() => setCommentMode('thread')} className={`flex-1 py-2 rounded-md font-bold text-xs ${commentMode === 'thread' ? 'bg-white shadow text-blue-600' : 'text-slate-500'}`}>THREAD COMMENT</button>
             </div>
 
-            <div className="space-y-3">
-               <input type="file" onChange={(e) => handleImageUpload(e, setAvatar)} className="text-xs" />
-               <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" className="w-full p-3 bg-slate-50 border rounded-xl" />
-               <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl h-24" />
-               {commentMode === 'sticker' && <input type="text" value={replyTo} onChange={(e) => setReplyTo(e.target.value)} placeholder="Reply to..." className="w-full p-3 bg-slate-50 border rounded-xl" />}
+            {commentMode === 'thread' && (
+              <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
+                <button onClick={() => setThreadTheme('dark')} className={`flex-1 py-2 rounded-md font-bold text-xs ${threadTheme === 'dark' ? 'bg-slate-800 text-white' : 'text-slate-500'}`}>🌙 DARK MODE</button>
+                <button onClick={() => setThreadTheme('light')} className={`flex-1 py-2 rounded-md font-bold text-xs ${threadTheme === 'light' ? 'bg-white text-slate-900 shadow' : 'text-slate-500'}`}>☀️ LIGHT MODE</button>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <h3 className="font-bold text-blue-600 uppercase text-xs tracking-widest">Komentar Utama</h3>
+              <input type="file" onChange={(e) => handleImageUpload(e, setAvatar)} className="text-xs block w-full" />
+              <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" className="w-full p-3 bg-slate-50 border rounded-xl" />
+              {commentMode === 'sticker' ? (
+                 <input type="text" value={replyTo} onChange={(e) => setReplyTo(e.target.value)} placeholder="Reply to username..." className="w-full p-3 bg-slate-50 border rounded-xl" />
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  <input type="text" value={likes} onChange={(e) => setLikes(e.target.value)} placeholder="Likes" className="p-3 bg-slate-50 border rounded-xl" />
+                  <input type="text" value={date} onChange={(e) => setDate(e.target.value)} placeholder="Date" className="p-3 bg-slate-50 border rounded-xl" />
+                </div>
+              )}
+              <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl min-h-[100px]" />
             </div>
 
-            <button onClick={exportCommentImage} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl shadow-lg">📸 EXPORT PNG HD</button>
+            {commentMode === 'thread' && (
+              <div className="space-y-4 pt-4 border-t border-slate-100">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-bold text-indigo-600 uppercase text-xs tracking-widest">Balasan (Reply)</h3>
+                  <input type="checkbox" checked={showReply} onChange={() => setShowReply(!showReply)} />
+                </div>
+                {showReply && (
+                  <>
+                    <input type="file" onChange={(e) => handleImageUpload(e, setReplyAvatar)} className="text-xs block w-full" />
+                    <div className="grid grid-cols-2 gap-2">
+                      <input type="text" value={replyUsername} onChange={(e) => setReplyUsername(e.target.value)} placeholder="Reply Username" className="w-full p-3 bg-slate-50 border rounded-xl" />
+                      <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="Likes" className="w-full p-3 bg-slate-50 border rounded-xl" />
+                    </div>
+                    <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl min-h-[80px]" />
+                  </>
+                )}
+              </div>
+            )}
+
+            <button onClick={exportCommentImage} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-[0.98]">📸 Export PNG HD</button>
           </div>
 
-          {/* Preview Canvas */}
-          <div className="bg-[#0f172a] rounded-3xl p-10 flex items-center justify-center overflow-hidden min-h-[500px]">
+          <div className="bg-[#0f172a] rounded-3xl p-10 flex items-center justify-center min-h-[500px] overflow-hidden">
+            {/* WADAH UTAMA YANG DIFOTO DENGAN PADDING EXTRA DI BAWAH */}
             <div ref={previewRef} style={{ 
               backgroundColor: 'transparent',
-              padding: '40px 40px 80px 40px', // Extra bottom padding for sticker tail
+              padding: commentMode === 'sticker' ? '30px 30px 60px 30px' : '30px', // Extra padding bawah untuk sticker
               display: 'inline-flex',
               flexDirection: 'column',
-              fontFamily: 'sans-serif'
+              fontFamily: 'Arial, Helvetica, sans-serif'
             }}>
               
+              {/* STICKER MODE UPDATE */}
               {commentMode === 'sticker' && (
                 <div style={{ position: 'relative', display: 'inline-flex' }}>
                   <div style={{ 
-                    backgroundColor: '#ffffff', borderRadius: '20px 20px 20px 0px', padding: '16px 24px', 
-                    display: 'flex', gap: '15px', maxWidth: '400px', boxShadow: '0 10px 40px rgba(0,0,0,0.2)' 
+                    backgroundColor: '#ffffff', 
+                    borderRadius: '16px 16px 16px 0px', 
+                    padding: '16px 20px', 
+                    display: 'flex',
+                    width: 'fit-content',
+                    maxWidth: '400px', // Mengatur max-width agar tidak melebar tak terhingga
+                    gap: '12px', 
+                    alignItems: 'flex-start', 
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.10)' 
                   }}>
-                    <img src={avatar} style={{ width: '45px', height: '45px', borderRadius: '50%', objectFit: 'cover' }} />
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <p style={{ color: '#8a8b91', fontSize: '13px', fontWeight: 'bold', margin: '0 0 4px 0' }}>Reply to {replyTo}'s comment</p>
-                      <p style={{ color: '#000', fontSize: '18px', fontWeight: 'bold', margin: 0, lineHeight: 1.25, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{commentText}</p>
+                    <img key={avatar} src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+                      <p style={{ color: '#8a8b91', fontSize: '14px', fontWeight: 'bold', margin: '0 0 2px 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
+                      <p style={{ 
+                        color: '#000000', 
+                        fontSize: '18px', 
+                        fontWeight: 'bold', 
+                        margin: '0', 
+                        lineHeight: 1.3, 
+                        whiteSpace: 'pre-wrap', 
+                        wordWrap: 'break-word', // Mengganti wordBreak dengan wordWrap untuk kompabilitas yang lebih baik
+                        fontFamily: 'Arial, Helvetica, sans-serif' 
+                      }}>
+                        {commentText}
+                      </p>
                     </div>
                   </div>
-                  <svg width="20" height="20" style={{ position: 'absolute', bottom: '-19px', left: 0 }}>
-                    <polygon points="0,0 20,0 0,20" fill="#ffffff" />
+                  
+                  {/* SVG Ekor Sticker */}
+                  <svg 
+                    width="16" 
+                    height="16" 
+                    viewBox="0 0 16 16" 
+                    style={{
+                      position: 'absolute',
+                      bottom: '-15px', // Sesuaikan posisi
+                      left: '0px'
+                    }}
+                  >
+                    <polygon points="0,0 16,0 0,16" fill="#ffffff" />
                   </svg>
                 </div>
               )}
 
+              {/* THREAD MODE UPDATE */}
               {commentMode === 'thread' && (
                 <div style={{ 
-                  backgroundColor: threadTheme === 'dark' ? '#121212' : '#ffffff',
-                  padding: '24px', borderRadius: '16px', width: '400px', display: 'flex', flexDirection: 'column', gap: '20px'
+                  backgroundColor: threadTheme === 'dark' ? TIKTOK_DARK_BG : TIKTOK_LIGHT_BG,
+                  padding: '20px 24px', 
+                  borderRadius: '12px',
+                  display: 'flex',
+                  flexDirection: 'column', 
+                  gap: '20px', 
+                  width: '400px', // Lebar tetap yang stabil
+                  minHeight: '100px'
                 }}>
+                  {/* Komentar Utama */}
                   <div style={{ display: 'flex', gap: '12px' }}>
-                    <img src={avatar} style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
+                    <img key={avatar} src={avatar} style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                     <div style={{ flex: 1 }}>
-                      <p style={{ color: '#8a8b91', fontSize: '14px', fontWeight: 600, margin: 0 }}>{username}</p>
-                      <p style={{ color: threadTheme === 'dark' ? '#fff' : '#000', fontSize: '15px', margin: '4px 0', lineHeight: 1.4, whiteSpace: 'pre-wrap' }}>{commentText}</p>
-                      <div style={{ display: 'flex', gap: '15px', color: '#8a8b91', fontSize: '12px', marginTop: '8px', fontWeight: 'bold' }}>
-                        <span>{date}</span><span>Reply</span>
+                      <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif' }}>{username}</p>
+                      <p style={{ 
+                        color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, 
+                        fontSize: '15px', margin: '3px 0', lineHeight: 1.4, 
+                        whiteSpace: 'pre-wrap', 
+                        wordWrap: 'break-word',
+                        fontFamily: 'Arial, Helvetica, sans-serif' 
+                      }}>
+                        {commentText}
+                      </p>
+                      <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 600, marginTop: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                        <span>{date}</span>
+                        <span>Reply</span>
                       </div>
                     </div>
+                    <div style={{ textAlign: 'center', color: TIKTOK_GRAY_TEXT, flexShrink: 0, marginLeft: '8px' }}>
+                      <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                      <p style={{ fontSize: '12px', margin: '4px 0 0 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>{likes}</p>
+                    </div>
                   </div>
+
+                  {/* Komentar Balasan */}
+                  {showReply && (
+                    <div style={{ display: 'flex', gap: '12px', marginLeft: '50px' }}>
+                      <img key={replyAvatar} src={replyAvatar} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                      <div style={{ flex: 1 }}>
+                        <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif' }}>{replyUsername}</p>
+                        <p style={{ 
+                          color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, 
+                          fontSize: '15px', margin: '3px 0', lineHeight: 1.4, 
+                          whiteSpace: 'pre-wrap', 
+                          wordWrap: 'break-word',
+                          fontFamily: 'Arial, Helvetica, sans-serif' 
+                        }}>
+                          {replyText}
+                        </p>
+                        <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 600, marginTop: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                          <span>{replyDate}</span>
+                          <span>Reply</span>
+                        </div>
+                      </div>
+                      <div style={{ textAlign: 'center', color: TIKTOK_GRAY_TEXT, flexShrink: 0, marginLeft: '8px' }}>
+                        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                        <p style={{ fontSize: '11px', margin: '4px 0 0 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>{replyLikes}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
-
             </div>
           </div>
         </div>
       )}
+
+      <footer style={{ 
+        marginTop: '80px', 
+        paddingTop: '40px', 
+        paddingBottom: '20px', 
+        textAlign: 'center', 
+        width: '100%', 
+        maxWidth: '1152px', 
+        borderTop: '1px solid #e2e8f0' 
+      }}>
+        <p style={{ color: '#64748b', fontSize: '14px' }}>
+          &copy; {new Date().getFullYear()} <span style={{ fontWeight: 'bold', color: '#0f172a' }}>Aditya Satria Pratama</span>. All rights reserved.
+        </p>
+        <p style={{ color: '#94a3b8', fontSize: '12px', marginTop: '8px', fontStyle: 'italic' }}>
+          Ditunggu aja update nya.
+        </p>
+      </footer>
+
     </main>
   );
 }
