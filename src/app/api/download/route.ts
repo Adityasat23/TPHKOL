@@ -1,32 +1,29 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'edge'; // Performa maksimal di Vercel Edge Network
-
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const { url } = await req.json();
+    const { url } = await request.json();
 
-    if (!url?.includes('tiktok.com')) {
-      return NextResponse.json({ error: 'URL TikTok tidak valid' }, { status: 400 });
+    if (!url) {
+      return NextResponse.json({ error: 'URL tidak boleh kosong' }, { status: 400 });
     }
 
-    const response = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
-    const payload = await response.json();
+    // Ganti URL, Host, dan Key ini sesuai dengan API yang kamu pilih di RapidAPI
+    const options = {
+      method: 'GET',
+      headers: {
+        'X-RapidAPI-Key': process.env.RAPIDAPI_KEY as string,
+        'X-RapidAPI-Host': 'tiktok-video-no-watermark2.p.rapidapi.com'
+      }
+    };
 
-    if (payload.code !== 0) {
-      return NextResponse.json({ error: 'Video tidak ditemukan' }, { status: 404 });
-    }
+    // Mengirim request ke API pihak ketiga
+    const fetchUrl = `https://tiktok-video-no-watermark2.p.rapidapi.com/?url=${encodeURIComponent(url)}`;
+    const response = await fetch(fetchUrl, options);
+    const data = await response.json();
 
-    const { data } = payload;
-    return NextResponse.json({
-      title: data.title,
-      cover: data.cover,
-      video: data.hdplay || data.play,
-      music: data.music,
-      author: data.author.nickname,
-      stats: { views: data.play_count, likes: data.digg_count }
-    });
+    return NextResponse.json(data);
   } catch (error) {
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: 'Gagal memproses video' }, { status: 500 });
   }
 }
