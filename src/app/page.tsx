@@ -25,7 +25,6 @@ export default function Home() {
 
       if (!res.ok) throw new Error(data.error || 'Terjadi kesalahan');
       
-      // Struktur data dari API mungkin berbeda, sesuaikan dengan response RapidAPI yang kamu pakai
       setResult(data); 
     } catch (err: any) {
       setError(err.message);
@@ -62,24 +61,29 @@ export default function Home() {
 
         {result && result.play && (
           <div className="mt-8 flex flex-col items-center gap-4">
-            <h3 className="font-semibold text-lg">Hasil Unduhan:</h3>
+            <h3 className="font-semibold text-lg text-black">Hasil Unduhan:</h3>
+            {/* Thumbnail Video (Opsional, agar lebih keren) */}
+            <img src={result.cover} alt="Thumbnail" className="w-48 rounded-md shadow-sm mb-2" />
+            <p className="text-gray-700 text-center text-sm">{result.title}</p>
             
-            <a
-              href={result.play}
-              target="_blank"
-              rel="noreferrer"
-              className="w-full text-center bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-md"
-            >
-              Download Tanpa Watermark
-            </a>
-            <a
-              href={result.music}
-              target="_blank"
-              rel="noreferrer"
-              className="w-full text-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-4 rounded-md"
-            >
-              Download MP3
-            </a>
+            <div className="flex flex-col sm:flex-row gap-3 w-full mt-4">
+              <a
+                href={result.hdplay || result.play}
+                target="_blank"
+                rel="noreferrer"
+                className="flex-1 text-center bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-md"
+              >
+                Download Video (HD)
+              </a>
+              <a
+                href={result.music}
+                target="_blank"
+                rel="noreferrer"
+                className="flex-1 text-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-4 rounded-md"
+              >
+                Download MP3
+              </a>
+            </div>
           </div>
         )}
       </div>
