@@ -8,48 +8,42 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'URL tidak boleh kosong' }, { status: 400 });
     }
 
-    // --- LOGIKA KHUSUS UNTUK LINK LAGU (MUSIC) ---
+    // --- ENGINE KHUSUS UNTUK LINK LAGU (MUSIC) ---
+    // Kita piggyback ke API Cobalt yang tangguh menembus keamanan platform
     if (url.includes('/music/')) {
       try {
-        // Trik Bypass: Menyamar sebagai robot pencari Google (Googlebot)
-        const pageRes = await fetch(url, {
+        const cobaltRes = await fetch('https://co.wuk.sh/api/json', {
+          method: 'POST',
           headers: {
-            'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
           },
-          cache: 'no-store'
+          body: JSON.stringify({
+            url: url,
+            isAudioOnly: true // Meminta server mereka untuk hanya mengambil file MP3
+          })
         });
-        
-        const html = await pageRes.text();
 
-        // Mencari link audio mentah di dalam tumpukan kode HTML TikTok
-        const audioMatch = html.match(/"playUrl":"([^"]+)"/);
-        const titleMatch = html.match(/"title":"([^"]+)"/);
+        const cobaltData = await cobaltRes.json();
 
-        if (audioMatch && audioMatch[1]) {
-          // Membersihkan URL dari karakter escape JSON
-          const cleanAudioUrl = audioMatch[1].replace(/\\u002F/g, '/').replace(/\\u0026/g, '&');
-          const cleanTitle = titleMatch ? titleMatch[1].replace(/\\u002F/g, '/') : 'TikTok Audio';
-
+        // Jika Cobalt berhasil menembus dan mendapatkan URL audionya
+        if (cobaltData && cobaltData.url) {
           return NextResponse.json({
-            title: cleanTitle,
-            cover: '', // Dikosongkan karena tidak ada thumbnail spesifik
+            title: 'TikTok MP3 Audio',
+            cover: '', // Dikosongkan karena tidak perlu cover untuk audio mentah
             play: '',
-            music: cleanAudioUrl,
+            music: cobaltData.url,
           });
         } else {
-          return NextResponse.json({ 
-            error: 'Audio tidak ditemukan. Link mungkin diprivate atau diblokir region.' 
-          }, { status: 400 });
+          return NextResponse.json({ error: 'Server pusat gagal mengekstrak MP3 dari link ini.' }, { status: 400 });
         }
       } catch (err: any) {
-        // Menangkap error spesifik jika gagal memproses link musik
-        return NextResponse.json({ error: `Gagal ekstrak lagu: ${err.message}` }, { status: 500 });
+        return NextResponse.json({ error: `Gagal menembus server: ${err.message}` }, { status: 500 });
       }
     }
     // ---------------------------------------------
 
-    // --- LOGIKA UNTUK LINK VIDEO BIASA ---
+    // --- ENGINE UNTUK LINK VIDEO BIASA (Lovetik) ---
     const formData = new URLSearchParams();
     formData.append('query', url);
 
@@ -93,7 +87,6 @@ export async function POST(request: Request) {
     });
 
   } catch (error: any) {
-    // Sekarang error akan memunculkan pesan asli dari sistem, bukan sekadar "Terjadi kesalahan sistem"
     return NextResponse.json({ error: `Sistem Error: ${error.message}` }, { status: 500 });
   }
 }
