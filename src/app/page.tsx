@@ -80,7 +80,6 @@ export default function Home() {
           useCORS: true, 
           allowTaint: false, 
           logging: false,
-          // ✅ FIX 3: Tambah windowWidth & windowHeight agar tidak terpotong oleh viewport
           windowWidth: element.scrollWidth,
           windowHeight: element.scrollHeight
         });
@@ -189,16 +188,16 @@ export default function Home() {
           </div>
 
           <div className="bg-[#0f172a] rounded-3xl p-10 flex items-center justify-center min-h-[500px] overflow-hidden">
-            
-            {/* ✅ FIX 2: Tambah padding-bottom 50px saat di mode sticker agar ekor aman */}
+            {/* WADAH UTAMA YANG DIFOTO DENGAN PADDING EXTRA DI BAWAH */}
             <div ref={previewRef} style={{ 
               backgroundColor: 'transparent',
-              padding: commentMode === 'sticker' ? '30px 30px 50px 30px' : '30px', 
+              padding: commentMode === 'sticker' ? '30px 30px 60px 30px' : '30px', // Extra padding bawah untuk sticker
               display: 'inline-flex',
               flexDirection: 'column',
               fontFamily: 'Arial, Helvetica, sans-serif'
             }}>
               
+              {/* STICKER MODE UPDATE */}
               {commentMode === 'sticker' && (
                 <div style={{ position: 'relative', display: 'inline-flex' }}>
                   <div style={{ 
@@ -207,13 +206,13 @@ export default function Home() {
                     padding: '16px 20px', 
                     display: 'flex',
                     width: 'fit-content',
-                    maxWidth: '400px',
+                    maxWidth: '400px', // Mengatur max-width agar tidak melebar tak terhingga
                     gap: '12px', 
                     alignItems: 'flex-start', 
                     boxShadow: '0 10px 30px rgba(0,0,0,0.10)' 
                   }}>
                     <img key={avatar} src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%', overflow: 'hidden' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
                       <p style={{ color: '#8a8b91', fontSize: '14px', fontWeight: 'bold', margin: '0 0 2px 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
                       <p style={{ 
                         color: '#000000', 
@@ -222,7 +221,7 @@ export default function Home() {
                         margin: '0', 
                         lineHeight: 1.3, 
                         whiteSpace: 'pre-wrap', 
-                        wordBreak: 'break-word', 
+                        wordWrap: 'break-word', // Mengganti wordBreak dengan wordWrap untuk kompabilitas yang lebih baik
                         fontFamily: 'Arial, Helvetica, sans-serif' 
                       }}>
                         {commentText}
@@ -230,23 +229,23 @@ export default function Home() {
                     </div>
                   </div>
                   
-                  {/* ✅ FIX 1: Mengganti Border CSS dengan SVG Polygon Murni */}
+                  {/* SVG Ekor Sticker */}
                   <svg 
                     width="16" 
                     height="16" 
                     viewBox="0 0 16 16" 
                     style={{
                       position: 'absolute',
-                      bottom: '-15px',
+                      bottom: '-15px', // Sesuaikan posisi
                       left: '0px'
                     }}
                   >
                     <polygon points="0,0 16,0 0,16" fill="#ffffff" />
                   </svg>
-
                 </div>
               )}
 
+              {/* THREAD MODE UPDATE */}
               {commentMode === 'thread' && (
                 <div style={{ 
                   backgroundColor: threadTheme === 'dark' ? TIKTOK_DARK_BG : TIKTOK_LIGHT_BG,
@@ -255,18 +254,19 @@ export default function Home() {
                   display: 'flex',
                   flexDirection: 'column', 
                   gap: '20px', 
-                  width: '420px', 
+                  width: '400px', // Lebar tetap yang stabil
                   minHeight: '100px'
                 }}>
+                  {/* Komentar Utama */}
                   <div style={{ display: 'flex', gap: '12px' }}>
                     <img key={avatar} src={avatar} style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-                    <div style={{ flex: 1, overflow: 'hidden' }}>
+                    <div style={{ flex: 1 }}>
                       <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif' }}>{username}</p>
                       <p style={{ 
                         color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, 
                         fontSize: '15px', margin: '3px 0', lineHeight: 1.4, 
                         whiteSpace: 'pre-wrap', 
-                        wordBreak: 'break-word',
+                        wordWrap: 'break-word',
                         fontFamily: 'Arial, Helvetica, sans-serif' 
                       }}>
                         {commentText}
@@ -282,16 +282,17 @@ export default function Home() {
                     </div>
                   </div>
 
+                  {/* Komentar Balasan */}
                   {showReply && (
                     <div style={{ display: 'flex', gap: '12px', marginLeft: '50px' }}>
                       <img key={replyAvatar} src={replyAvatar} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-                      <div style={{ flex: 1, overflow: 'hidden' }}>
+                      <div style={{ flex: 1 }}>
                         <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif' }}>{replyUsername}</p>
                         <p style={{ 
                           color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, 
                           fontSize: '15px', margin: '3px 0', lineHeight: 1.4, 
                           whiteSpace: 'pre-wrap', 
-                          wordBreak: 'break-word',
+                          wordWrap: 'break-word',
                           fontFamily: 'Arial, Helvetica, sans-serif' 
                         }}>
                           {replyText}
