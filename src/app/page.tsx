@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 
-// Placeholder Avatar (Base64 Solid Gray) - Mencegah error CORS mutlak saat load awal
+// Placeholder Avatar (Base64 Solid Gray)
 const DEFAULT_AVATAR = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk8A8AAQsAzQ/8/GkAAAAASUVORK5CYII=";
 
 export default function Home() {
@@ -17,7 +17,7 @@ export default function Home() {
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState('');
 
-  // State Komentar
+  // State Komentar Utama
   const [username, setUsername] = useState('jethro');
   const [commentText, setCommentText] = useState('bang beli 1\nASKSADKNSDNASDA');
   const [likes, setLikes] = useState('3352');
@@ -41,11 +41,8 @@ export default function Home() {
   const TIKTOK_WHITE_TEXT = "#ffffff";
   const TIKTOK_BLACK_TEXT = "#161823";
 
-  // Memaksa canvas direfresh sebentar saat pertama load untuk membersihkan cache rendering
   const [isReady, setIsReady] = useState(false);
-  useEffect(() => {
-    setIsReady(true);
-  }, []);
+  useEffect(() => { setIsReady(true); }, []);
 
   const handleDownload = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,27 +72,32 @@ export default function Home() {
     }
   };
 
+  // ✅ FUNGSI EXPORT ANTI-BLANK
   const exportCommentImage = async () => {
     if (previewRef.current && isReady) {
       try {
+        // Jeda 300ms agar browser selesai nge-render font & element sebelum difoto
+        await new Promise(resolve => setTimeout(resolve, 300));
+
         const canvas = await html2canvas(previewRef.current, { 
           backgroundColor: null, 
-          scale: 4, 
+          scale: 2, // 👈 Diturunkan jadi 2 (Tetap HD) agar memori browser tidak nge-crash (Blank Putih)
           useCORS: true, 
-          allowTaint: false, // Diubah menjadi false karena kita sudah murni pakai Base64
+          allowTaint: false, 
           logging: false 
         });
+        
         const link = document.createElement('a');
         link.download = `tiktok-${commentMode}-${username}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
       } catch (err: any) {
-        alert("Gagal export gambar. Pastikan gambar profil sudah ter-upload.");
+        alert("Gagal export gambar. Pastikan gambar profil valid.");
       }
     }
   };
 
-  if (!isReady) return null; // Mencegah hidration mismatch
+  if (!isReady) return null;
 
   return (
     <main className="min-h-screen bg-[#f8fafc] flex flex-col items-center py-10 px-4 font-sans text-[#1e293b]">
@@ -190,12 +192,12 @@ export default function Home() {
           </div>
 
           <div className="bg-[#0f172a] rounded-3xl p-10 flex items-center justify-center min-h-[500px]">
-            {/* ✅ FIX BLANK: Memaksa fontFamily menjadi standar (Arial, Helvetica, sans-serif) secara inline */}
+            {/* ✅ FIX BUG LEBAR: Gunakan 'inline-flex' di sini (wadah utama), bukan di stikernya */}
             <div ref={previewRef} style={{ 
               backgroundColor: commentMode === 'sticker' ? 'transparent' : (threadTheme === 'dark' ? TIKTOK_DARK_BG : TIKTOK_LIGHT_BG),
               padding: '24px',
-              width: '100%',
-              maxWidth: '420px',
+              display: 'inline-flex', // Rahasia agar ukurannya nge-pas konten
+              flexDirection: 'column',
               fontFamily: 'Arial, Helvetica, sans-serif'
             }}>
               
@@ -205,13 +207,11 @@ export default function Home() {
                   borderRadius: '14px', 
                   borderBottomLeftRadius: '4px', 
                   padding: '14px 18px 16px 18px', 
-                  display: 'inline-flex',
-                  width: 'fit-content',
+                  display: 'flex', // Dibalikkan ke flex biasa tanpa fit-content
                   gap: '12px', 
                   alignItems: 'center', 
                   boxShadow: '0 10px 30px rgba(0,0,0,0.15)' 
                 }}>
-                  {/* Gunakan key berdasarkan img agar react memaksanya me-render ulang saat diganti */}
                   <img key={avatar} src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                   <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <p style={{ color: '#8a8b91', fontSize: '13px', fontWeight: 'bold', margin: '0 0 2px 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
