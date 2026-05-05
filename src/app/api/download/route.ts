@@ -8,16 +8,38 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'URL tidak boleh kosong' }, { status: 400 });
     }
 
-    // --- DETEKSI URL MUSIK ---
+    // --- LOGIKA KHUSUS UNTUK LINK LAGU (MUSIC) ---
     if (url.includes('/music/')) {
-      return NextResponse.json(
-        { error: 'Maaf, link khusus lagu (music) belum didukung oleh server. Silakan masukkan link video TikTok biasa.' },
-        { status: 400 }
-      );
-    }
-    // -------------------------
+      // Kita mengambil source code HTML dari halaman lagu tersebut
+      const pageRes = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        }
+      });
+      const html = await pageRes.text();
 
-    // Melanjutkan proses menggunakan API Lovetik untuk link video
+      // Menggunakan Regex untuk mencari URL MP3 rahasia yang tersembunyi di dalam HTML
+      const audioMatch = html.match(/"playUrl":"(https:\/\/[^"]+)"/);
+      const titleMatch = html.match(/"title":"([^"]+)"/);
+
+      if (audioMatch && audioMatch[1]) {
+        // Membersihkan URL dari karakter unicode (mengubah \u002F menjadi garis miring biasa)
+        const cleanAudioUrl = audioMatch[1].replace(/\\u002F/g, '/').replace(/\\u0026/g, '&');
+        const cleanTitle = titleMatch ? titleMatch[1] : 'TikTok Audio';
+
+        return NextResponse.json({
+          title: cleanTitle,
+          cover: '', // Dikosongkan karena fokus ke audio
+          play: '',  // Dikosongkan karena tidak ada video
+          music: cleanAudioUrl,
+        });
+      } else {
+        return NextResponse.json({ error: 'Gagal mengekstrak audio. Lagu mungkin di-private atau dibatasi wilayah.' }, { status: 400 });
+      }
+    }
+    // ---------------------------------------------
+
+    // --- LOGIKA UNTUK LINK VIDEO BIASA ---
     const formData = new URLSearchParams();
     formData.append('query', url);
 
@@ -55,6 +77,7 @@ export async function POST(request: Request) {
       play: playLink,
       music: musicLink,
     });
+
   } catch (error) {
     return NextResponse.json({ error: 'Terjadi kesalahan sistem' }, { status: 500 });
   }
