@@ -8,85 +8,43 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'URL tidak boleh kosong' }, { status: 400 });
     }
 
-    // --- ENGINE KHUSUS UNTUK LINK LAGU (MUSIC) ---
-    // Kita piggyback ke API Cobalt yang tangguh menembus keamanan platform
-    if (url.includes('/music/')) {
-      try {
-        const cobaltRes = await fetch('https://co.wuk.sh/api/json', {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            url: url,
-            isAudioOnly: true // Meminta server mereka untuk hanya mengambil file MP3
-          })
-        });
-
-        const cobaltData = await cobaltRes.json();
-
-        // Jika Cobalt berhasil menembus dan mendapatkan URL audionya
-        if (cobaltData && cobaltData.url) {
-          return NextResponse.json({
-            title: 'TikTok MP3 Audio',
-            cover: '', // Dikosongkan karena tidak perlu cover untuk audio mentah
-            play: '',
-            music: cobaltData.url,
-          });
-        } else {
-          return NextResponse.json({ error: 'Server pusat gagal mengekstrak MP3 dari link ini.' }, { status: 400 });
-        }
-      } catch (err: any) {
-        return NextResponse.json({ error: `Gagal menembus server: ${err.message}` }, { status: 500 });
-      }
-    }
-    // ---------------------------------------------
-
-    // --- ENGINE UNTUK LINK VIDEO BIASA (Lovetik) ---
-    const formData = new URLSearchParams();
-    formData.append('query', url);
-
-    const response = await fetch('https://lovetik.com/api/ajax/search', {
-      method: 'POST',
+    // --- ENGINE TIKWM (Paling Ampuh & Stabil) ---
+    // API ini sudah punya proxy internal, jadi Vercel kamu tidak akan kena blokir.
+    const tikwmUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
+    
+    const response = await fetch(tikwmUrl, {
+      method: 'GET',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-      },
-      body: formData.toString()
+        'Accept': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      }
     });
-
-    if (!response.ok) {
-       return NextResponse.json({ error: 'API Video sedang bermasalah, coba lagi nanti.' }, { status: 400 });
-    }
 
     const data = await response.json();
 
-    if (data.status !== 'ok') {
-      return NextResponse.json({ error: 'Gagal mengambil data video. Pastikan link valid.' }, { status: 400 });
+    // Cek apakah data berhasil diambil (TikWM mengembalikan code 0 jika sukses)
+    if (data.code === 0 && data.data) {
+      const resData = data.data;
+
+      // Logika cerdas: Deteksi apakah ini Video atau murni Musik
+      return NextResponse.json({
+        title: resData.title || 'TikTok Media',
+        cover: resData.cover || resData.music_info?.cover || '',
+        // Jika ada video, ambil link videonya (play). Jika tidak ada, kosongkan.
+        play: resData.play || '', 
+        // Link musik selalu diambil baik dari video maupun dari link musik murni
+        music: resData.music || resData.music_info?.play || '',
+      });
+    } else {
+      return NextResponse.json({ 
+        error: 'Link tidak didukung atau sedang error. Pastikan link TikTok valid.' 
+      }, { status: 400 });
     }
-
-    let playLink = data.play_url || '';
-    let musicLink = '';
-
-    if (data.links && Array.isArray(data.links)) {
-      const audio = data.links.find((l: any) => l.s?.includes('Audio') || l.s?.includes('MP3') || l.t?.includes('MP3'));
-      if (audio) musicLink = audio.a;
-
-      if (!playLink) {
-        const video = data.links.find((l: any) => l.s?.includes('Watermark') || (!l.s?.includes('Audio') && !l.s?.includes('MP3')));
-        if (video) playLink = video.a;
-      }
-    }
-
-    return NextResponse.json({
-      title: data.desc || data.author_name || 'TikTok Media',
-      cover: data.cover || '',
-      play: playLink,
-      music: musicLink,
-    });
 
   } catch (error: any) {
-    return NextResponse.json({ error: `Sistem Error: ${error.message}` }, { status: 500 });
+    console.error("Fetch Error:", error.message);
+    return NextResponse.json({ 
+      error: 'Koneksi ke server pusat terputus. Coba lagi dalam beberapa saat.' 
+    }, { status: 500 });
   }
 }
