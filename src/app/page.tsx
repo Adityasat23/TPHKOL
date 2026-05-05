@@ -16,7 +16,7 @@ export default function Home() {
 
   // States untuk Komentar Utama
   const [username, setUsername] = useState('jethro');
-  const [commentText, setCommentText] = useState('bang beli 1');
+  const [commentText, setCommentText] = useState('bang beli 1\nASKSADKNSDNASDA'); // Default dengan enter
   const [likes, setLikes] = useState('3352');
   const [date, setDate] = useState('2025-11-17');
   const [avatar, setAvatar] = useState('https://ui-avatars.com/api/?name=B&background=random');
@@ -93,7 +93,10 @@ export default function Home() {
       
       {/* HEADER UTAMA */}
       <div className="max-w-3xl w-full text-center mb-8">
-        <h1 className="text-5xl font-black text-[#0f172a] mb-2 tracking-tight">TPH<span className="text-[#2563eb]">Editor Tools</span></h1>
+        {/* ✅ FIX NAMA LOGO: Spasi dan warna Hitam-Silver */}
+        <h1 className="text-5xl font-black text-[#0f172a] mb-2 tracking-tight">
+          TPH <span className="text-[#94a3b8]">Editor Tools</span>
+        </h1>
         <p className="text-[#64748b] text-lg">Semoga membantu guys</p>
       </div>
 
@@ -104,7 +107,7 @@ export default function Home() {
       </div>
 
       {/* ========================================= */}
-      {/* TAB 1: FITUR DOWNLOADER (SUDAH KEMBALI!) */}
+      {/* TAB 1: FITUR DOWNLOADER                   */}
       {/* ========================================= */}
       {activeTab === 'downloader' && (
         <div className="w-full max-w-2xl bg-white shadow-xl shadow-blue-100/50 rounded-3xl p-8 border border-slate-100 animate-in fade-in zoom-in duration-300">
@@ -163,7 +166,7 @@ export default function Home() {
                   <input type="text" value={date} onChange={(e) => setDate(e.target.value)} placeholder="Date" className="p-3 bg-slate-50 border rounded-xl" />
                 </div>
               )}
-              <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl min-h-[60px]" />
+              <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl min-h-[80px]" />
             </div>
 
             {commentMode === 'thread' && (
@@ -179,7 +182,7 @@ export default function Home() {
                       <input type="text" value={replyUsername} onChange={(e) => setReplyUsername(e.target.value)} placeholder="Reply Username" className="w-full p-3 bg-slate-50 border rounded-xl" />
                       <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="Likes" className="w-full p-3 bg-slate-50 border rounded-xl" />
                     </div>
-                    <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl min-h-[60px]" />
+                    <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl min-h-[80px]" />
                   </>
                 )}
               </div>
@@ -205,8 +208,8 @@ export default function Home() {
                   borderRadius: '14px', 
                   borderBottomLeftRadius: '4px', 
                   padding: '14px 18px 16px 18px', 
-                  display: 'inline-flex',    /* 👈 Ubah dari 'flex' jadi 'inline-flex' */
-                  width: 'fit-content',      /* 👈 Tambahkan ini agar lebar menyesuaikan teks */
+                  display: 'inline-flex',
+                  width: 'fit-content',
                   gap: '12px', 
                   alignItems: 'center', 
                   boxShadow: '0 10px 30px rgba(0,0,0,0.15)' 
@@ -214,10 +217,12 @@ export default function Home() {
                   <img src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                   <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <p style={{ color: '#8a8b91', fontSize: '13px', fontWeight: 'bold', margin: '0 0 2px 0' }}>Reply to {replyTo}'s comment</p>
-                    <p style={{ color: '#000000', fontSize: '16px', fontWeight: 'bold', margin: '0', lineHeight: 1.3 }}>{commentText}</p>
+                    {/* ✅ FIX ENTER: Tambahkan whiteSpace: 'pre-wrap' agar tombol enter dari keyboard terbaca */}
+                    <p style={{ color: '#000000', fontSize: '16px', fontWeight: 'bold', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap' }}>{commentText}</p>
                   </div>
                 </div>
               )}
+
               {/* THREAD MODE */}
               {commentMode === 'thread' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -226,7 +231,8 @@ export default function Home() {
                     <img src={avatar} style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                     <div style={{ flex: 1 }}>
                       <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0 }}>{username}</p>
-                      <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '3px 0', lineHeight: 1.4 }}>{commentText}</p>
+                      {/* ✅ FIX ENTER */}
+                      <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '3px 0', lineHeight: 1.4, whiteSpace: 'pre-wrap' }}>{commentText}</p>
                       <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 600, marginTop: '6px' }}>
                         <span>{date}</span>
                         <span>Reply</span>
@@ -244,7 +250,8 @@ export default function Home() {
                       <img src={replyAvatar} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                       <div style={{ flex: 1 }}>
                         <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0 }}>{replyUsername}</p>
-                        <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '3px 0', lineHeight: 1.4 }}>{replyText}</p>
+                        {/* ✅ FIX ENTER */}
+                        <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '3px 0', lineHeight: 1.4, whiteSpace: 'pre-wrap' }}>{replyText}</p>
                         <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 600, marginTop: '6px' }}>
                           <span>{replyDate}</span>
                           <span>Reply</span>
@@ -262,7 +269,8 @@ export default function Home() {
           </div>
         </div>
       )}
-    {/* FOOTER / COPYRIGHT */}
+
+      {/* FOOTER / COPYRIGHT */}
       <footer style={{ 
         marginTop: '80px', 
         paddingTop: '40px', 
@@ -279,6 +287,7 @@ export default function Home() {
           Ditunggu aja update nya.
         </p>
       </footer>
+
     </main>
   );
 }
