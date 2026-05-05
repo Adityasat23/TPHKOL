@@ -1,45 +1,52 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import html2canvas from 'html2canvas';
+
+// Placeholder Avatar (Base64 Solid Gray) - Mencegah error CORS mutlak saat load awal
+const DEFAULT_AVATAR = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk8A8AAQsAzQ/8/GkAAAAASUVORK5CYII=";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'downloader' | 'comment'>('comment');
   const [commentMode, setCommentMode] = useState<'sticker' | 'thread'>('sticker');
   const [threadTheme, setThreadTheme] = useState<'dark' | 'light'>('dark');
   
-  // States untuk Downloader
+  // State Downloader
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState('');
 
-  // States untuk Komentar Utama
+  // State Komentar
   const [username, setUsername] = useState('jethro');
-  const [commentText, setCommentText] = useState('bang beli 1\nASKSADKNSDNASDA'); // Default dengan enter
+  const [commentText, setCommentText] = useState('bang beli 1\nASKSADKNSDNASDA');
   const [likes, setLikes] = useState('3352');
   const [date, setDate] = useState('2025-11-17');
-  const [avatar, setAvatar] = useState('https://ui-avatars.com/api/?name=B&background=random');
+  const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
   const [replyTo, setReplyTo] = useState('creator');
 
-  // States untuk Balasan (Reply)
+  // State Balasan
   const [showReply, setShowReply] = useState(true);
   const [replyUsername, setReplyUsername] = useState('Timephoria');
   const [replyText, setReplyText] = useState('GASSS!');
   const [replyLikes, setReplyLikes] = useState('2116');
   const [replyDate, setReplyDate] = useState('2025-11-17');
-  const [replyAvatar, setReplyAvatar] = useState('https://ui-avatars.com/api/?name=C&background=random');
+  const [replyAvatar, setReplyAvatar] = useState(DEFAULT_AVATAR);
 
   const previewRef = useRef<HTMLDivElement>(null);
 
-  // HEX CODES (Anti-Error untuk html2canvas)
   const TIKTOK_DARK_BG = "#121212";
   const TIKTOK_LIGHT_BG = "#ffffff";
   const TIKTOK_GRAY_TEXT = "#8a8b91";
   const TIKTOK_WHITE_TEXT = "#ffffff";
   const TIKTOK_BLACK_TEXT = "#161823";
 
-  // Fungsi Fitur Downloader
+  // Memaksa canvas direfresh sebentar saat pertama load untuk membersihkan cache rendering
+  const [isReady, setIsReady] = useState(false);
+  useEffect(() => {
+    setIsReady(true);
+  }, []);
+
   const handleDownload = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true); setError(''); setResult(null);
@@ -69,13 +76,13 @@ export default function Home() {
   };
 
   const exportCommentImage = async () => {
-    if (previewRef.current) {
+    if (previewRef.current && isReady) {
       try {
         const canvas = await html2canvas(previewRef.current, { 
           backgroundColor: null, 
           scale: 4, 
           useCORS: true, 
-          allowTaint: true,
+          allowTaint: false, // Diubah menjadi false karena kita sudah murni pakai Base64
           logging: false 
         });
         const link = document.createElement('a');
@@ -83,32 +90,28 @@ export default function Home() {
         link.href = canvas.toDataURL('image/png');
         link.click();
       } catch (err: any) {
-        alert("Gagal export: " + err.message);
+        alert("Gagal export gambar. Pastikan gambar profil sudah ter-upload.");
       }
     }
   };
 
+  if (!isReady) return null; // Mencegah hidration mismatch
+
   return (
     <main className="min-h-screen bg-[#f8fafc] flex flex-col items-center py-10 px-4 font-sans text-[#1e293b]">
       
-      {/* HEADER UTAMA */}
       <div className="max-w-3xl w-full text-center mb-8">
-        {/* ✅ FIX NAMA LOGO: Spasi dan warna Hitam-Silver */}
         <h1 className="text-5xl font-black text-[#0f172a] mb-2 tracking-tight">
           TPH <span className="text-[#94a3b8]">Editor Tools</span>
         </h1>
         <p className="text-[#64748b] text-lg">Semoga membantu guys</p>
       </div>
 
-      {/* NAVIGASI TABS */}
       <div className="flex bg-white rounded-full shadow-sm border border-slate-200 p-1 mb-8">
         <button onClick={() => setActiveTab('downloader')} className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${activeTab === 'downloader' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500'}`}>📥 DOWNLOADER</button>
         <button onClick={() => setActiveTab('comment')} className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${activeTab === 'comment' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500'}`}>💬 FAKE COMMENT</button>
       </div>
 
-      {/* ========================================= */}
-      {/* TAB 1: FITUR DOWNLOADER                   */}
-      {/* ========================================= */}
       {activeTab === 'downloader' && (
         <div className="w-full max-w-2xl bg-white shadow-xl shadow-blue-100/50 rounded-3xl p-8 border border-slate-100 animate-in fade-in zoom-in duration-300">
           <form onSubmit={handleDownload} className="space-y-4">
@@ -133,14 +136,9 @@ export default function Home() {
         </div>
       )}
 
-
-      {/* ========================================= */}
-      {/* TAB 2: FITUR FAKE COMMENT                 */}
-      {/* ========================================= */}
       {activeTab === 'comment' && (
         <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in zoom-in duration-300">
           
-          {/* PANEL KIRI: EDIT KONTROL */}
           <div className="bg-white shadow-xl rounded-3xl p-6 border border-slate-100 space-y-6">
             <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
               <button onClick={() => setCommentMode('sticker')} className={`flex-1 py-2 rounded-md font-bold text-xs ${commentMode === 'sticker' ? 'bg-white shadow text-blue-600' : 'text-slate-500'}`}>STICKER BUBBLE</button>
@@ -191,17 +189,16 @@ export default function Home() {
             <button onClick={exportCommentImage} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-[0.98]">📸 Export PNG HD</button>
           </div>
 
-          {/* PANEL KANAN: LIVE PREVIEW & EXPORT AREA */}
           <div className="bg-[#0f172a] rounded-3xl p-10 flex items-center justify-center min-h-[500px]">
+            {/* ✅ FIX BLANK: Memaksa fontFamily menjadi standar (Arial, Helvetica, sans-serif) secara inline */}
             <div ref={previewRef} style={{ 
               backgroundColor: commentMode === 'sticker' ? 'transparent' : (threadTheme === 'dark' ? TIKTOK_DARK_BG : TIKTOK_LIGHT_BG),
               padding: '24px',
               width: '100%',
               maxWidth: '420px',
-              fontFamily: 'sans-serif'
+              fontFamily: 'Arial, Helvetica, sans-serif'
             }}>
               
-              {/* STICKER MODE */}
               {commentMode === 'sticker' && (
                 <div style={{ 
                   backgroundColor: '#ffffff', 
@@ -214,52 +211,47 @@ export default function Home() {
                   alignItems: 'center', 
                   boxShadow: '0 10px 30px rgba(0,0,0,0.15)' 
                 }}>
-                  <img src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                  {/* Gunakan key berdasarkan img agar react memaksanya me-render ulang saat diganti */}
+                  <img key={avatar} src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                   <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <p style={{ color: '#8a8b91', fontSize: '13px', fontWeight: 'bold', margin: '0 0 2px 0' }}>Reply to {replyTo}'s comment</p>
-                    {/* ✅ FIX ENTER: Tambahkan whiteSpace: 'pre-wrap' agar tombol enter dari keyboard terbaca */}
-                    <p style={{ color: '#000000', fontSize: '16px', fontWeight: 'bold', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap' }}>{commentText}</p>
+                    <p style={{ color: '#8a8b91', fontSize: '13px', fontWeight: 'bold', margin: '0 0 2px 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
+                    <p style={{ color: '#000000', fontSize: '16px', fontWeight: 'bold', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', fontFamily: 'Arial, Helvetica, sans-serif' }}>{commentText}</p>
                   </div>
                 </div>
               )}
 
-              {/* THREAD MODE */}
               {commentMode === 'thread' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                  {/* Komentar Pertama */}
                   <div style={{ display: 'flex', gap: '12px' }}>
-                    <img src={avatar} style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                    <img key={avatar} src={avatar} style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                     <div style={{ flex: 1 }}>
-                      <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0 }}>{username}</p>
-                      {/* ✅ FIX ENTER */}
-                      <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '3px 0', lineHeight: 1.4, whiteSpace: 'pre-wrap' }}>{commentText}</p>
-                      <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 600, marginTop: '6px' }}>
+                      <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif' }}>{username}</p>
+                      <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '3px 0', lineHeight: 1.4, whiteSpace: 'pre-wrap', fontFamily: 'Arial, Helvetica, sans-serif' }}>{commentText}</p>
+                      <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 600, marginTop: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                         <span>{date}</span>
                         <span>Reply</span>
                       </div>
                     </div>
                     <div style={{ textAlign: 'center', color: TIKTOK_GRAY_TEXT }}>
                       <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                      <p style={{ fontSize: '12px', margin: '4px 0 0 0' }}>{likes}</p>
+                      <p style={{ fontSize: '12px', margin: '4px 0 0 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>{likes}</p>
                     </div>
                   </div>
 
-                  {/* Komentar Balasan */}
                   {showReply && (
                     <div style={{ display: 'flex', gap: '12px', marginLeft: '50px' }}>
-                      <img src={replyAvatar} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                      <img key={replyAvatar} src={replyAvatar} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                       <div style={{ flex: 1 }}>
-                        <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0 }}>{replyUsername}</p>
-                        {/* ✅ FIX ENTER */}
-                        <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '3px 0', lineHeight: 1.4, whiteSpace: 'pre-wrap' }}>{replyText}</p>
-                        <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 600, marginTop: '6px' }}>
+                        <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif' }}>{replyUsername}</p>
+                        <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '3px 0', lineHeight: 1.4, whiteSpace: 'pre-wrap', fontFamily: 'Arial, Helvetica, sans-serif' }}>{replyText}</p>
+                        <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 600, marginTop: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                           <span>{replyDate}</span>
                           <span>Reply</span>
                         </div>
                       </div>
                       <div style={{ textAlign: 'center', color: TIKTOK_GRAY_TEXT }}>
                         <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                        <p style={{ fontSize: '11px', margin: '4px 0 0 0' }}>{replyLikes}</p>
+                        <p style={{ fontSize: '11px', margin: '4px 0 0 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>{replyLikes}</p>
                       </div>
                     </div>
                   )}
@@ -270,7 +262,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* FOOTER / COPYRIGHT */}
       <footer style={{ 
         marginTop: '80px', 
         paddingTop: '40px', 
