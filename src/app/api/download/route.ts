@@ -10,36 +10,41 @@ export async function POST(request: Request) {
 
     // --- LOGIKA KHUSUS UNTUK LINK LAGU (MUSIC) ---
     if (url.includes('/music/')) {
-      // 1. Ekstrak ID unik dari URL (kumpulan angka di akhir link)
-      const idMatch = url.match(/-(\d+)(?:\?|$)/);
-      if (!idMatch) {
-        return NextResponse.json({ error: 'Format link musik tidak valid.' }, { status: 400 });
-      }
-      const musicId = idMatch[1];
-
-      // 2. Gunakan API internal milik aplikasi Mobile TikTok
-      // Jalur ini bisa menembus blokir yang biasanya dialami server Vercel
-      const apiUrl = `https://api16-normal-c-useast1a.tiktokv.com/aweme/v1/music/detail/?music_id=${musicId}`;
-      
-      const apiRes = await fetch(apiUrl, {
-        headers: {
-          // Menyamar sebagai aplikasi TikTok di iPhone
-          'User-Agent': 'TikTok 26.2.0 rv:262018 (iPhone; iOS 14.4.2; en_US) Cronet'
-        }
-      });
-      
-      const data = await apiRes.json();
-
-      // 3. Ambil data audio dari respons API
-      if (data && data.music_info && data.music_info.play_url && data.music_info.play_url.url_list) {
-        return NextResponse.json({
-          title: data.music_info.title || 'TikTok Audio',
-          cover: data.music_info.cover_large?.url_list?.[0] || '',
-          play: '', 
-          music: data.music_info.play_url.url_list[0],
+      try {
+        // Trik Bypass: Menyamar sebagai robot pencari Google (Googlebot)
+        const pageRes = await fetch(url, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+          },
+          cache: 'no-store'
         });
-      } else {
-        return NextResponse.json({ error: 'Gagal mengekstrak audio. Data tidak ditemukan di server.' }, { status: 400 });
+        
+        const html = await pageRes.text();
+
+        // Mencari link audio mentah di dalam tumpukan kode HTML TikTok
+        const audioMatch = html.match(/"playUrl":"([^"]+)"/);
+        const titleMatch = html.match(/"title":"([^"]+)"/);
+
+        if (audioMatch && audioMatch[1]) {
+          // Membersihkan URL dari karakter escape JSON
+          const cleanAudioUrl = audioMatch[1].replace(/\\u002F/g, '/').replace(/\\u0026/g, '&');
+          const cleanTitle = titleMatch ? titleMatch[1].replace(/\\u002F/g, '/') : 'TikTok Audio';
+
+          return NextResponse.json({
+            title: cleanTitle,
+            cover: '', // Dikosongkan karena tidak ada thumbnail spesifik
+            play: '',
+            music: cleanAudioUrl,
+          });
+        } else {
+          return NextResponse.json({ 
+            error: 'Audio tidak ditemukan. Link mungkin diprivate atau diblokir region.' 
+          }, { status: 400 });
+        }
+      } catch (err: any) {
+        // Menangkap error spesifik jika gagal memproses link musik
+        return NextResponse.json({ error: `Gagal ekstrak lagu: ${err.message}` }, { status: 500 });
       }
     }
     // ---------------------------------------------
@@ -57,10 +62,14 @@ export async function POST(request: Request) {
       body: formData.toString()
     });
 
+    if (!response.ok) {
+       return NextResponse.json({ error: 'API Video sedang bermasalah, coba lagi nanti.' }, { status: 400 });
+    }
+
     const data = await response.json();
 
     if (data.status !== 'ok') {
-      return NextResponse.json({ error: 'Gagal mengambil data. Pastikan link valid dan bukan private.' }, { status: 400 });
+      return NextResponse.json({ error: 'Gagal mengambil data video. Pastikan link valid.' }, { status: 400 });
     }
 
     let playLink = data.play_url || '';
@@ -83,7 +92,8 @@ export async function POST(request: Request) {
       music: musicLink,
     });
 
-  } catch (error) {
-    return NextResponse.json({ error: 'Terjadi kesalahan sistem' }, { status: 500 });
+  } catch (error: any) {
+    // Sekarang error akan memunculkan pesan asli dari sistem, bukan sekadar "Terjadi kesalahan sistem"
+    return NextResponse.json({ error: `Sistem Error: ${error.message}` }, { status: 500 });
   }
 }
