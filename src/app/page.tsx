@@ -16,16 +16,16 @@ export default function Home() {
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState('');
 
-  const [username, setUsername] = useState('sienna');
-  const [commentText, setCommentText] = useState("Although I'm not a medical student, I still want to remind you to pay attention to the muscles in your left shoulder, especially the trapezius area to avoid strain.");
+  const [username, setUsername] = useState('jetroyefta');
+  const [commentText, setCommentText] = useState("Ini Bigsale nya kapan");
   const [likes, setLikes] = useState('52');
   const [date, setDate] = useState('2025-11-16');
   const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
   const [replyTo, setReplyTo] = useState('creator');
 
   const [showReply, setShowReply] = useState(true);
-  const [replyUsername, setReplyUsername] = useState('maria');
-  const [replyText, setReplyText] = useState('this is a good one perioddd');
+  const [replyUsername, setReplyUsername] = useState('Timephoria');
+  const [replyText, setReplyText] = useState('BESOK!');
   const [replyLikes, setReplyLikes] = useState('5');
   const [replyDate, setReplyDate] = useState('2025-11-17');
   const [replyAvatar, setReplyAvatar] = useState(DEFAULT_AVATAR);
@@ -102,7 +102,7 @@ export default function Home() {
         <h1 className="text-5xl font-black text-[#0f172a] mb-2 tracking-tight">
           TPH <span className="text-[#94a3b8]">Editor Tools</span>
         </h1>
-        <p className="text-[#64748b] text-lg">Semoga membantu guys</p>
+        <p className="text-[#64748b] text-lg">Buat dowloan TikTok</p>
       </div>
 
       <div className="flex bg-white rounded-full shadow-sm border border-slate-200 p-1 mb-8">
@@ -206,7 +206,7 @@ export default function Home() {
                     padding: '16px 20px', 
                     display: 'flex',
                     width: 'fit-content',
-                    maxWidth: '400px', // Mengatur max-width agar tidak melebar tak terhingga
+                    maxWidth: '600px', // Mengatur max-width agar tidak melebar tak terhingga
                     gap: '12px', 
                     alignItems: 'flex-start', 
                     boxShadow: '0 10px 30px rgba(0,0,0,0.10)' 
@@ -254,7 +254,7 @@ export default function Home() {
                   display: 'flex',
                   flexDirection: 'column', 
                   gap: '20px', 
-                  width: '400px', // Lebar tetap yang stabil
+                  width: '900px', // Lebar tetap yang stabil
                   minHeight: '100px'
                 }}>
                   {/* Komentar Utama */}
@@ -328,7 +328,7 @@ export default function Home() {
           &copy; {new Date().getFullYear()} <span style={{ fontWeight: 'bold', color: '#0f172a' }}>Aditya Satria Pratama</span>. All rights reserved.
         </p>
         <p style={{ color: '#94a3b8', fontSize: '12px', marginTop: '8px', fontStyle: 'italic' }}>
-          Ditunggu aja update nya.
+          Next update bisa YT & Pinterest.
         </p>
       </footer>
 
