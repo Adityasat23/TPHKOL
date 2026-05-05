@@ -260,7 +260,7 @@ export default function Home() {
                   display: 'flex',
                   flexDirection: 'column', 
                   gap: '20px', 
-                  width: '600px', // Lebar tetap yang stabil
+                  width: '500px', // Lebar tetap yang stabil
                   minHeight: '100px'
                 }}>
                   {/* Komentar Utama */}
