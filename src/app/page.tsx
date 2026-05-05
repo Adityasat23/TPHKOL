@@ -11,13 +11,11 @@ export default function Home() {
   const [commentMode, setCommentMode] = useState<'sticker' | 'thread'>('sticker');
   const [threadTheme, setThreadTheme] = useState<'dark' | 'light'>('dark');
   
-  // State Downloader
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState('');
 
-  // ✅ FIX: Default Text diubah menjadi Lorem Ipsum
   const [username, setUsername] = useState('jethro');
   const [commentText, setCommentText] = useState('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.');
   const [likes, setLikes] = useState('3352');
@@ -25,7 +23,6 @@ export default function Home() {
   const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
   const [replyTo, setReplyTo] = useState('creator');
 
-  // State Balasan
   const [showReply, setShowReply] = useState(true);
   const [replyUsername, setReplyUsername] = useState('Timephoria');
   const [replyText, setReplyText] = useState('GASSS!');
@@ -196,27 +193,40 @@ export default function Home() {
               fontFamily: 'Arial, Helvetica, sans-serif'
             }}>
               
-              {/* ✅ STICKER MODE UPDATE: Ditambahkan "Ekor" (Tail) Segitiga */}
+              {/* STICKER MODE UPDATE: Mengatur batas lebar dan kata yang di-break */}
               {commentMode === 'sticker' && (
                 <div style={{ position: 'relative', display: 'inline-flex' }}>
                   <div style={{ 
                     backgroundColor: '#ffffff', 
-                    borderRadius: '16px 16px 16px 0px', // 👈 Sudut Kiri Bawah Lancip (0px)
+                    borderRadius: '16px 16px 16px 0px', 
                     padding: '16px 20px', 
                     display: 'inline-flex',
                     width: 'fit-content',
+                    maxWidth: '350px', // ✅ MEMBATASI LEBAR KOTAK MAKSIMAL 350PX
                     gap: '12px', 
-                    alignItems: 'center', 
+                    alignItems: 'flex-start', // ✅ Mengubah posisi profil ke atas agar rapi saat baris teks banyak
                     boxShadow: '0 10px 30px rgba(0,0,0,0.10)' 
                   }}>
                     <img key={avatar} src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%', overflow: 'hidden' }}>
                       <p style={{ color: '#8a8b91', fontSize: '14px', fontWeight: 'bold', margin: '0 0 2px 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
-                      <p style={{ color: '#000000', fontSize: '18px', fontWeight: 'bold', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', fontFamily: 'Arial, Helvetica, sans-serif' }}>{commentText}</p>
+                      
+                      {/* ✅ FIX TEKS PANJANG: Penambahan wordBreak: 'break-word' */}
+                      <p style={{ 
+                        color: '#000000', 
+                        fontSize: '18px', 
+                        fontWeight: 'bold', 
+                        margin: '0', 
+                        lineHeight: 1.3, 
+                        whiteSpace: 'pre-wrap', 
+                        wordBreak: 'break-word', // 👈 INI KUNCI UTAMANYA!
+                        fontFamily: 'Arial, Helvetica, sans-serif' 
+                      }}>
+                        {commentText}
+                      </p>
                     </div>
                   </div>
                   
-                  {/* 👈 INI ADALAH KODE UNTUK "EKOR" GELEMBUNGNYA */}
                   <div style={{
                     position: 'absolute',
                     bottom: '-12px',
@@ -229,14 +239,24 @@ export default function Home() {
                 </div>
               )}
 
-              {/* THREAD MODE (Tetap Normal) */}
+              {/* THREAD MODE */}
               {commentMode === 'thread' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '380px' }}>
                   <div style={{ display: 'flex', gap: '12px' }}>
                     <img key={avatar} src={avatar} style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-                    <div style={{ flex: 1 }}>
+                    <div style={{ flex: 1, overflow: 'hidden' }}>
                       <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif' }}>{username}</p>
-                      <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '3px 0', lineHeight: 1.4, whiteSpace: 'pre-wrap', fontFamily: 'Arial, Helvetica, sans-serif' }}>{commentText}</p>
+                      
+                      {/* ✅ FIX TEKS PANJANG (Main Thread) */}
+                      <p style={{ 
+                        color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, 
+                        fontSize: '15px', margin: '3px 0', lineHeight: 1.4, 
+                        whiteSpace: 'pre-wrap', 
+                        wordBreak: 'break-word', // 👈 INI KUNCI UTAMANYA!
+                        fontFamily: 'Arial, Helvetica, sans-serif' 
+                      }}>
+                        {commentText}
+                      </p>
                       <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 600, marginTop: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                         <span>{date}</span>
                         <span>Reply</span>
@@ -251,9 +271,19 @@ export default function Home() {
                   {showReply && (
                     <div style={{ display: 'flex', gap: '12px', marginLeft: '50px' }}>
                       <img key={replyAvatar} src={replyAvatar} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-                      <div style={{ flex: 1 }}>
+                      <div style={{ flex: 1, overflow: 'hidden' }}>
                         <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif' }}>{replyUsername}</p>
-                        <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '3px 0', lineHeight: 1.4, whiteSpace: 'pre-wrap', fontFamily: 'Arial, Helvetica, sans-serif' }}>{replyText}</p>
+                        
+                        {/* ✅ FIX TEKS PANJANG (Reply Thread) */}
+                        <p style={{ 
+                          color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, 
+                          fontSize: '15px', margin: '3px 0', lineHeight: 1.4, 
+                          whiteSpace: 'pre-wrap', 
+                          wordBreak: 'break-word', // 👈 INI KUNCI UTAMANYA!
+                          fontFamily: 'Arial, Helvetica, sans-serif' 
+                        }}>
+                          {replyText}
+                        </p>
                         <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 600, marginTop: '6px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                           <span>{replyDate}</span>
                           <span>Reply</span>
