@@ -5,13 +5,77 @@ export async function POST(request: Request) {
     const { url } = await request.json();
     if (!url) return NextResponse.json({ error: 'URL kosong' }, { status: 400 });
 
-    // ✅ Validasi rileks agar link pendek tetap lolos
     const isLinkValid = (link?: string) => {
       return typeof link === 'string' && link.startsWith('http');
     };
 
     console.log("🔍 Memproses URL:", url);
 
+    // ==========================================
+    // 1. PENANGANAN YOUTUBE (Hanya MP3 yang diminta)
+    // ==========================================
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      try {
+        // Menggunakan API pihak ketiga yang sering dipakai untuk YT to MP3
+        // Catatan: API ini mungkin memiliki batas rate limit atau ketersediaan
+        const apiUrl = `https://pinger.tools/api/yt?url=${encodeURIComponent(url)}`;
+        const res = await fetch(apiUrl);
+        const data = await res.json();
+
+        if (data && data.audio) {
+           return NextResponse.json({
+            title: data.title || 'YouTube Audio',
+            cover: data.thumbnail || '',
+            play: '', // User hanya minta MP3 untuk YT
+            music: data.audio,
+          });
+        }
+      } catch (e) {
+          console.log("❌ YouTube API Error");
+      }
+      return NextResponse.json({ error: 'Gagal mengekstrak audio dari YouTube. Pastikan video publik.' }, { status: 400 });
+    }
+
+    // ==========================================
+    // 2. PENANGANAN PINTEREST (Hanya MP4 yang diminta)
+    // ==========================================
+    if (url.includes('pinterest.com') || url.includes('pin.it')) {
+        try {
+            // Menggunakan API alternatif untuk Pinterest
+             const apiUrl = `https://api.ryzendesu.vip/api/downloader/pinterest?url=${encodeURIComponent(url)}`;
+             const res = await fetch(apiUrl);
+             const data = await res.json();
+
+             // Cek jika response memiliki data media (terkadang array, kadang object)
+             let videoLink = '';
+             if (data.success && data.data && data.data.length > 0) {
+                 // Mencari yang tipenya video/mp4 jika ada
+                 const videoItem = data.data.find((item: any) => item.type === 'video');
+                 if(videoItem) {
+                     videoLink = videoItem.url;
+                 } else if (data.data[0].url && data.data[0].url.includes('.mp4')) {
+                     videoLink = data.data[0].url;
+                 }
+             }
+
+             if (isLinkValid(videoLink)) {
+                return NextResponse.json({
+                  title: 'Pinterest Video',
+                  cover: '', // Pinterest downloader API tertentu tidak sllu ksh cover
+                  play: videoLink,
+                  music: '',
+                });
+             }
+        } catch(e) {
+            console.log("❌ Pinterest API Error");
+        }
+        return NextResponse.json({ error: 'Gagal mengekstrak video dari Pinterest. Pastikan itu adalah pin video (bukan gambar).' }, { status: 400 });
+    }
+
+    // ==========================================
+    // 3. PENANGANAN TIKTOK (Kode Lama yang sudah stabil)
+    // ==========================================
+    
     // --- ENGINE 0: Jalur Mobile API (Khusus Music) ---
     if (url.includes('/music/')) {
       const match = url.match(/-(\d+)(?:\?|$)/);
@@ -24,8 +88,6 @@ export async function POST(request: Request) {
           const data = await apiRes.json();
           const musicLink = data?.music_info?.play_url?.url_list?.[0];
           
-          console.log("✅ Engine 0 (Mobile API):", musicLink ? "Found" : "Not Found");
-
           if (isLinkValid(musicLink)) {
             return NextResponse.json({
               title: data.music_info.title || 'TikTok Audio',
@@ -38,7 +100,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // --- ENGINE 1: TIKWM (Fallback Utama - Auto Extract Music dari Video) ---
+    // --- ENGINE 1: TIKWM ---
     try {
       const res = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}&hd=1`);
       const data = await res.json();
@@ -47,8 +109,6 @@ export async function POST(request: Request) {
         const playLink = data.data.play || '';
         const musicLink = data.data.music || data.data.music_info?.play || '';
         
-        console.log("✅ Engine 1 (TikWM):", { video: !!playLink, audio: !!musicLink });
-
         if (isLinkValid(playLink) || isLinkValid(musicLink)) {
           return NextResponse.json({
             title: data.data.title || 'TikTok Media',
@@ -60,7 +120,7 @@ export async function POST(request: Request) {
       }
     } catch (e) { console.log("❌ Engine 1 Error"); }
 
-    // --- ENGINE 2: RYZENDESU (Backup Indonesia Server) ---
+    // --- ENGINE 2: RYZENDESU ---
     try {
       const res = await fetch(`https://api.ryzendesu.vip/api/downloader/ttdl?url=${encodeURIComponent(url)}`);
       const data = await res.json();
@@ -69,8 +129,6 @@ export async function POST(request: Request) {
         const musicLink = data.data.audio || data.data.music || '';
         const playLink = data.data.play || '';
         
-        console.log("✅ Engine 2 (Ryzendesu):", !!musicLink);
-
         if (isLinkValid(musicLink) || isLinkValid(playLink)) {
           return NextResponse.json({
             title: data.data.title || 'TikTok Media',
@@ -82,31 +140,9 @@ export async function POST(request: Request) {
       }
     } catch (e) { console.log("❌ Engine 2 Error"); }
 
-    // --- ENGINE 3: TIKLYDOWN (Final Fallback) ---
-    try {
-      const res = await fetch(`https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(url)}`);
-      const data = await res.json();
-      if (data?.result) {
-        const playLink = data.result.video?.noWatermark || '';
-        const musicLink = data.result.music?.play_url || '';
-        
-        console.log("✅ Engine 3 (Tiklydown):", !!musicLink);
-
-        if (isLinkValid(playLink) || isLinkValid(musicLink)) {
-          return NextResponse.json({
-            title: data.result.description || data.result.music?.title || 'TikTok Media',
-            // 🔥 TYPO SUDAH DIPERBAIKI DI BAWAH INI:
-            cover: data.result.cover || data.result.music?.cover || '',
-            play: playLink,
-            music: musicLink,
-          });
-        }
-      }
-    } catch (e) { console.log("❌ Engine 3 Error"); }
-
-    // UX Error yang jujur (kalau dari ke-4 jalur di atas semuanya gagal)
+    // Fallback error untuk TikTok
     return NextResponse.json({ 
-      error: 'Audio tidak tersedia untuk download langsung. Coba gunakan link video TikTok yang menggunakan lagu ini.' 
+      error: 'Audio/Video tidak tersedia. Untuk lagu, coba copy link dari video TikTok yang memakainya.' 
     }, { status: 400 });
 
   } catch (error: any) {

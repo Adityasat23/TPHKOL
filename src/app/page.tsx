@@ -11,18 +11,21 @@ export default function Home() {
   const [commentMode, setCommentMode] = useState<'sticker' | 'thread'>('sticker');
   const [threadTheme, setThreadTheme] = useState<'dark' | 'light'>('dark');
   
+  // State Downloader
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState('');
 
+  // State Komentar Utama
   const [username, setUsername] = useState('jethro');
-  const [commentText, setCommentText] = useState('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.');
+  const [commentText, setCommentText] = useState('KAPAN KAKKK DISKONNYA\nAHSBDHASBDH KUTUNGGU');
   const [likes, setLikes] = useState('3352');
   const [date, setDate] = useState('2025-11-17');
   const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
   const [replyTo, setReplyTo] = useState('creator');
 
+  // State Balasan
   const [showReply, setShowReply] = useState(true);
   const [replyUsername, setReplyUsername] = useState('Timephoria');
   const [replyText, setReplyText] = useState('GASSS!');
@@ -111,7 +114,7 @@ export default function Home() {
         <div className="w-full max-w-2xl bg-white shadow-xl shadow-blue-100/50 rounded-3xl p-8 border border-slate-100 animate-in fade-in zoom-in duration-300">
           <form onSubmit={handleDownload} className="space-y-4">
             <div className="relative">
-              <input type="text" placeholder="Tempel link video atau musik di sini..." className="w-full pl-5 pr-32 py-5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-blue-500 text-slate-800" value={url} onChange={(e) => setUrl(e.target.value)} required />
+              <input type="text" placeholder="Link TikTok, YouTube (MP3), atau Pinterest (Video)..." className="w-full pl-5 pr-32 py-5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-blue-500 text-slate-800" value={url} onChange={(e) => setUrl(e.target.value)} required />
               <button type="submit" disabled={loading} className="absolute right-2 top-2 bottom-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 rounded-xl disabled:opacity-50">{loading ? '...' : 'Download'}</button>
             </div>
           </form>
@@ -122,8 +125,8 @@ export default function Home() {
               <div className="flex-1 text-center md:text-left w-full">
                 <h3 className="font-bold text-slate-800 text-xl mb-4 line-clamp-2">{result.title}</h3>
                 <div className="flex flex-col sm:flex-row gap-3">
-                  {result.play && <a href={result.play} target="_blank" rel="noreferrer" className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl text-center shadow-lg">Unduh Video</a>}
-                  {result.music && <a href={result.music} target="_blank" rel="noreferrer" className="flex-1 bg-slate-800 hover:bg-black text-white font-bold py-3 rounded-xl text-center shadow-lg">Unduh MP3</a>}
+                  {result.play && <a href={result.play} target="_blank" rel="noreferrer" className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl text-center shadow-lg">Unduh Video (MP4)</a>}
+                  {result.music && <a href={result.music} target="_blank" rel="noreferrer" className="flex-1 bg-slate-800 hover:bg-black text-white font-bold py-3 rounded-xl text-center shadow-lg">Unduh Musik (MP3)</a>}
                 </div>
               </div>
             </div>
@@ -185,33 +188,32 @@ export default function Home() {
           </div>
 
           <div className="bg-[#0f172a] rounded-3xl p-10 flex items-center justify-center min-h-[500px]">
+            {/* WADAH UTAMA PREVIEW */}
             <div ref={previewRef} style={{ 
-              backgroundColor: commentMode === 'sticker' ? 'transparent' : (threadTheme === 'dark' ? TIKTOK_DARK_BG : TIKTOK_LIGHT_BG),
-              padding: '24px',
+              backgroundColor: 'transparent', // Wadah luar selalu transparan
+              padding: '24px', // Memberikan ruang aman agar html2canvas tidak memotong
               display: 'inline-flex',
               flexDirection: 'column',
               fontFamily: 'Arial, Helvetica, sans-serif'
             }}>
               
-              {/* STICKER MODE UPDATE: Mengatur batas lebar dan kata yang di-break */}
+              {/* STICKER MODE UPDATE: Padding dan Wrapper diperbaiki agar teks panjang aman saat diexport */}
               {commentMode === 'sticker' && (
-                <div style={{ position: 'relative', display: 'inline-flex' }}>
+                <div style={{ position: 'relative', display: 'inline-flex', paddingBottom: '16px' /* Ruang untuk ekor */ }}>
                   <div style={{ 
                     backgroundColor: '#ffffff', 
                     borderRadius: '16px 16px 16px 0px', 
                     padding: '16px 20px', 
-                    display: 'inline-flex',
+                    display: 'flex',
                     width: 'fit-content',
-                    maxWidth: '350px', // ✅ MEMBATASI LEBAR KOTAK MAKSIMAL 350PX
+                    maxWidth: '380px', // Batasan lebar
                     gap: '12px', 
-                    alignItems: 'flex-start', // ✅ Mengubah posisi profil ke atas agar rapi saat baris teks banyak
+                    alignItems: 'flex-start', 
                     boxShadow: '0 10px 30px rgba(0,0,0,0.10)' 
                   }}>
                     <img key={avatar} src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%', overflow: 'hidden' }}>
                       <p style={{ color: '#8a8b91', fontSize: '14px', fontWeight: 'bold', margin: '0 0 2px 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
-                      
-                      {/* ✅ FIX TEKS PANJANG: Penambahan wordBreak: 'break-word' */}
                       <p style={{ 
                         color: '#000000', 
                         fontSize: '18px', 
@@ -219,7 +221,7 @@ export default function Home() {
                         margin: '0', 
                         lineHeight: 1.3, 
                         whiteSpace: 'pre-wrap', 
-                        wordBreak: 'break-word', // 👈 INI KUNCI UTAMANYA!
+                        wordBreak: 'break-word', 
                         fontFamily: 'Arial, Helvetica, sans-serif' 
                       }}>
                         {commentText}
@@ -227,9 +229,10 @@ export default function Home() {
                     </div>
                   </div>
                   
+                  {/* Ekor Sticker diletakkan menempel pada kotak */}
                   <div style={{
                     position: 'absolute',
-                    bottom: '-12px',
+                    bottom: '4px', // Disesuaikan karena ada paddingBottom di wrapper
                     left: '0px',
                     width: '0px',
                     height: '0px',
@@ -239,20 +242,29 @@ export default function Home() {
                 </div>
               )}
 
-              {/* THREAD MODE */}
+              {/* THREAD MODE UPDATE: Background fix mengikuti konten */}
               {commentMode === 'thread' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '380px' }}>
+                <div style={{ 
+                  backgroundColor: threadTheme === 'dark' ? TIKTOK_DARK_BG : TIKTOK_LIGHT_BG,
+                  padding: '16px 20px', // Memberikan jarak agar avatar/teks tidak berdempetan dengan ujung background
+                  borderRadius: '12px',
+                  display: 'inline-flex',
+                  flexDirection: 'column', 
+                  gap: '20px', 
+                  maxWidth: '420px',
+                  width: 'fit-content' // Background akan mengikuti lebar konten
+                }}>
+                  {/* Komentar Pertama */}
                   <div style={{ display: 'flex', gap: '12px' }}>
                     <img key={avatar} src={avatar} style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                     <div style={{ flex: 1, overflow: 'hidden' }}>
                       <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif' }}>{username}</p>
                       
-                      {/* ✅ FIX TEKS PANJANG (Main Thread) */}
                       <p style={{ 
                         color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, 
                         fontSize: '15px', margin: '3px 0', lineHeight: 1.4, 
                         whiteSpace: 'pre-wrap', 
-                        wordBreak: 'break-word', // 👈 INI KUNCI UTAMANYA!
+                        wordBreak: 'break-word',
                         fontFamily: 'Arial, Helvetica, sans-serif' 
                       }}>
                         {commentText}
@@ -268,18 +280,18 @@ export default function Home() {
                     </div>
                   </div>
 
+                  {/* Komentar Balasan */}
                   {showReply && (
                     <div style={{ display: 'flex', gap: '12px', marginLeft: '50px' }}>
                       <img key={replyAvatar} src={replyAvatar} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                       <div style={{ flex: 1, overflow: 'hidden' }}>
                         <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif' }}>{replyUsername}</p>
                         
-                        {/* ✅ FIX TEKS PANJANG (Reply Thread) */}
                         <p style={{ 
                           color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, 
                           fontSize: '15px', margin: '3px 0', lineHeight: 1.4, 
                           whiteSpace: 'pre-wrap', 
-                          wordBreak: 'break-word', // 👈 INI KUNCI UTAMANYA!
+                          wordBreak: 'break-word',
                           fontFamily: 'Arial, Helvetica, sans-serif' 
                         }}>
                           {replyText}
