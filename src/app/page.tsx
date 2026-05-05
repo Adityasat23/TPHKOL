@@ -15,8 +15,8 @@ export default function Home() {
   const [error, setError] = useState('');
 
   // States untuk Komentar Utama
-  const [username, setUsername] = useState('bronwyn');
-  const [commentText, setCommentText] = useState('your girlfriend is so pretty!!!');
+  const [username, setUsername] = useState('jethro');
+  const [commentText, setCommentText] = useState('bang beli 1');
   const [likes, setLikes] = useState('3352');
   const [date, setDate] = useState('2025-11-17');
   const [avatar, setAvatar] = useState('https://ui-avatars.com/api/?name=B&background=random');
@@ -24,8 +24,8 @@ export default function Home() {
 
   // States untuk Balasan (Reply)
   const [showReply, setShowReply] = useState(true);
-  const [replyUsername, setReplyUsername] = useState('bronwyn');
-  const [replyText, setReplyText] = useState('thank you!! ❤️');
+  const [replyUsername, setReplyUsername] = useState('Timephoria');
+  const [replyText, setReplyText] = useState('GASSS!');
   const [replyLikes, setReplyLikes] = useState('2116');
   const [replyDate, setReplyDate] = useState('2025-11-17');
   const [replyAvatar, setReplyAvatar] = useState('https://ui-avatars.com/api/?name=C&background=random');
@@ -93,8 +93,8 @@ export default function Home() {
       
       {/* HEADER UTAMA */}
       <div className="max-w-3xl w-full text-center mb-8">
-        <h1 className="text-5xl font-black text-[#0f172a] mb-2 tracking-tight">TikTok<span className="text-[#2563eb]">Tools</span></h1>
-        <p className="text-[#64748b] text-lg">Platform All-in-One untuk Kreator</p>
+        <h1 className="text-5xl font-black text-[#0f172a] mb-2 tracking-tight">TPH<span className="text-[#2563eb]">Editor Tools</span></h1>
+        <p className="text-[#64748b] text-lg">Semoga membantu guys</p>
       </div>
 
       {/* NAVIGASI TABS */}
@@ -198,9 +198,19 @@ export default function Home() {
               fontFamily: 'sans-serif'
             }}>
               
-              {/* ✅ PERBAIKAN STICKER MODE: Padding diperbesar agar tulisan tidak mepet ke bawah border */}
+              {/* STICKER MODE */}
               {commentMode === 'sticker' && (
-                <div style={{ backgroundColor: '#ffffff', borderRadius: '14px', borderBottomLeftRadius: '4px', padding: '14px 18px 16px 18px', display: 'flex', gap: '12px', alignItems: 'center', boxShadow: '0 10px 30px rgba(0,0,0,0.15)' }}>
+                <div style={{ 
+                  backgroundColor: '#ffffff', 
+                  borderRadius: '14px', 
+                  borderBottomLeftRadius: '4px', 
+                  padding: '14px 18px 16px 18px', 
+                  display: 'inline-flex',    /* 👈 Ubah dari 'flex' jadi 'inline-flex' */
+                  width: 'fit-content',      /* 👈 Tambahkan ini agar lebar menyesuaikan teks */
+                  gap: '12px', 
+                  alignItems: 'center', 
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.15)' 
+                }}>
                   <img src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                   <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <p style={{ color: '#8a8b91', fontSize: '13px', fontWeight: 'bold', margin: '0 0 2px 0' }}>Reply to {replyTo}'s comment</p>
@@ -208,7 +218,6 @@ export default function Home() {
                   </div>
                 </div>
               )}
-
               {/* THREAD MODE */}
               {commentMode === 'thread' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -253,6 +262,23 @@ export default function Home() {
           </div>
         </div>
       )}
+    {/* FOOTER / COPYRIGHT */}
+      <footer style={{ 
+        marginTop: '80px', 
+        paddingTop: '40px', 
+        paddingBottom: '20px', 
+        textAlign: 'center', 
+        width: '100%', 
+        maxWidth: '1152px', 
+        borderTop: '1px solid #e2e8f0' 
+      }}>
+        <p style={{ color: '#64748b', fontSize: '14px' }}>
+          &copy; {new Date().getFullYear()} <span style={{ fontWeight: 'bold', color: '#0f172a' }}>Aditya Satria Pratama</span>. All rights reserved.
+        </p>
+        <p style={{ color: '#94a3b8', fontSize: '12px', marginTop: '8px', fontStyle: 'italic' }}>
+          Ditunggu aja update nya.
+        </p>
+      </footer>
     </main>
   );
 }
