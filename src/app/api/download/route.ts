@@ -3,48 +3,60 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
   try {
     const { url } = await request.json();
+    if (!url) return NextResponse.json({ error: 'URL kosong' }, { status: 400 });
 
-    if (!url) {
-      return NextResponse.json({ error: 'URL tidak boleh kosong' }, { status: 400 });
-    }
-
-    // --- ENGINE TIKWM (Paling Ampuh & Stabil) ---
-    // API ini sudah punya proxy internal, jadi Vercel kamu tidak akan kena blokir.
-    const tikwmUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
-    
-    const response = await fetch(tikwmUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    // --- ENGINE 1: TIKLYDOWN (Utama - Sangat Kuat untuk Video & Music) ---
+    try {
+      const res = await fetch(`https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(url)}`);
+      const data = await res.json();
+      
+      if (data && data.result) {
+        const result = data.result;
+        return NextResponse.json({
+          title: result.description || result.music?.title || 'TikTok Media',
+          cover: result.cover || result.music?.cover || '',
+          play: result.video?.noWatermark || result.video?.watermark || '',
+          music: result.music?.play_url || '',
+        });
       }
-    });
+    } catch (e) { console.log("Engine 1 failed, switching..."); }
 
-    const data = await response.json();
+    // --- ENGINE 2: TIKWM (Cadangan) ---
+    try {
+      const res = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
+      const data = await res.json();
+      if (data.code === 0) {
+        return NextResponse.json({
+          title: data.data.title || 'TikTok Media',
+          cover: data.data.cover || '',
+          play: data.data.play || '',
+          music: data.data.music || data.data.music_info?.play || '',
+        });
+      }
+    } catch (e) { console.log("Engine 2 failed, switching..."); }
 
-    // Cek apakah data berhasil diambil (TikWM mengembalikan code 0 jika sukses)
-    if (data.code === 0 && data.data) {
-      const resData = data.data;
-
-      // Logika cerdas: Deteksi apakah ini Video atau murni Musik
-      return NextResponse.json({
-        title: resData.title || 'TikTok Media',
-        cover: resData.cover || resData.music_info?.cover || '',
-        // Jika ada video, ambil link videonya (play). Jika tidak ada, kosongkan.
-        play: resData.play || '', 
-        // Link musik selalu diambil baik dari video maupun dari link musik murni
-        music: resData.music || resData.music_info?.play || '',
+    // --- ENGINE 3: LOVETIK (Cadangan Terakhir) ---
+    try {
+      const formData = new URLSearchParams();
+      formData.append('query', url);
+      const res = await fetch('https://lovetik.com/api/ajax/search', {
+        method: 'POST',
+        body: formData
       });
-    } else {
-      return NextResponse.json({ 
-        error: 'Link tidak didukung atau sedang error. Pastikan link TikTok valid.' 
-      }, { status: 400 });
-    }
+      const data = await res.json();
+      if (data.status === 'ok') {
+        return NextResponse.json({
+          title: data.desc || 'TikTok Media',
+          cover: data.cover || '',
+          play: data.links?.[0]?.a || '',
+          music: data.links?.find((l: any) => l.t.includes('MP3'))?.a || '',
+        });
+      }
+    } catch (e) { console.log("Engine 3 failed"); }
+
+    return NextResponse.json({ error: 'Semua server sedang sibuk. Coba lagi dalam 1 menit.' }, { status: 500 });
 
   } catch (error: any) {
-    console.error("Fetch Error:", error.message);
-    return NextResponse.json({ 
-      error: 'Koneksi ke server pusat terputus. Coba lagi dalam beberapa saat.' 
-    }, { status: 500 });
+    return NextResponse.json({ error: 'Sistem sedang tidak stabil' }, { status: 500 });
   }
 }
