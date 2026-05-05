@@ -17,9 +17,9 @@ export default function Home() {
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState('');
 
-  // State Komentar Utama
+  // ✅ FIX: Default Text diubah menjadi Lorem Ipsum
   const [username, setUsername] = useState('jethro');
-  const [commentText, setCommentText] = useState('bang beli 1\nASKSADKNSDNASDA');
+  const [commentText, setCommentText] = useState('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.');
   const [likes, setLikes] = useState('3352');
   const [date, setDate] = useState('2025-11-17');
   const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
@@ -72,21 +72,17 @@ export default function Home() {
     }
   };
 
-  // ✅ FUNGSI EXPORT ANTI-BLANK
   const exportCommentImage = async () => {
     if (previewRef.current && isReady) {
       try {
-        // Jeda 300ms agar browser selesai nge-render font & element sebelum difoto
         await new Promise(resolve => setTimeout(resolve, 300));
-
         const canvas = await html2canvas(previewRef.current, { 
           backgroundColor: null, 
-          scale: 2, // 👈 Diturunkan jadi 2 (Tetap HD) agar memori browser tidak nge-crash (Blank Putih)
+          scale: 2, 
           useCORS: true, 
           allowTaint: false, 
           logging: false 
         });
-        
         const link = document.createElement('a');
         link.download = `tiktok-${commentMode}-${username}.png`;
         link.href = canvas.toDataURL('image/png');
@@ -192,34 +188,48 @@ export default function Home() {
           </div>
 
           <div className="bg-[#0f172a] rounded-3xl p-10 flex items-center justify-center min-h-[500px]">
-            {/* ✅ FIX BUG LEBAR: Gunakan 'inline-flex' di sini (wadah utama), bukan di stikernya */}
             <div ref={previewRef} style={{ 
               backgroundColor: commentMode === 'sticker' ? 'transparent' : (threadTheme === 'dark' ? TIKTOK_DARK_BG : TIKTOK_LIGHT_BG),
               padding: '24px',
-              display: 'inline-flex', // Rahasia agar ukurannya nge-pas konten
+              display: 'inline-flex',
               flexDirection: 'column',
               fontFamily: 'Arial, Helvetica, sans-serif'
             }}>
               
+              {/* ✅ STICKER MODE UPDATE: Ditambahkan "Ekor" (Tail) Segitiga */}
               {commentMode === 'sticker' && (
-                <div style={{ 
-                  backgroundColor: '#ffffff', 
-                  borderRadius: '14px', 
-                  borderBottomLeftRadius: '4px', 
-                  padding: '14px 18px 16px 18px', 
-                  display: 'flex', // Dibalikkan ke flex biasa tanpa fit-content
-                  gap: '12px', 
-                  alignItems: 'center', 
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.15)' 
-                }}>
-                  <img key={avatar} src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <p style={{ color: '#8a8b91', fontSize: '13px', fontWeight: 'bold', margin: '0 0 2px 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
-                    <p style={{ color: '#000000', fontSize: '16px', fontWeight: 'bold', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', fontFamily: 'Arial, Helvetica, sans-serif' }}>{commentText}</p>
+                <div style={{ position: 'relative', display: 'inline-flex' }}>
+                  <div style={{ 
+                    backgroundColor: '#ffffff', 
+                    borderRadius: '16px 16px 16px 0px', // 👈 Sudut Kiri Bawah Lancip (0px)
+                    padding: '16px 20px', 
+                    display: 'inline-flex',
+                    width: 'fit-content',
+                    gap: '12px', 
+                    alignItems: 'center', 
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.10)' 
+                  }}>
+                    <img key={avatar} src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                      <p style={{ color: '#8a8b91', fontSize: '14px', fontWeight: 'bold', margin: '0 0 2px 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
+                      <p style={{ color: '#000000', fontSize: '18px', fontWeight: 'bold', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', fontFamily: 'Arial, Helvetica, sans-serif' }}>{commentText}</p>
+                    </div>
                   </div>
+                  
+                  {/* 👈 INI ADALAH KODE UNTUK "EKOR" GELEMBUNGNYA */}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '-12px',
+                    left: '0px',
+                    width: '0px',
+                    height: '0px',
+                    borderTop: '12px solid #ffffff',
+                    borderRight: '16px solid transparent'
+                  }}></div>
                 </div>
               )}
 
+              {/* THREAD MODE (Tetap Normal) */}
               {commentMode === 'thread' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                   <div style={{ display: 'flex', gap: '12px' }}>
