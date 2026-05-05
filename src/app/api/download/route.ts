@@ -10,31 +10,36 @@ export async function POST(request: Request) {
 
     // --- LOGIKA KHUSUS UNTUK LINK LAGU (MUSIC) ---
     if (url.includes('/music/')) {
-      // Kita mengambil source code HTML dari halaman lagu tersebut
-      const pageRes = await fetch(url, {
+      // 1. Ekstrak ID unik dari URL (kumpulan angka di akhir link)
+      const idMatch = url.match(/-(\d+)(?:\?|$)/);
+      if (!idMatch) {
+        return NextResponse.json({ error: 'Format link musik tidak valid.' }, { status: 400 });
+      }
+      const musicId = idMatch[1];
+
+      // 2. Gunakan API internal milik aplikasi Mobile TikTok
+      // Jalur ini bisa menembus blokir yang biasanya dialami server Vercel
+      const apiUrl = `https://api16-normal-c-useast1a.tiktokv.com/aweme/v1/music/detail/?music_id=${musicId}`;
+      
+      const apiRes = await fetch(apiUrl, {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+          // Menyamar sebagai aplikasi TikTok di iPhone
+          'User-Agent': 'TikTok 26.2.0 rv:262018 (iPhone; iOS 14.4.2; en_US) Cronet'
         }
       });
-      const html = await pageRes.text();
+      
+      const data = await apiRes.json();
 
-      // Menggunakan Regex untuk mencari URL MP3 rahasia yang tersembunyi di dalam HTML
-      const audioMatch = html.match(/"playUrl":"(https:\/\/[^"]+)"/);
-      const titleMatch = html.match(/"title":"([^"]+)"/);
-
-      if (audioMatch && audioMatch[1]) {
-        // Membersihkan URL dari karakter unicode (mengubah \u002F menjadi garis miring biasa)
-        const cleanAudioUrl = audioMatch[1].replace(/\\u002F/g, '/').replace(/\\u0026/g, '&');
-        const cleanTitle = titleMatch ? titleMatch[1] : 'TikTok Audio';
-
+      // 3. Ambil data audio dari respons API
+      if (data && data.music_info && data.music_info.play_url && data.music_info.play_url.url_list) {
         return NextResponse.json({
-          title: cleanTitle,
-          cover: '', // Dikosongkan karena fokus ke audio
-          play: '',  // Dikosongkan karena tidak ada video
-          music: cleanAudioUrl,
+          title: data.music_info.title || 'TikTok Audio',
+          cover: data.music_info.cover_large?.url_list?.[0] || '',
+          play: '', 
+          music: data.music_info.play_url.url_list[0],
         });
       } else {
-        return NextResponse.json({ error: 'Gagal mengekstrak audio. Lagu mungkin di-private atau dibatasi wilayah.' }, { status: 400 });
+        return NextResponse.json({ error: 'Gagal mengekstrak audio. Data tidak ditemukan di server.' }, { status: 400 });
       }
     }
     // ---------------------------------------------
