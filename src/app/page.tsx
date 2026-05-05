@@ -198,7 +198,7 @@ export default function Home() {
             <div ref={previewRef} style={{ 
               backgroundColor: 'transparent',
               padding: commentMode === 'sticker' ? '30px 30px 60px 30px' : '30px', // Extra padding bawah untuk sticker
-              display: 'block', width: commentMode === 'sticker' ? '600px' : '600px',
+              display: 'inline-flex', width: commentMode === 'sticker' ? '600px' : '600px',
               flexDirection: 'column',
               fontFamily: 'Arial, Helvetica, sans-serif'
             }}>
