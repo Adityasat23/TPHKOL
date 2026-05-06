@@ -203,41 +203,95 @@ export default function Home() {
               fontFamily: 'Arial, Helvetica, sans-serif'
             }}>
               
-// 1. Tambahkan wrapper dengan filter drop-shadow
-<div style={{ filter: 'drop-shadow(0 15px 30px rgba(0,0,0,0.25))' }}>
-
-  <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
-    
-    {/* 2. Kotak Utama Komentar */}
-    <div style={{ 
-      backgroundColor: '#ffffff', 
-      borderRadius: '16px 16px 16px 0px', // Siku tajam di kiri bawah
-      padding: '16px 20px', 
-      display: 'flex',
-      width: '100%',
-      // ... stylenya tetap sama, HAPUS boxShadow di sini
-    }}>
-      {/* Isi konten dan text komentar... */}
-    </div>
-    
-    {/* 3. Flawless SVG Ekor Sticker */}
-    <svg 
-      width="24" 
-      height="18" 
-      viewBox="0 0 24 18" 
-      fill="none" 
-      xmlns="http://www.w3.org/2000/svg"
-      style={{ 
-        marginTop: '-1px', // ⬅️ Ini kunci untuk menghilangkan celah (gap)
-        alignSelf: 'flex-start' // ⬅️ Memastikan posisinya pas di sebelah kiri
-      }} 
+{/* STICKER MODE UPDATE */}
+{commentMode === 'sticker' && (
+  <div
+    style={{
+      position: 'relative',
+      display: 'inline-flex',
+      filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.10))',
+    }}
+  >
+    <div
+      style={{
+        backgroundColor: '#ffffff',
+        borderRadius: '16px 16px 16px 0px',
+        padding: '16px 24px',
+        display: 'flex',
+        width: '100%',
+        maxWidth: '600px',
+        gap: '12px',
+        alignItems: 'flex-start',
+      }}
     >
-      {/* Path ini melengkung mulus seperti ekor di TikTok */}
-      <path d="M0 0 H24 L4 16 Q2 18 0 15 Z" fill="#ffffff"/>
-    </svg>
+      <img
+        key={avatar}
+        src={avatar}
+        style={{
+          width: '42px',
+          height: '42px',
+          borderRadius: '50%',
+          objectFit: 'cover',
+          flexShrink: 0,
+        }}
+      />
 
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          width: '100%',
+        }}
+      >
+        <p
+          style={{
+            color: '#8a8b91',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            margin: '0 0 2px 0',
+            fontFamily: 'Arial, Helvetica, sans-serif',
+          }}
+        >
+          Reply to {replyTo}'s comment
+        </p>
+
+        <p
+          style={{
+            color: '#000000',
+            fontSize: '18px',
+            fontWeight: 'bold',
+            margin: '0',
+            lineHeight: 1.3,
+            whiteSpace: 'pre-wrap',
+            wordWrap: 'break-word',
+            fontFamily: 'Arial, Helvetica, sans-serif',
+          }}
+        >
+          {commentText}
+        </p>
+      </div>
+    </div>
+
+    {/* Ekor sticker seamless */}
+    <svg
+      width="36"
+      height="24"
+      viewBox="0 0 36 24"
+      style={{
+        position: 'absolute',
+        left: '0px',
+        top: 'calc(100% - 1px)',
+        display: 'block',
+      }}
+    >
+      <path
+        d="M0 0 H42 L0 24 Z"
+        fill="#ffffff"
+      />
+    </svg>
   </div>
-</div>
+)}
 
               {/* THREAD MODE UPDATE */}
               {commentMode === 'thread' && (
