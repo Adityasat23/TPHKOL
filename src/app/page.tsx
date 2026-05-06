@@ -207,11 +207,12 @@ export default function Home() {
 {commentMode === 'sticker' && (
   <div
     style={{
-      position: 'relative',
       display: 'inline-flex',
-      filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.10))',
+      flexDirection: 'column',
+      filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.15))',
     }}
   >
+    {/* Bubble utama */}
     <div
       style={{
         backgroundColor: '#ffffff',
@@ -235,7 +236,7 @@ export default function Home() {
           flexShrink: 0,
         }}
       />
-
+ 
       <div
         style={{
           display: 'flex',
@@ -255,7 +256,7 @@ export default function Home() {
         >
           Reply to {replyTo}'s comment
         </p>
-
+ 
         <p
           style={{
             color: '#000000',
@@ -272,24 +273,18 @@ export default function Home() {
         </p>
       </div>
     </div>
-
-    {/* Ekor sticker seamless */}
-    <svg
-      width="32"
-      height="20"
-      viewBox="0 0 32 20"
+ 
+    {/* Ekor lancip - div dengan clip-path, bukan SVG absolute */}
+    <div
       style={{
-        position: 'absolute',
-        left: '0px',
-        top: 'calc(100% - 1px)',
-        display: 'block',
+        width: '36px',
+        height: '20px',
+        backgroundColor: '#ffffff',
+        clipPath: 'polygon(0 0, 100% 0, 0 100%)',
+        flexShrink: 0,
+        alignSelf: 'flex-start',
       }}
-    >
-      <path
-        d="M0 0 H42 L0 20 Z"
-        fill="#ffffff"
-      />
-    </svg>
+    />
   </div>
 )}
 
