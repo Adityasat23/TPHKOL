@@ -216,11 +216,11 @@ export default function Home() {
       style={{
         backgroundColor: '#ffffff',
         borderRadius: '16px 16px 16px 0px',
-        padding: '16px 24px',
+        padding: '16px 32px',
         display: 'flex',
         width: '100%',
         maxWidth: '600px',
-        gap: '12px',
+        gap: '16px',
         alignItems: 'flex-start',
       }}
     >
