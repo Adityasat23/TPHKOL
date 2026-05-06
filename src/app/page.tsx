@@ -197,7 +197,7 @@ export default function Home() {
             {/* WADAH UTAMA YANG DIFOTO DENGAN PADDING EXTRA DI BAWAH */}
             <div ref={previewRef} style={{ 
               backgroundColor: 'transparent',
-              padding: commentMode === 'sticker' ? '30px 30px 80px 30px' : '30px', // Extra padding bawah untuk sticker
+              padding: commentMode === 'sticker' ? '30px 30px 150px 30px' : '30px', // Extra padding bawah untuk sticker
               display: 'inline-flex', width: commentMode === 'sticker' ? '600px' : '600px',
               flexDirection: 'column',
               fontFamily: 'Arial, Helvetica, sans-serif'
@@ -275,9 +275,9 @@ export default function Home() {
 
     {/* Ekor sticker seamless */}
     <svg
-      width="36"
-      height="24"
-      viewBox="0 0 36 24"
+      width="32"
+      height="20"
+      viewBox="0 0 32 20"
       style={{
         position: 'absolute',
         left: '0px',
@@ -286,7 +286,7 @@ export default function Home() {
       }}
     >
       <path
-        d="M0 0 H42 L0 24 Z"
+        d="M0 0 H32 L0 20 Z"
         fill="#ffffff"
       />
     </svg>
