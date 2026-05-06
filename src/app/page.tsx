@@ -239,14 +239,14 @@ export default function Home() {
                   <div
   style={{
     position: 'absolute',
-    bottom: '-6px',
-    left: '14px',
+    bottom: '-8px',   // ⬅️ turun sedikit
+    left: '8px',      // ⬅️ geser ke kiri (ini kunci)
     width: '16px',
     height: '16px',
     background: '#ffffff',
     transform: 'rotate(45deg)',
-    borderBottomLeftRadius: '4px', // 🔥 bikin curve
-    boxShadow: '0 4px 10px rgba(0,0,0,0.08)', // shadow halus
+    borderBottomLeftRadius: '5px',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.08)',
   }}
 />
                 </div>
