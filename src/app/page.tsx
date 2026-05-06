@@ -203,54 +203,95 @@ export default function Home() {
               fontFamily: 'Arial, Helvetica, sans-serif'
             }}>
               
-              {/* STICKER MODE UPDATE */}
-              {commentMode === 'sticker' && (
-                <div style={{ position: 'relative', display: 'inline-flex' }}>
-                  <div style={{ 
-                    backgroundColor: '#ffffff', 
-                    borderRadius: '16px 16px 16px 0px', 
-                    padding: '16px 20px', 
-                    display: 'flex',
-                    width: '100%',
-                    maxWidth: '600px', // Mengatur max-width agar tidak melebar tak terhingga
-                    gap: '12px', 
-                    alignItems: 'flex-start', 
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.10)' 
-                  }}>
-                    <img key={avatar} src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-                      <p style={{ color: '#8a8b91', fontSize: '14px', fontWeight: 'bold', margin: '0 0 2px 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
-                      <p style={{ 
-                        color: '#000000', 
-                        fontSize: '18px', 
-                        fontWeight: 'bold', 
-                        margin: '0', 
-                        lineHeight: 1.3, 
-                        whiteSpace: 'pre-wrap', 
-                        wordWrap: 'break-word', // Mengganti wordBreak dengan wordWrap untuk kompabilitas yang lebih baik
-                        fontFamily: 'Arial, Helvetica, sans-serif' 
-                      }}>
-                        {commentText}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  {/* SVG Ekor Sticker */}
-                  <div
-  style={{
-    position: 'absolute',
-    bottom: '-8px',   // ⬅️ turun sedikit
-    left: '8px',      // ⬅️ geser ke kiri (ini kunci)
-    width: '16px',
-    height: '16px',
-    background: '#ffffff',
-    transform: 'rotate(45deg)',
-    borderBottomLeftRadius: '5px',
-    boxShadow: '0 4px 10px rgba(0,0,0,0.08)',
-  }}
-/>
-                </div>
-              )}
+{/* STICKER MODE UPDATE */}
+{commentMode === 'sticker' && (
+  <div
+    style={{
+      position: 'relative',
+      display: 'inline-flex',
+      filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.10))',
+    }}
+  >
+    <div
+      style={{
+        backgroundColor: '#ffffff',
+        borderRadius: '16px 16px 16px 0px',
+        padding: '16px 20px',
+        display: 'flex',
+        width: '100%',
+        maxWidth: '600px',
+        gap: '12px',
+        alignItems: 'flex-start',
+      }}
+    >
+      <img
+        key={avatar}
+        src={avatar}
+        style={{
+          width: '42px',
+          height: '42px',
+          borderRadius: '50%',
+          objectFit: 'cover',
+          flexShrink: 0,
+        }}
+      />
+
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          width: '100%',
+        }}
+      >
+        <p
+          style={{
+            color: '#8a8b91',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            margin: '0 0 2px 0',
+            fontFamily: 'Arial, Helvetica, sans-serif',
+          }}
+        >
+          Reply to {replyTo}'s comment
+        </p>
+
+        <p
+          style={{
+            color: '#000000',
+            fontSize: '18px',
+            fontWeight: 'bold',
+            margin: '0',
+            lineHeight: 1.3,
+            whiteSpace: 'pre-wrap',
+            wordWrap: 'break-word',
+            fontFamily: 'Arial, Helvetica, sans-serif',
+          }}
+        >
+          {commentText}
+        </p>
+      </div>
+    </div>
+
+    {/* Ekor sticker seamless */}
+    <svg
+      width="42"
+      height="28"
+      viewBox="0 0 42 28"
+      style={{
+        position: 'absolute',
+        left: '0px',
+        top: 'calc(100% - 1px)',
+        display: 'block',
+      }}
+    >
+      <path
+        d="M0 0 H42 L0 28 Z"
+        fill="#ffffff"
+      />
+    </svg>
+  </div>
+)}
 
               {/* THREAD MODE UPDATE */}
               {commentMode === 'thread' && (
