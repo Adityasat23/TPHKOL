@@ -237,14 +237,16 @@ export default function Home() {
                   
                   {/* SVG Ekor Sticker */}
                   <div
-   style={{
+  style={{
     position: 'absolute',
-    bottom: '-10px',
-    left: '8px',
-    width: 0,
-    height: 0,
-    borderRight: '14px solid #ffffff',
-    borderTop: '14px solid transparent',
+    bottom: '-6px',
+    left: '14px',
+    width: '16px',
+    height: '16px',
+    background: '#ffffff',
+    transform: 'rotate(45deg)',
+    borderBottomLeftRadius: '4px', // 🔥 bikin curve
+    boxShadow: '0 4px 10px rgba(0,0,0,0.08)', // shadow halus
   }}
 />
                 </div>
