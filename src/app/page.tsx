@@ -274,20 +274,18 @@ export default function Home() {
       </div>
     </div>
  
-    {/* Ekor lancip - div dengan clip-path, bukan SVG absolute */}
-   <div
-  style={{
-    width: 0,
-    height: 0,
-    borderRight: '20px solid #ffffff',
-    borderTop: '14px solid transparent',
-    marginTop: '-2px',
-    filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.08))',
-  }}
-/>
+    {/* Ekor lancip - SVG inline dalam flow normal, support html2canvas */}
+    <svg
+      width="36"
+      height="20"
+      viewBox="0 0 36 20"
+      style={{ display: 'block', alignSelf: 'flex-start' }}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <polygon points="0,0 36,0 0,20" fill="#ffffff" />
+    </svg>
   </div>
 )}
-
               {/* THREAD MODE UPDATE */}
               {commentMode === 'thread' && (
                 <div style={{ 
