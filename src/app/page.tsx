@@ -5,11 +5,29 @@ import html2canvas from 'html2canvas';
 
 // Placeholder Avatar & Product
 const DEFAULT_AVATAR = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk8A8AAQsAzQ/8/GkAAAAASUVORK5CYII=";
-const DEFAULT_PRODUCT = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII="; // Placeholder abu-abu terang
+const DEFAULT_PRODUCT = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=";
+
+// --- SVG Icons (Inline agar html2canvas tidak error / nge-blank) ---
+const TruckIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '4px' }}>
+    <path d="M20 8h-3V4H3v13h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM8 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm12 0c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-7l2.12 2.83H17V11h2z" />
+  </svg>
+);
+
+const StarYellow = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="#fabb05" style={{ marginRight: '4px', transform: 'translateY(-1px)' }}>
+    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+  </svg>
+);
+
+const CartIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
+  </svg>
+);
 
 export default function Home() {
-  // ✅ UPDATE: Tambahkan 'product' ke union type activeTab
-  const [activeTab, setActiveTab] = useState<'downloader' | 'comment' | 'product'>('comment');
+  const [activeTab, setActiveTab] = useState<'downloader' | 'comment' | 'product'>('product');
   
   // ==========================================
   // STATE: FAKE COMMENT
@@ -39,7 +57,7 @@ export default function Home() {
   const [error, setError] = useState('');
 
   // ==========================================
-  // ✅ STATE BARU: PRODUCT CARD GENERATOR
+  // STATE: PRODUCT CARD GENERATOR
   // ==========================================
   const [productLayout, setProductLayout] = useState<'portrait' | 'landscape'>('portrait');
   const [productImage, setProductImage] = useState(DEFAULT_PRODUCT);
@@ -49,6 +67,11 @@ export default function Home() {
   const [productSold, setProductSold] = useState("1.1K sold");
   const [productRating, setProductRating] = useState("4.9");
   const [productTag, setProductTag] = useState("-63%");
+  
+  // Kustomisasi Label Spesifik
+  const [freeShippingText, setFreeShippingText] = useState("Free shipping");
+  const [discountTagText, setDiscountTagText] = useState("10% off");
+
   const productPreviewRef = useRef<HTMLDivElement>(null);
 
   const TIKTOK_DARK_BG = "#121212";
@@ -60,7 +83,6 @@ export default function Home() {
   const [isReady, setIsReady] = useState(false);
   useEffect(() => { setIsReady(true); }, []);
 
-  // --- HANDLER DOWNLOADER ---
   const handleDownload = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true); setError(''); setResult(null);
@@ -80,7 +102,6 @@ export default function Home() {
     }
   };
 
-  // --- HANDLER UPLOAD GAMBAR ---
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setImgFn: Function) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -90,7 +111,6 @@ export default function Home() {
     }
   };
 
-  // --- HANDLER EXPORT FAKE COMMENT ---
   const exportCommentImage = async () => {
     const element = previewRef.current;
     if (!element) return;
@@ -118,19 +138,21 @@ export default function Home() {
     }
   };
 
-  // --- ✅ HANDLER EXPORT PRODUCT CARD ---
+  // ✅ PERBAIKAN EXPORT PRODUCT: Dibuat sangat solid dan presisi
   const exportProductImage = async () => {
     const element = productPreviewRef.current;
     if (!element) return;
     try {
+      // Tunggu font Arial dkk siap
       await document.fonts.ready;
-      await new Promise((r) => setTimeout(r, 200));
+      await new Promise((r) => setTimeout(r, 300));
 
       const canvas = await html2canvas(element, {
         backgroundColor: null,
-        scale: 3, // HD Quality
+        scale: 3, 
         useCORS: true,
         allowTaint: false,
+        logging: false,
         width: element.offsetWidth,
         height: element.scrollHeight,
         windowWidth: element.offsetWidth,
@@ -138,11 +160,11 @@ export default function Home() {
       });
 
       const link = document.createElement('a');
-      link.download = `product-card-${Date.now()}.png`;
+      link.download = `product-${productLayout}-${Date.now()}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
     } catch (err) {
-      alert("Export Product Card gagal");
+      alert("Export Product Card gagal. Pastikan gambar valid.");
     }
   };
 
@@ -155,19 +177,16 @@ export default function Home() {
         <h1 className="text-5xl font-black text-[#0f172a] mb-2 tracking-tight">
           TPH <span className="text-[#94a3b8]">Editor Tools</span>
         </h1>
-        <p className="text-[#64748b] text-lg">Buat download, fake komen, dan product card creator</p>
+        <p className="text-[#64748b] text-lg">Platform All-in-one untuk Kreator & Affiliate</p>
       </div>
 
-      {/* ✅ UPDATE: Navigasi Tabs Ditambah 1 */}
       <div className="flex bg-white rounded-full shadow-sm border border-slate-200 p-1 mb-8">
         <button onClick={() => setActiveTab('downloader')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${activeTab === 'downloader' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>📥 DOWNLOADER</button>
         <button onClick={() => setActiveTab('comment')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${activeTab === 'comment' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>💬 FAKE COMMENT</button>
         <button onClick={() => setActiveTab('product')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${activeTab === 'product' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>🛍️ PRODUCT CARD</button>
       </div>
 
-      {/* ========================================= */}
-      {/* TAB 1: DOWNLOADER (TIDAK DIGANGGU) */}
-      {/* ========================================= */}
+      {/* TABS 1 & 2 (DOWNLOADER & COMMENT) TETAP SEPERTI ASLINYA */}
       {activeTab === 'downloader' && (
         <div className="w-full max-w-2xl bg-white shadow-xl shadow-blue-100/50 rounded-3xl p-8 border border-slate-100 animate-in fade-in zoom-in duration-300">
           <form onSubmit={handleDownload} className="space-y-4">
@@ -192,9 +211,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* ========================================= */}
-      {/* TAB 2: FAKE COMMENT (TIDAK DIGANGGU) */}
-      {/* ========================================= */}
       {activeTab === 'comment' && (
         <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in zoom-in duration-300">
           <div className="bg-white shadow-xl rounded-3xl p-6 border border-slate-100 space-y-6 h-fit">
@@ -202,12 +218,14 @@ export default function Home() {
               <button onClick={() => setCommentMode('sticker')} className={`flex-1 py-2 rounded-md font-bold text-xs ${commentMode === 'sticker' ? 'bg-white shadow text-blue-600' : 'text-slate-500'}`}>STICKER BUBBLE</button>
               <button onClick={() => setCommentMode('thread')} className={`flex-1 py-2 rounded-md font-bold text-xs ${commentMode === 'thread' ? 'bg-white shadow text-blue-600' : 'text-slate-500'}`}>THREAD COMMENT</button>
             </div>
+
             {commentMode === 'thread' && (
               <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
                 <button onClick={() => setThreadTheme('dark')} className={`flex-1 py-2 rounded-md font-bold text-xs ${threadTheme === 'dark' ? 'bg-slate-800 text-white' : 'text-slate-500'}`}>🌙 DARK MODE</button>
                 <button onClick={() => setThreadTheme('light')} className={`flex-1 py-2 rounded-md font-bold text-xs ${threadTheme === 'light' ? 'bg-white text-slate-900 shadow' : 'text-slate-500'}`}>☀️ LIGHT MODE</button>
               </div>
             )}
+
             <div className="space-y-4">
               <h3 className="font-bold text-blue-600 uppercase text-xs tracking-widest">Komentar Utama</h3>
               <input type="file" onChange={(e) => handleImageUpload(e, setAvatar)} className="text-xs block w-full" />
@@ -241,6 +259,7 @@ export default function Home() {
                 )}
               </div>
             )}
+
             <button onClick={exportCommentImage} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-[0.98]">📸 Export PNG HD</button>
           </div>
 
@@ -305,12 +324,11 @@ export default function Home() {
       )}
 
       {/* ========================================= */}
-      {/* ✅ TAB 3: PRODUCT CARD GENERATOR BARU */}
+      {/* TAB 3: PRODUCT CARD GENERATOR (PERBAIKAN HTML2CANVAS) */}
       {/* ========================================= */}
       {activeTab === 'product' && (
         <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in zoom-in duration-300">
           
-          {/* Panel Kiri: Form Editor */}
           <div className="bg-white shadow-xl rounded-3xl p-6 border border-slate-100 space-y-6 h-fit">
             <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
               <button onClick={() => setProductLayout('portrait')} className={`flex-1 py-2 rounded-md font-bold text-xs ${productLayout === 'portrait' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>📱 PORTRAIT</button>
@@ -328,25 +346,29 @@ export default function Home() {
               <input type="text" value={productTitle} onChange={(e) => setProductTitle(e.target.value)} placeholder="Nama Produk" className="w-full p-3 bg-slate-50 border rounded-xl" />
               
               <div className="grid grid-cols-2 gap-2">
-                <input type="text" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} placeholder="Harga Diskon (cth: Rp87.120)" className="w-full p-3 bg-slate-50 border rounded-xl" />
-                <input type="text" value={productOriginalPrice} onChange={(e) => setProductOriginalPrice(e.target.value)} placeholder="Harga Coret (cth: Rp238.000)" className="w-full p-3 bg-slate-50 border rounded-xl" />
+                <input type="text" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} placeholder="Harga (cth: Rp87.120)" className="w-full p-3 bg-slate-50 border rounded-xl font-bold text-pink-600" />
+                <input type="text" value={productOriginalPrice} onChange={(e) => setProductOriginalPrice(e.target.value)} placeholder="Harga Coret (cth: Rp238.000)" className="w-full p-3 bg-slate-50 border rounded-xl text-slate-400 line-through" />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <input type="text" value={freeShippingText} onChange={(e) => setFreeShippingText(e.target.value)} placeholder="Teks Label 1 (Free shipping)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
+                <input type="text" value={discountTagText} onChange={(e) => setDiscountTagText(e.target.value)} placeholder="Teks Label 2 (10% off)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
               </div>
 
               <div className="grid grid-cols-3 gap-2">
-                <input type="text" value={productRating} onChange={(e) => setProductRating(e.target.value)} placeholder="Rating (cth: 4.9)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
-                <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="Terjual (cth: 1.1K sold)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
-                <input type="text" value={productTag} onChange={(e) => setProductTag(e.target.value)} placeholder="Label Diskon (cth: -63%)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
+                <input type="text" value={productRating} onChange={(e) => setProductRating(e.target.value)} placeholder="Rating (4.9)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
+                <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="Terjual (1.1K sold)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
+                <input type="text" value={productTag} onChange={(e) => setProductTag(e.target.value)} placeholder="Pojok Kanan (-63%)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
               </div>
             </div>
 
             <button onClick={exportProductImage} className="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-[0.98]">📸 Export Product Card</button>
           </div>
 
-          {/* Panel Kanan: Live Preview Product */}
           <div className="bg-slate-100 rounded-3xl p-10 flex items-center justify-center min-h-[500px] overflow-hidden border border-slate-200">
-            <div style={{ padding: '24px', display: 'inline-flex', justifyContent: 'center' }}>
+            {/* WADAH PENGAMAN EKSPORT (Padding besar agar tidak kepotong) */}
+            <div style={{ padding: '40px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent' }}>
               
-              {/* WADAH PREVIEW YANG AKAN DIFOTO */}
               <div ref={productPreviewRef} style={{ 
                 backgroundColor: '#ffffff', 
                 borderRadius: '8px', 
@@ -358,54 +380,91 @@ export default function Home() {
                 boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
               }}>
                 
-                {/* Bagian Gambar */}
+                {/* Bagian Gambar (Relative agar Tag tidak terpotong) */}
                 <div style={{ 
                   position: 'relative', 
-                  width: productLayout === 'portrait' ? '100%' : '50%', 
+                  width: productLayout === 'portrait' ? '100%' : '200px', 
                   height: productLayout === 'portrait' ? '300px' : 'auto', 
-                  minHeight: productLayout === 'landscape' ? '220px' : 'auto' 
+                  minHeight: productLayout === 'landscape' ? '200px' : 'auto',
+                  flexShrink: 0
                 }}>
-                  <img key={productImage} src={productImage} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img key={productImage} src={productImage} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   
-                  {/* Badge Diskon di sudut kanan atas gambar */}
+                  {/* Tag Pojok Kanan Atas (-63%) */}
                   {productTag && (
-                    <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#f21835', color: '#fff', padding: '4px 8px', fontSize: '14px', fontWeight: 'bold', borderBottomLeftRadius: '8px' }}>
+                    <div style={{ 
+                      position: 'absolute', top: 0, right: 0, 
+                      backgroundColor: '#fe2c55', color: '#fff', 
+                      padding: '4px 8px', fontSize: '14px', fontWeight: 'bold', 
+                      borderBottomLeftRadius: '8px', zIndex: 10 
+                    }}>
                       {productTag}
                     </div>
                   )}
                 </div>
 
-                {/* Bagian Info (Teks) */}
-                <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, backgroundColor: '#fff' }}>
+                {/* Bagian Info (Teks dipaksa height dan line-height stabil) */}
+                <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#fff', boxSizing: 'border-box' }}>
                   
-                  {/* Judul Produk */}
-                  <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', color: '#222', lineHeight: '1.4', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                  {/* Judul: Fix text-overflow untuk html2canvas */}
+                  <div style={{ 
+                    margin: '0 0 8px 0', 
+                    fontSize: '15px', 
+                    fontWeight: 500,
+                    color: '#222', 
+                    lineHeight: '20px', 
+                    height: '40px', // Membatasi max 2 baris
+                    overflow: 'hidden',
+                    fontFamily: 'Arial, sans-serif'
+                  }}>
                     {productTitle}
-                  </h3>
+                  </div>
                   
-                  {/* Tag Promosi (Tiruan Shopee/TikTok) */}
+                  {/* Tag Promosi */}
                   <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                    <span style={{ backgroundColor: '#e2f7f4', color: '#00b09b', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>🚚 Free shipping</span>
-                    <span style={{ backgroundColor: '#ffeef2', color: '#f21835', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>10% off</span>
+                    <span style={{ display: 'flex', alignItems: 'center', backgroundColor: '#e2f7f4', color: '#00b09b', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>
+                      <TruckIcon /> {freeShippingText}
+                    </span>
+                    <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>
+                      {discountTagText}
+                    </span>
                   </div>
 
                   {/* Rating dan Terjual */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#888', marginBottom: '12px' }}>
-                    <span style={{ color: '#f5a623' }}>★ {productRating}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#888', marginBottom: productLayout === 'portrait' ? '12px' : 'auto' }}>
+                    {productLayout === 'landscape' ? (
+                      <span style={{ color: '#222', fontSize: '14px', letterSpacing: '-1px' }}>★★★★★</span>
+                    ) : (
+                      <StarYellow />
+                    )}
+                    <span style={{ color: productLayout === 'landscape' ? '#222' : '#fabb05', fontWeight: productLayout === 'landscape' ? 'normal' : 'bold' }}>{productRating}</span>
                     <span style={{ color: '#ccc' }}>|</span>
                     <span>{productSold}</span>
                   </div>
 
-                  {/* Harga */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: 'auto' }}>
-                    <span style={{ color: '#f21835', fontSize: '22px', fontWeight: 'bold', letterSpacing: '-0.5px' }}>{productPrice}</span>
-                    <span style={{ color: '#aaa', fontSize: '14px', textDecoration: 'line-through' }}>{productOriginalPrice}</span>
-                  </div>
-
-                  {/* Tombol Buy Khusus Landscape */}
-                  {productLayout === 'landscape' && (
-                    <div style={{ marginTop: '16px', alignSelf: 'flex-end' }}>
-                      <button style={{ backgroundColor: '#f21835', color: '#fff', border: 'none', padding: '8px 24px', borderRadius: '6px', fontWeight: 'bold', fontSize: '14px' }}>Buy</button>
+                  {/* Harga Row */}
+                  {productLayout === 'portrait' ? (
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: 'auto' }}>
+                      <span style={{ color: '#fe2c55', fontSize: '24px', fontWeight: 'bold', letterSpacing: '-0.5px', fontFamily: 'Arial, sans-serif' }}>{productPrice}</span>
+                      {/* FIX CORET: Menggunakan tag <del> standar HTML */}
+                      <del style={{ color: '#999999', fontSize: '14px', fontFamily: 'Arial, sans-serif' }}>{productOriginalPrice}</del>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: '12px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ color: '#fe2c55', fontSize: '24px', fontWeight: 'bold', lineHeight: 1, fontFamily: 'Arial, sans-serif' }}>{productPrice}</span>
+                        <del style={{ color: '#999999', fontSize: '14px', marginTop: '6px', fontFamily: 'Arial, sans-serif' }}>{productOriginalPrice}</del>
+                      </div>
+                      
+                      {/* Tombol Buy Mirip Referensi */}
+                      <div style={{ display: 'flex', height: '32px' }}>
+                        <div style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '0 10px', display: 'flex', alignItems: 'center', borderTopLeftRadius: '4px', borderBottomLeftRadius: '4px' }}>
+                          <CartIcon />
+                        </div>
+                        <div style={{ backgroundColor: '#fe2c55', color: '#ffffff', padding: '0 16px', display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '14px', borderTopRightRadius: '4px', borderBottomRightRadius: '4px' }}>
+                          Buy
+                        </div>
+                      </div>
                     </div>
                   )}
 
@@ -430,7 +489,7 @@ export default function Home() {
           &copy; {new Date().getFullYear()} <span style={{ fontWeight: 'bold', color: '#0f172a' }}>Aditya Satria Pratama</span>. All rights reserved.
         </p>
         <p style={{ color: '#94a3b8', fontSize: '12px', marginTop: '8px', fontStyle: 'italic' }}>
-          Next update bisa YT & Pinterest.
+          Updated with Product Card Generator.
         </p>
       </footer>
 
