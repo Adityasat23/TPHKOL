@@ -197,7 +197,7 @@ export default function Home() {
             {/* WADAH UTAMA YANG DIFOTO DENGAN PADDING EXTRA DI BAWAH */}
             <div ref={previewRef} style={{ 
               backgroundColor: 'transparent',
-              padding: commentMode === 'sticker' ? '30px 30px 60px 30px' : '30px', // Extra padding bawah untuk sticker
+              padding: commentMode === 'sticker' ? '30px 30px 80px 30px' : '30px', // Extra padding bawah untuk sticker
               display: 'inline-flex', width: commentMode === 'sticker' ? '600px' : '600px',
               flexDirection: 'column',
               fontFamily: 'Arial, Helvetica, sans-serif'
@@ -236,18 +236,17 @@ export default function Home() {
                   </div>
                   
                   {/* SVG Ekor Sticker */}
-                  <svg 
-                    width="16" 
-                    height="16" 
-                    viewBox="0 0 16 16" 
-                    style={{
-                      position: 'absolute',
-                      bottom: '-15px', // Sesuaikan posisi
-                      left: '0px'
-                    }}
-                  >
-                    <polygon points="0,0 16,0 0,16" fill="#ffffff" />
-                  </svg>
+                  <div
+  style={{
+    position: 'absolute',
+    bottom: '-12px',
+    left: '0px',
+    width: 0,
+    height: 0,
+    borderLeft: '16px solid #ffffff',
+    borderTop: '16px solid transparent',
+  }}
+/>
                 </div>
               )}
 
