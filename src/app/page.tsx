@@ -108,7 +108,7 @@ export default function Home() {
         <h1 className="text-5xl font-black text-[#0f172a] mb-2 tracking-tight">
           TPH <span className="text-[#94a3b8]">Editor Tools</span>
         </h1>
-        <p className="text-[#64748b] text-lg">Buat dowloan TikTok</p>
+        <p className="text-[#64748b] text-lg">Buat download TikTok sama fake komen guys</p>
       </div>
 
       <div className="flex bg-white rounded-full shadow-sm border border-slate-200 p-1 mb-8">
@@ -197,7 +197,7 @@ export default function Home() {
             {/* WADAH UTAMA YANG DIFOTO DENGAN PADDING EXTRA DI BAWAH */}
             <div ref={previewRef} style={{ 
               backgroundColor: 'transparent',
-              padding: commentMode === 'sticker' ? '30px 30px 150px 30px' : '30px', // Extra padding bawah untuk sticker
+              padding: commentMode === 'sticker' ? '30px 30px 120px 30px' : '30px', // Extra padding bawah untuk sticker
               display: 'inline-flex', width: commentMode === 'sticker' ? '600px' : '600px',
               flexDirection: 'column',
               fontFamily: 'Arial, Helvetica, sans-serif'
@@ -216,7 +216,7 @@ export default function Home() {
       style={{
         backgroundColor: '#ffffff',
         borderRadius: '16px 16px 16px 0px',
-        padding: '16px 32px',
+        padding: '16px 42px',
         display: 'flex',
         width: '100%',
         maxWidth: '600px',
@@ -228,8 +228,8 @@ export default function Home() {
         key={avatar}
         src={avatar}
         style={{
-          width: '42px',
-          height: '42px',
+          width: '36px',
+          height: '36px',
           borderRadius: '50%',
           objectFit: 'cover',
           flexShrink: 0,
