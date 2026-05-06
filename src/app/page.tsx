@@ -237,14 +237,14 @@ export default function Home() {
                   
                   {/* SVG Ekor Sticker */}
                   <div
-  style={{
+   style={{
     position: 'absolute',
-    bottom: '-12px',
-    left: '0px',
+    bottom: '-10px',
+    left: '8px',
     width: 0,
     height: 0,
-    borderLeft: '16px solid #ffffff',
-    borderTop: '16px solid transparent',
+    borderRight: '14px solid #ffffff',
+    borderTop: '14px solid transparent',
   }}
 />
                 </div>
