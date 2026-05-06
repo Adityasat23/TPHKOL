@@ -275,16 +275,16 @@ export default function Home() {
     </div>
  
     {/* Ekor lancip - div dengan clip-path, bukan SVG absolute */}
-    <div
-      style={{
-        width: '36px',
-        height: '20px',
-        backgroundColor: '#ffffff',
-        clipPath: 'polygon(0 0, 100% 0, 0 100%)',
-        flexShrink: 0,
-        alignSelf: 'flex-start',
-      }}
-    />
+   <div
+  style={{
+    width: 0,
+    height: 0,
+    borderRight: '20px solid #ffffff',
+    borderTop: '14px solid transparent',
+    marginTop: '-2px',
+    filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.08))',
+  }}
+/>
   </div>
 )}
 
