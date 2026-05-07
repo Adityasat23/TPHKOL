@@ -158,7 +158,7 @@ export default function Home() {
         <h1 className="text-5xl font-black text-[#0f172a] mb-2 tracking-tight">
           TPH <span className="text-[#94a3b8]">Editor Tools</span>
         </h1>
-        <p className="text-[#64748b] text-lg">Platform All-in-one untuk Kreator & Affiliate</p>
+        <p className="text-[#64748b] text-lg">Semoga membantu teman teman</p>
       </div>
 
       <div className="flex bg-white rounded-full shadow-sm border border-slate-200 p-1 mb-8">
@@ -171,7 +171,7 @@ export default function Home() {
         <div className="w-full max-w-2xl bg-white shadow-xl shadow-blue-100/50 rounded-3xl p-8 border border-slate-100 animate-in fade-in zoom-in duration-300">
           <form onSubmit={handleDownload} className="space-y-4">
             <div className="relative">
-              <input type="text" placeholder="Link TikTok, YouTube (MP3), atau Pinterest (Video)..." className="w-full pl-5 pr-32 py-5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-blue-500 text-slate-800" value={url} onChange={(e) => setUrl(e.target.value)} required />
+              <input type="text" placeholder="Baru bisa tiktok, YT belum bisa" className="w-full pl-5 pr-32 py-5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-blue-500 text-slate-800" value={url} onChange={(e) => setUrl(e.target.value)} required />
               <button type="submit" disabled={loading} className="absolute right-2 top-2 bottom-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 rounded-xl disabled:opacity-50">{loading ? '...' : 'Download'}</button>
             </div>
           </form>
