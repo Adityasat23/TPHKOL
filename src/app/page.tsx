@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import html2canvas from 'html2canvas';
+import { toPng } from 'html-to-image';
 
 // Placeholder Avatar & Product
 const DEFAULT_AVATAR = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk8A8AAQsAzQ/8/GkAAAAASUVORK5CYII=";
 const DEFAULT_PRODUCT = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=";
 
-// --- SVG Icons (Inline agar html2canvas aman) ---
+// --- SVG Icons ---
 const TruckIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '4px' }}>
     <path d="M20 8h-3V4H3v13h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM8 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm12 0c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-7l2.12 2.83H17V11h2z" />
@@ -61,17 +61,18 @@ export default function Home() {
   // STATE: PRODUCT CARD GENERATOR
   const [productLayout, setProductLayout] = useState<'portrait' | 'landscape'>('landscape');
   const [productImage, setProductImage] = useState(DEFAULT_PRODUCT);
-  const [productTitle, setProductTitle] = useState("[MALL] TIMEPHORIA - MILKYWAY Liptint");
+  const [productTitle, setProductTitle] = useState("[MALL] TIMEPHORIA - MILKYWAY Liptint Glow");
   const [productPrice, setProductPrice] = useState("Rp87.120");
   const [productOriginalPrice, setProductOriginalPrice] = useState("Rp238.000");
   const [productSold, setProductSold] = useState("1.1K sold");
   const [productRating, setProductRating] = useState("4.9");
-  const [productTag, setProductTag] = useState("50%");
+  const [productTag, setProductTag] = useState("-63%");
   const [freeShippingText, setFreeShippingText] = useState("Free shipping");
-  const [discountTagText, setDiscountTagText] = useState("50% off");
+  const [discountTagText, setDiscountTagText] = useState("10% off");
 
   const productPreviewRef = useRef<HTMLDivElement>(null);
 
+  // ✅ KEMBALIKAN VARIABEL WARNA YANG TERHAPUS
   const TIKTOK_DARK_BG = "#121212";
   const TIKTOK_LIGHT_BG = "#ffffff";
   const TIKTOK_GRAY_TEXT = "#8a8b91";
@@ -109,54 +110,42 @@ export default function Home() {
     }
   };
 
+  // EXPORT MENGGUNAKAN HTML-TO-IMAGE
   const exportCommentImage = async () => {
-    const element = previewRef.current;
-    if (!element) return;
+    if (!previewRef.current) return;
     try {
       await document.fonts.ready;
-      await new Promise((r) => setTimeout(r, 300));
-      const canvas = await html2canvas(element, {
-        backgroundColor: null, scale: 3, useCORS: true, allowTaint: false, logging: false,
-        width: element.offsetWidth, height: element.scrollHeight,
-        windowWidth: element.offsetWidth, windowHeight: element.scrollHeight,
+      
+      const dataUrl = await toPng(previewRef.current, {
+        cacheBust: true,
+        pixelRatio: 3, 
+        backgroundColor: 'transparent'
       });
+
       const link = document.createElement('a');
-      link.download = `tiktok-${commentMode}-${username}.png`;
-      link.href = canvas.toDataURL('image/png');
+      link.download = `tiktok-${commentMode}-${Date.now()}.png`;
+      link.href = dataUrl;
       link.click();
     } catch (err) { alert("Export gagal"); }
   };
 
   const exportProductImage = async () => {
-    const element = productPreviewRef.current;
-    if (!element) return;
+    if (!productPreviewRef.current) return;
     try {
       await document.fonts.ready;
-      await new Promise((r) => setTimeout(r, 300));
       
-      const originalHeight = element.style.height;
-      element.style.height = 'auto';
-
-      const canvas = await html2canvas(element, {
-        backgroundColor: null,
-        scale: 3, 
-        useCORS: true,
-        allowTaint: false,
-        logging: false,
-        width: element.offsetWidth,
-        height: element.scrollHeight,
-        windowWidth: element.offsetWidth,
-        windowHeight: element.scrollHeight,
+      const dataUrl = await toPng(productPreviewRef.current, {
+        cacheBust: true,
+        pixelRatio: 3, 
+        backgroundColor: 'transparent'
       });
-
-      element.style.height = originalHeight;
 
       const link = document.createElement('a');
       link.download = `product-${productLayout}-${Date.now()}.png`;
-      link.href = canvas.toDataURL('image/png');
+      link.href = dataUrl;
       link.click();
     } catch (err) {
-      alert("Export Product Card gagal. Pastikan gambar valid.");
+      alert("Export Product Card gagal.");
     }
   };
 
@@ -299,7 +288,7 @@ export default function Home() {
                         </div>
                       </div>
                       <div style={{ textAlign: 'center', color: TIKTOK_GRAY_TEXT, flexShrink: 0, marginLeft: '8px' }}>
-                        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364 0z"></path></svg>
+                        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                         <p style={{ fontSize: '11px', margin: '4px 0 0 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>{replyLikes}</p>
                       </div>
                     </div>
@@ -356,7 +345,6 @@ export default function Home() {
           <div className="bg-slate-100 rounded-3xl p-10 flex items-center justify-center min-h-[500px] overflow-hidden border border-slate-200">
             <div style={{ padding: '40px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent' }}>
               
-              {/* ✅ WADAH PRODUK FINAL: Diperbaiki tata letak & pixel strict-nya */}
               <div ref={productPreviewRef} style={{ 
                 backgroundColor: '#ffffff', 
                 borderRadius: '12px', 
@@ -368,7 +356,6 @@ export default function Home() {
                 boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
               }}>
                 
-                {/* Bagian Gambar */}
                 <div style={{ 
                   position: 'relative', 
                   width: productLayout === 'portrait' ? '100%' : '200px', 
@@ -389,26 +376,16 @@ export default function Home() {
                   )}
                 </div>
 
-                {/* Bagian Info */}
                 <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#fff', boxSizing: 'border-box', minWidth: 0 }}>
                   
-                  {/* ✅ FIX 1: Hapus height mutlak agar judul bisa ke baris 2 tanpa terpotong setengah */}
                   <div style={{ 
-                    margin: '0 0 8px 0', 
-                    fontSize: '15px', 
-                    fontWeight: 600,
-                    color: '#222', 
-                    lineHeight: '20px', 
-                    maxHeight: '40px', // Membatasi max 2 baris (20px * 2)
-                    overflow: 'hidden',
-                    fontFamily: 'Arial, sans-serif',
-                    wordWrap: 'break-word',
-                    whiteSpace: 'normal'
+                    margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#222', lineHeight: '20px', 
+                    maxHeight: '40px', overflow: 'hidden', fontFamily: 'Arial, sans-serif',
+                    wordWrap: 'break-word', whiteSpace: 'normal'
                   }}>
                     {productTitle}
                   </div>
                   
-                  {/* Label Promosi */}
                   <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                     <span style={{ display: 'flex', alignItems: 'center', backgroundColor: '#e2f7f4', color: '#00b09b', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>
                       <TruckIcon /> {freeShippingText}
@@ -418,31 +395,25 @@ export default function Home() {
                     </span>
                   </div>
 
-                  {/* Rating */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#888', marginBottom: productLayout === 'portrait' ? '12px' : 'auto' }}>
                     {productLayout === 'landscape' ? (
-                      <span style={{ display: 'flex', alignItems: 'center' }}>
-                        <StarBlack/><StarBlack/><StarBlack/><StarBlack/><StarBlack/>
-                      </span>
-                    ) : (
-                      <StarYellow />
-                    )}
+                      <span style={{ display: 'flex', alignItems: 'center' }}><StarBlack/><StarBlack/><StarBlack/><StarBlack/><StarBlack/></span>
+                    ) : ( <StarYellow /> )}
                     <span style={{ color: productLayout === 'landscape' ? '#222' : '#fabb05', fontWeight: productLayout === 'landscape' ? 'normal' : 'bold', marginLeft: '2px' }}>{productRating}</span>
                     <span style={{ color: '#ccc', margin: '0 4px' }}>|</span>
                     <span>{productSold}</span>
                   </div>
 
-                  {/* ✅ FIX 2: Harga & Coret (Native textDecoration lebih aman untuk Canvas) */}
                   {productLayout === 'portrait' ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: 'auto' }}>
                       <span style={{ color: '#fe2c55', fontSize: '24px', fontWeight: 'bold', fontFamily: 'Arial, sans-serif' }}>{productPrice}</span>
-                      <span style={{ color: '#999999', fontSize: '14px', textDecoration: 'line-through', fontFamily: 'Arial, sans-serif' }}>{productOriginalPrice}</span>
+                      <del style={{ color: '#999999', fontSize: '14px', fontFamily: 'Arial, sans-serif' }}>{productOriginalPrice}</del>
                     </div>
                   ) : (
                     <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: '12px' }}>
                       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                         <span style={{ color: '#fe2c55', fontSize: '24px', fontWeight: 'bold', lineHeight: '24px', fontFamily: 'Arial, sans-serif' }}>{productPrice}</span>
-                        <span style={{ color: '#999999', fontSize: '14px', textDecoration: 'line-through', lineHeight: '14px', marginTop: '4px', fontFamily: 'Arial, sans-serif' }}>{productOriginalPrice}</span>
+                        <del style={{ color: '#999999', fontSize: '14px', lineHeight: '14px', marginTop: '4px', fontFamily: 'Arial, sans-serif' }}>{productOriginalPrice}</del>
                       </div>
                       
                       <div style={{ display: 'flex', height: '32px' }}>
@@ -465,19 +436,13 @@ export default function Home() {
       )}
 
       <footer style={{ 
-        marginTop: '80px', 
-        paddingTop: '40px', 
-        paddingBottom: '20px', 
-        textAlign: 'center', 
-        width: '100%', 
-        maxWidth: '1152px', 
-        borderTop: '1px solid #e2e8f0' 
+        marginTop: '80px', paddingTop: '40px', paddingBottom: '20px', textAlign: 'center', width: '100%', maxWidth: '1152px', borderTop: '1px solid #e2e8f0' 
       }}>
         <p style={{ color: '#64748b', fontSize: '14px' }}>
           &copy; {new Date().getFullYear()} <span style={{ fontWeight: 'bold', color: '#0f172a' }}>Aditya Satria Pratama</span>. All rights reserved.
         </p>
         <p style={{ color: '#94a3b8', fontSize: '12px', marginTop: '8px', fontStyle: 'italic' }}>
-          Updated with Pro Product Card Generator.
+          Powered by html-to-image (Stable Rendering).
         </p>
       </footer>
 
