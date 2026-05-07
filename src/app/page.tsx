@@ -254,10 +254,10 @@ export default function Home() {
             }}>
               {commentMode === 'sticker' && (
                 <div style={{ display: 'inline-flex', flexDirection: 'column', filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.15))' }}>
-                  <div style={{ backgroundColor: '#ffffff', borderRadius: '16px 16px 16px 0px', padding: '16px 24px', display: 'flex', width: '100%', maxWidth: '600px', gap: '12px', alignItems: 'flex-start' }}>
+                  <div style={{ backgroundColor: '#ffffff', borderRadius: '16px 24px 24px 24px', padding: '16px 24px', display: 'flex', width: '100%', maxWidth: '600px', gap: '12px', alignItems: 'flex-start' }}>
                     <img key={avatar} src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-                      <p style={{ color: '#8a8b91', fontSize: '14px', fontWeight: 'bold', margin: '0 0 2px 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
+                      <p style={{ color: '#8a8b91', fontSize: '14px', fontWeight: 'bold', margin: '0 0 1px 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
                       <p style={{ color: '#000000', fontSize: '18px', fontWeight: 'bold', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'Arial, Helvetica, sans-serif' }}>{commentText}</p>
                     </div>
                   </div>
