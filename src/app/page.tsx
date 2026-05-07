@@ -7,7 +7,7 @@ import html2canvas from 'html2canvas';
 const DEFAULT_AVATAR = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk8A8AAQsAzQ/8/GkAAAAASUVORK5CYII=";
 const DEFAULT_PRODUCT = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=";
 
-// --- SVG Icons (Inline agar html2canvas tidak error) ---
+// --- SVG Icons (Inline agar html2canvas aman) ---
 const TruckIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '4px' }}>
     <path d="M20 8h-3V4H3v13h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM8 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm12 0c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-7l2.12 2.83H17V11h2z" />
@@ -15,7 +15,13 @@ const TruckIcon = () => (
 );
 
 const StarYellow = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="#fabb05" style={{ marginRight: '4px', transform: 'translateY(-1px)' }}>
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="#fabb05" style={{ marginRight: '2px' }}>
+    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+  </svg>
+);
+
+const StarBlack = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="#222" style={{ marginRight: '1px' }}>
     <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
   </svg>
 );
@@ -55,14 +61,14 @@ export default function Home() {
   // STATE: PRODUCT CARD GENERATOR
   const [productLayout, setProductLayout] = useState<'portrait' | 'landscape'>('landscape');
   const [productImage, setProductImage] = useState(DEFAULT_PRODUCT);
-  const [productTitle, setProductTitle] = useState("[MALL] TIMEPHORIA - MILKYWAY Liptint Glow");
+  const [productTitle, setProductTitle] = useState("[MALL] TIMEPHORIA - MILKYWAY Liptint");
   const [productPrice, setProductPrice] = useState("Rp87.120");
   const [productOriginalPrice, setProductOriginalPrice] = useState("Rp238.000");
   const [productSold, setProductSold] = useState("1.1K sold");
   const [productRating, setProductRating] = useState("4.9");
-  const [productTag, setProductTag] = useState("-63%");
+  const [productTag, setProductTag] = useState("50%");
   const [freeShippingText, setFreeShippingText] = useState("Free shipping");
-  const [discountTagText, setDiscountTagText] = useState("10% off");
+  const [discountTagText, setDiscountTagText] = useState("50% off");
 
   const productPreviewRef = useRef<HTMLDivElement>(null);
 
@@ -129,7 +135,7 @@ export default function Home() {
       await new Promise((r) => setTimeout(r, 300));
       
       const originalHeight = element.style.height;
-      element.style.height = 'auto'; // Paksa agar seluruh div terbaca
+      element.style.height = 'auto';
 
       const canvas = await html2canvas(element, {
         backgroundColor: null,
@@ -163,13 +169,13 @@ export default function Home() {
         <h1 className="text-5xl font-black text-[#0f172a] mb-2 tracking-tight">
           TPH <span className="text-[#94a3b8]">Editor Tools</span>
         </h1>
-        <p className="text-[#64748b] text-lg">Untuk Sejawat Editor</p>
+        <p className="text-[#64748b] text-lg">Platform All-in-one untuk Kreator & Affiliate</p>
       </div>
 
       <div className="flex bg-white rounded-full shadow-sm border border-slate-200 p-1 mb-8">
         <button onClick={() => setActiveTab('downloader')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${activeTab === 'downloader' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>📥 DOWNLOADER</button>
         <button onClick={() => setActiveTab('comment')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${activeTab === 'comment' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>💬 FAKE COMMENT</button>
-        <button onClick={() => setActiveTab('product')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${activeTab === 'product' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>🛍️ TT PRODUCT SS</button>
+        <button onClick={() => setActiveTab('product')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${activeTab === 'product' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>🛍️ PRODUCT CARD</button>
       </div>
 
       {activeTab === 'downloader' && (
@@ -254,10 +260,10 @@ export default function Home() {
             }}>
               {commentMode === 'sticker' && (
                 <div style={{ display: 'inline-flex', flexDirection: 'column', filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.15))' }}>
-                  <div style={{ backgroundColor: '#ffffff', borderRadius: '16px 24px 24px 24px', padding: '16px 24px', display: 'flex', width: '100%', maxWidth: '600px', gap: '12px', alignItems: 'flex-start' }}>
+                  <div style={{ backgroundColor: '#ffffff', borderRadius: '16px 16px 16px 0px', padding: '16px 24px', display: 'flex', width: '100%', maxWidth: '600px', gap: '12px', alignItems: 'flex-start' }}>
                     <img key={avatar} src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-                      <p style={{ color: '#8a8b91', fontSize: '14px', fontWeight: 'bold', margin: '0 0 1px 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
+                      <p style={{ color: '#8a8b91', fontSize: '14px', fontWeight: 'bold', margin: '0 0 2px 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
                       <p style={{ color: '#000000', fontSize: '18px', fontWeight: 'bold', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'Arial, Helvetica, sans-serif' }}>{commentText}</p>
                     </div>
                   </div>
@@ -350,6 +356,7 @@ export default function Home() {
           <div className="bg-slate-100 rounded-3xl p-10 flex items-center justify-center min-h-[500px] overflow-hidden border border-slate-200">
             <div style={{ padding: '40px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent' }}>
               
+              {/* ✅ WADAH PRODUK FINAL: Diperbaiki tata letak & pixel strict-nya */}
               <div ref={productPreviewRef} style={{ 
                 backgroundColor: '#ffffff', 
                 borderRadius: '12px', 
@@ -361,10 +368,12 @@ export default function Home() {
                 boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
               }}>
                 
+                {/* Bagian Gambar */}
                 <div style={{ 
                   position: 'relative', 
                   width: productLayout === 'portrait' ? '100%' : '200px', 
-                  height: productLayout === 'portrait' ? '300px' : '220px',
+                  height: productLayout === 'portrait' ? '300px' : 'auto', 
+                  minHeight: productLayout === 'landscape' ? '200px' : 'auto',
                   flexShrink: 0
                 }}>
                   <img key={productImage} src={productImage} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
@@ -380,25 +389,27 @@ export default function Home() {
                   )}
                 </div>
 
-                {/* ✅ FIX: minWidth: 0 ditambahkan agar container text tidak terdorong tumpah */}
+                {/* Bagian Info */}
                 <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#fff', boxSizing: 'border-box', minWidth: 0 }}>
                   
-                  {/* ✅ FIX 1: Hapus height mutlak agar tulisan bebas manjang ke bawah */}
+                  {/* ✅ FIX 1: Hapus height mutlak agar judul bisa ke baris 2 tanpa terpotong setengah */}
                   <div style={{ 
                     margin: '0 0 8px 0', 
                     fontSize: '15px', 
                     fontWeight: 600,
                     color: '#222', 
-                    lineHeight: '1.4', 
+                    lineHeight: '20px', 
+                    maxHeight: '40px', // Membatasi max 2 baris (20px * 2)
+                    overflow: 'hidden',
                     fontFamily: 'Arial, sans-serif',
                     wordWrap: 'break-word',
-                    whiteSpace: 'normal',
-                    display: 'block'
+                    whiteSpace: 'normal'
                   }}>
                     {productTitle}
                   </div>
                   
-                  <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                  {/* Label Promosi */}
+                  <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                     <span style={{ display: 'flex', alignItems: 'center', backgroundColor: '#e2f7f4', color: '#00b09b', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>
                       <TruckIcon /> {freeShippingText}
                     </span>
@@ -407,37 +418,31 @@ export default function Home() {
                     </span>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#888', marginBottom: productLayout === 'portrait' ? '12px' : 'auto' }}>
+                  {/* Rating */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#888', marginBottom: productLayout === 'portrait' ? '12px' : 'auto' }}>
                     {productLayout === 'landscape' ? (
-                      <span style={{ color: '#222', fontSize: '14px', letterSpacing: '-1px' }}>★★★★★</span>
+                      <span style={{ display: 'flex', alignItems: 'center' }}>
+                        <StarBlack/><StarBlack/><StarBlack/><StarBlack/><StarBlack/>
+                      </span>
                     ) : (
                       <StarYellow />
                     )}
-                    <span style={{ color: productLayout === 'landscape' ? '#222' : '#fabb05', fontWeight: productLayout === 'landscape' ? 'normal' : 'bold' }}>{productRating}</span>
-                    <span style={{ color: '#ccc' }}>|</span>
+                    <span style={{ color: productLayout === 'landscape' ? '#222' : '#fabb05', fontWeight: productLayout === 'landscape' ? 'normal' : 'bold', marginLeft: '2px' }}>{productRating}</span>
+                    <span style={{ color: '#ccc', margin: '0 4px' }}>|</span>
                     <span>{productSold}</span>
                   </div>
 
+                  {/* ✅ FIX 2: Harga & Coret (Native textDecoration lebih aman untuk Canvas) */}
                   {productLayout === 'portrait' ? (
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: 'auto' }}>
-                      <span style={{ color: '#fe2c55', fontSize: '24px', fontWeight: 'bold', letterSpacing: '-0.5px', fontFamily: 'Arial, sans-serif' }}>{productPrice}</span>
-                      
-                      {/* ✅ FIX 2: Garis Coret (Line-through) manual Anti-Bug html2canvas */}
-                      <div style={{ position: 'relative', display: 'inline-block', color: '#999999', fontSize: '14px', fontFamily: 'Arial, sans-serif' }}>
-                        {productOriginalPrice}
-                        <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, borderTop: '1px solid #999999' }}></div>
-                      </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: 'auto' }}>
+                      <span style={{ color: '#fe2c55', fontSize: '24px', fontWeight: 'bold', fontFamily: 'Arial, sans-serif' }}>{productPrice}</span>
+                      <span style={{ color: '#999999', fontSize: '14px', textDecoration: 'line-through', fontFamily: 'Arial, sans-serif' }}>{productOriginalPrice}</span>
                     </div>
                   ) : (
                     <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: '12px' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ color: '#fe2c55', fontSize: '24px', fontWeight: 'bold', lineHeight: 1, fontFamily: 'Arial, sans-serif' }}>{productPrice}</span>
-                        
-                        {/* ✅ FIX 2: Garis Coret (Line-through) manual */}
-                        <div style={{ position: 'relative', display: 'inline-block', color: '#999999', fontSize: '14px', marginTop: '6px', fontFamily: 'Arial, sans-serif' }}>
-                          {productOriginalPrice}
-                          <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, borderTop: '1px solid #999999' }}></div>
-                        </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                        <span style={{ color: '#fe2c55', fontSize: '24px', fontWeight: 'bold', lineHeight: '24px', fontFamily: 'Arial, sans-serif' }}>{productPrice}</span>
+                        <span style={{ color: '#999999', fontSize: '14px', textDecoration: 'line-through', lineHeight: '14px', marginTop: '4px', fontFamily: 'Arial, sans-serif' }}>{productOriginalPrice}</span>
                       </div>
                       
                       <div style={{ display: 'flex', height: '32px' }}>
