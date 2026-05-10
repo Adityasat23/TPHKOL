@@ -72,7 +72,6 @@ export default function Home() {
   const [error, setError] = useState('');
 
   // STATE: PRODUCT CARD GENERATOR
-  // ✅ 3 Tipe Layout Product
   const [productLayout, setProductLayout] = useState<'tiktok-portrait' | 'tiktok-landscape' | 'shopee'>('tiktok-landscape');
   const [productImage, setProductImage] = useState(DEFAULT_PRODUCT);
   const [productTitle, setProductTitle] = useState("[MALL] TIMEPHORIA - MILKYWAY Liptint Glow");
@@ -83,7 +82,7 @@ export default function Home() {
   const [freeShippingText, setFreeShippingText] = useState("Free shipping");
   
   const [priceFormat, setPriceFormat] = useState<'exact' | 'k-an'>('exact');
-  const [showShopeeLive, setShowShopeeLive] = useState(true); // Toggle Khusus Shopee
+  const [showShopeeLive, setShowShopeeLive] = useState(true);
 
   const productPreviewRef = useRef<HTMLDivElement>(null);
 
@@ -141,7 +140,11 @@ export default function Home() {
     if (!productPreviewRef.current) return;
     try {
       await document.fonts.ready;
-      const dataUrl = await toPng(productPreviewRef.current, { cacheBust: true, pixelRatio: 3, backgroundColor: 'transparent' });
+      const dataUrl = await toPng(productPreviewRef.current, { 
+        cacheBust: true, 
+        pixelRatio: 3, 
+        backgroundColor: 'transparent' // Luarnya transparent, dalamnya solid
+      });
       const link = document.createElement('a');
       link.download = `product-${productLayout}-${Date.now()}.png`;
       link.href = dataUrl;
@@ -151,9 +154,7 @@ export default function Home() {
     }
   };
 
-  // ==========================================
-  // ✅ AUTO-MATH LOGIC & FIX HARGA Rp
-  // ==========================================
+  // AUTO-MATH LOGIC & FIX HARGA Rp
   const getNum = (str: string) => parseInt(str.replace(/[^0-9]/g, ''), 10) || 0;
   const origPriceNum = getNum(productOriginalPrice);
   const newPriceNum = getNum(productPrice);
@@ -166,7 +167,6 @@ export default function Home() {
   const autoDiscountBadge = discountPct > 0 ? `-${discountPct}%` : '';
   const autoDiscountTagText = discountPct > 0 ? `${discountPct}% off` : '';
 
-  // Memastikan selalu ada prefix 'Rp'
   let rawPrice = productPrice.trim();
   if (!rawPrice.toLowerCase().startsWith('rp')) rawPrice = 'Rp' + rawPrice;
 
@@ -340,7 +340,6 @@ export default function Home() {
         <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in zoom-in duration-300">
           
           <div className="bg-white shadow-xl rounded-3xl p-6 border border-slate-100 space-y-6 h-fit">
-            {/* ✅ Menu 3 Berjejer: TikTok PT | TikTok LS | Shopee */}
             <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
               <button onClick={() => setProductLayout('tiktok-portrait')} className={`flex-1 py-2 rounded-md font-bold text-xs ${productLayout === 'tiktok-portrait' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>📱 TIKTOK PT</button>
               <button onClick={() => setProductLayout('tiktok-landscape')} className={`flex-1 py-2 rounded-md font-bold text-xs ${productLayout === 'tiktok-landscape' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🖥️ TIKTOK LS</button>
@@ -395,24 +394,23 @@ export default function Home() {
               {productLayout === 'shopee' && (
                  <div ref={productPreviewRef} style={{
                     backgroundColor: '#ffffff',
-                    borderRadius: '4px', // Shopee lebih kaku ujungnya
+                    borderRadius: '4px',
                     width: '300px',
                     overflow: 'hidden',
                     boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
                     fontFamily: 'Arial, sans-serif'
                  }}>
-                    {/* Gambar */}
-                    <div style={{ position: 'relative', width: '100%', height: '300px' }}>
-                       <img src={productImage} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+                    {/* ✅ FIX: Aspect ratio gambar dikunci mutlak (Anti melar) */}
+                    <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
+                       <img src={productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                        {autoDiscountBadge && (
                           <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#fff0f1', color: '#ee4d2d', padding: '4px 6px', fontSize: '14px', fontWeight: 'bold' }}>
                              {autoDiscountBadge}
                           </div>
                        )}
                     </div>
-                    {/* Detail Konten */}
-                    <div style={{ padding: '8px' }}>
-                       {/* Judul + Live Badge */}
+                    {/* ✅ FIX: Background putih mutlak (Anti bolong/transparan) */}
+                    <div style={{ padding: '8px', backgroundColor: '#ffffff' }}>
                        <div style={{ fontSize: '14px', lineHeight: '20px', color: '#222', maxHeight: '40px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordWrap: 'break-word', whiteSpace: 'normal' }}>
                           {showShopeeLive && (
                              <span style={{ backgroundColor: '#ee4d2d', color: '#fff', fontSize: '10px', fontWeight: 'bold', padding: '1px 4px', borderRadius: '2px', marginRight: '6px', verticalAlign: 'middle', display: 'inline-flex', alignItems: 'center' }}>
@@ -422,7 +420,6 @@ export default function Home() {
                           <span style={{ verticalAlign: 'middle' }}>{productTitle}</span>
                        </div>
 
-                       {/* Rating */}
                        <div style={{ marginTop: '8px' }}>
                           <div style={{ border: '1px solid #fabb05', display: 'inline-flex', alignItems: 'center', padding: '1px 4px', borderRadius: '2px', gap: '4px' }}>
                              <StarYellow />
@@ -430,7 +427,6 @@ export default function Home() {
                           </div>
                        </div>
 
-                       {/* Harga & Bottom Row */}
                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                              <span style={{ color: '#ee4d2d', fontSize: '20px', fontWeight: 'bold' }}>{displayPrice}</span>
@@ -458,14 +454,16 @@ export default function Home() {
                   boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
                 }}>
                   
+                  {/* ✅ FIX: Aspect ratio gambar dikunci mutlak (Anti melar) */}
                   <div style={{ 
                     position: 'relative', 
-                    width: productLayout === 'tiktok-portrait' ? '100%' : '200px', 
-                    height: productLayout === 'tiktok-portrait' ? '300px' : 'auto', 
-                    minHeight: productLayout === 'tiktok-landscape' ? '200px' : 'auto',
-                    flexShrink: 0
+                    width: productLayout === 'tiktok-portrait' ? '300px' : '200px', 
+                    height: productLayout === 'tiktok-portrait' ? '300px' : '220px', // Ukuran pasti
+                    flexShrink: 0,
+                    backgroundColor: '#ffffff',
+                    overflow: 'hidden'
                   }}>
-                    <img key={productImage} src={productImage} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                    <img key={productImage} src={productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                     
                     {autoDiscountBadge && (
                       <div style={{ 
@@ -479,7 +477,8 @@ export default function Home() {
                     )}
                   </div>
 
-                  <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#fff', boxSizing: 'border-box', minWidth: 0 }}>
+                  {/* ✅ FIX: Background putih mutlak (Anti bolong/transparan) */}
+                  <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#ffffff', boxSizing: 'border-box', minWidth: 0 }}>
                     
                     <div style={{ 
                       margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#222', lineHeight: '20px', 
