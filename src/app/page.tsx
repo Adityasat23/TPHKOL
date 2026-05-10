@@ -59,20 +59,20 @@ export default function Home() {
   const [error, setError] = useState('');
 
   // STATE: PRODUCT CARD GENERATOR
-  const [productLayout, setProductLayout] = useState<'portrait' | 'landscape'>('landscape');
+  const [productLayout, setProductLayout] = useState<'portrait' | 'landscape'>('portrait');
   const [productImage, setProductImage] = useState(DEFAULT_PRODUCT);
   const [productTitle, setProductTitle] = useState("[MALL] TIMEPHORIA - MILKYWAY Liptint Glow");
   const [productPrice, setProductPrice] = useState("Rp87.120");
   const [productOriginalPrice, setProductOriginalPrice] = useState("Rp238.000");
   const [productSold, setProductSold] = useState("1.1K sold");
   const [productRating, setProductRating] = useState("4.9");
-  const [productTag, setProductTag] = useState("-63%");
   const [freeShippingText, setFreeShippingText] = useState("Free shipping");
-  const [discountTagText, setDiscountTagText] = useState("10% off");
+  
+  // ✅ STATE BARU: Format Harga
+  const [priceFormat, setPriceFormat] = useState<'exact' | 'k-an'>('exact');
 
   const productPreviewRef = useRef<HTMLDivElement>(null);
 
-  // ✅ KEMBALIKAN VARIABEL WARNA YANG TERHAPUS
   const TIKTOK_DARK_BG = "#121212";
   const TIKTOK_LIGHT_BG = "#ffffff";
   const TIKTOK_GRAY_TEXT = "#8a8b91";
@@ -115,13 +115,7 @@ export default function Home() {
     if (!previewRef.current) return;
     try {
       await document.fonts.ready;
-      
-      const dataUrl = await toPng(previewRef.current, {
-        cacheBust: true,
-        pixelRatio: 3, 
-        backgroundColor: 'transparent'
-      });
-
+      const dataUrl = await toPng(previewRef.current, { cacheBust: true, pixelRatio: 3, backgroundColor: 'transparent' });
       const link = document.createElement('a');
       link.download = `tiktok-${commentMode}-${Date.now()}.png`;
       link.href = dataUrl;
@@ -133,13 +127,7 @@ export default function Home() {
     if (!productPreviewRef.current) return;
     try {
       await document.fonts.ready;
-      
-      const dataUrl = await toPng(productPreviewRef.current, {
-        cacheBust: true,
-        pixelRatio: 3, 
-        backgroundColor: 'transparent'
-      });
-
+      const dataUrl = await toPng(productPreviewRef.current, { cacheBust: true, pixelRatio: 3, backgroundColor: 'transparent' });
       const link = document.createElement('a');
       link.download = `product-${productLayout}-${Date.now()}.png`;
       link.href = dataUrl;
@@ -148,6 +136,30 @@ export default function Home() {
       alert("Export Product Card gagal.");
     }
   };
+
+  // ==========================================
+  // ✅ AUTO-MATH LOGIC (Kalkulator Diskon Otomatis)
+  // ==========================================
+  const getNum = (str: string) => parseInt(str.replace(/[^0-9]/g, ''), 10) || 0;
+  const origPriceNum = getNum(productOriginalPrice);
+  const newPriceNum = getNum(productPrice);
+  
+  let discountPct = 0;
+  if (origPriceNum > 0 && newPriceNum > 0 && origPriceNum > newPriceNum) {
+    discountPct = Math.round(((origPriceNum - newPriceNum) / origPriceNum) * 100);
+  }
+
+  const autoDiscountBadge = discountPct > 0 ? `-${discountPct}%` : '';
+  const autoDiscountTagText = discountPct > 0 ? `${discountPct}% off` : '';
+
+  // ==========================================
+  // ✅ PRICE FORMAT LOGIC
+  // ==========================================
+  let displayPrice = productPrice;
+  if (priceFormat === 'k-an' && newPriceNum > 0) {
+    const kValue = Math.floor(newPriceNum / 1000);
+    displayPrice = `Rp${kValue}Kan`; // Output: Rp87Kan
+  }
 
   if (!isReady) return null;
 
@@ -158,7 +170,7 @@ export default function Home() {
         <h1 className="text-5xl font-black text-[#0f172a] mb-2 tracking-tight">
           TPH <span className="text-[#94a3b8]">Editor Tools</span>
         </h1>
-        <p className="text-[#64748b] text-lg">Semoga membantu teman teman</p>
+        <p className="text-[#64748b] text-lg">Platform All-in-one untuk Kreator & Affiliate</p>
       </div>
 
       <div className="flex bg-white rounded-full shadow-sm border border-slate-200 p-1 mb-8">
@@ -171,7 +183,7 @@ export default function Home() {
         <div className="w-full max-w-2xl bg-white shadow-xl shadow-blue-100/50 rounded-3xl p-8 border border-slate-100 animate-in fade-in zoom-in duration-300">
           <form onSubmit={handleDownload} className="space-y-4">
             <div className="relative">
-              <input type="text" placeholder="Baru bisa tiktok, YT belum bisa" className="w-full pl-5 pr-32 py-5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-blue-500 text-slate-800" value={url} onChange={(e) => setUrl(e.target.value)} required />
+              <input type="text" placeholder="Link TikTok, YouTube (MP3), atau Pinterest (Video)..." className="w-full pl-5 pr-32 py-5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-blue-500 text-slate-800" value={url} onChange={(e) => setUrl(e.target.value)} required />
               <button type="submit" disabled={loading} className="absolute right-2 top-2 bottom-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 rounded-xl disabled:opacity-50">{loading ? '...' : 'Download'}</button>
             </div>
           </form>
@@ -204,10 +216,16 @@ export default function Home() {
                 <button onClick={() => setThreadTheme('light')} className={`flex-1 py-2 rounded-md font-bold text-xs ${threadTheme === 'light' ? 'bg-white text-slate-900 shadow' : 'text-slate-500'}`}>☀️ LIGHT MODE</button>
               </div>
             )}
+            
             <div className="space-y-4">
               <h3 className="font-bold text-blue-600 uppercase text-xs tracking-widest">Komentar Utama</h3>
               <input type="file" onChange={(e) => handleImageUpload(e, setAvatar)} className="text-xs block w-full" />
-              <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" className="w-full p-3 bg-slate-50 border rounded-xl" />
+              
+              {/* ✅ FIX 1: Kolom Username HANYA muncul di mode Thread */}
+              {commentMode === 'thread' && (
+                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" className="w-full p-3 bg-slate-50 border rounded-xl" />
+              )}
+              
               {commentMode === 'sticker' ? (
                  <input type="text" value={replyTo} onChange={(e) => setReplyTo(e.target.value)} placeholder="Reply to username..." className="w-full p-3 bg-slate-50 border rounded-xl" />
               ) : (
@@ -241,60 +259,59 @@ export default function Home() {
           </div>
 
           <div className="bg-[#0f172a] rounded-3xl p-10 flex items-center justify-center min-h-[500px] overflow-hidden">
-            <div ref={previewRef} style={{ 
-              backgroundColor: 'transparent',
-              padding: commentMode === 'sticker' ? '30px 30px 150px 30px' : '30px',
-              display: 'inline-flex', width: commentMode === 'sticker' ? '600px' : '600px',
-              flexDirection: 'column', fontFamily: 'Arial, Helvetica, sans-serif'
-            }}>
-              {commentMode === 'sticker' && (
-                <div style={{ display: 'inline-flex', flexDirection: 'column', filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.15))' }}>
-                  <div style={{ backgroundColor: '#ffffff', borderRadius: '16px 16px 16px 0px', padding: '16px 24px', display: 'flex', width: '100%', maxWidth: '600px', gap: '12px', alignItems: 'flex-start' }}>
-                    <img key={avatar} src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-                      <p style={{ color: '#8a8b91', fontSize: '14px', fontWeight: 'bold', margin: '0 0 2px 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
-                      <p style={{ color: '#000000', fontSize: '18px', fontWeight: 'bold', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'Arial, Helvetica, sans-serif' }}>{commentText}</p>
-                    </div>
-                  </div>
-                  <svg width="36" height="20" viewBox="0 0 36 20" style={{ display: 'block', alignSelf: 'flex-start' }} xmlns="http://www.w3.org/2000/svg">
-                    <polygon points="0,0 36,0 0,20" fill="#ffffff" />
-                  </svg>
-                </div>
-              )}
-              {commentMode === 'thread' && (
-                <div style={{ backgroundColor: threadTheme === 'dark' ? TIKTOK_DARK_BG : TIKTOK_LIGHT_BG, padding: '20px 24px', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '20px', width: '500px', minHeight: '100px' }}>
-                  <div style={{ display: 'flex', gap: '12px' }}>
-                    <img key={avatar} src={avatar} style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-                    <div style={{ flex: 1 }}>
-                      <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif' }}>{username}</p>
-                      <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '3px 0', lineHeight: 1.4, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'Arial, Helvetica, sans-serif' }}>{commentText}</p>
-                      <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 600, marginTop: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                        <span>{date}</span><span>Reply</span>
+            <div style={{ padding: '30px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent' }}>
+              
+              <div ref={previewRef} style={{ display: 'inline-flex', flexDirection: 'column', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                {commentMode === 'sticker' && (
+                  <div style={{ display: 'inline-flex', flexDirection: 'column', filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.15))' }}>
+                    {/* ✅ FIX 2: Lebar max-width Stiker dirapikan menjadi 380px agar tidak kepanjangan */}
+                    <div style={{ backgroundColor: '#ffffff', borderRadius: '16px 16px 16px 0px', padding: '16px 24px 26px 24px', display: 'flex', width: '100%', maxWidth: '380px', gap: '12px', alignItems: 'flex-start' }}>
+                      <img key={avatar} src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+                        <p style={{ color: '#8a8b91', fontSize: '14px', fontWeight: 'bold', margin: '0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
+                        <p style={{ color: '#000000', fontSize: '18px', fontWeight: 'bold', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'Arial, Helvetica, sans-serif' }}>{commentText}</p>
                       </div>
                     </div>
-                    <div style={{ textAlign: 'center', color: TIKTOK_GRAY_TEXT, flexShrink: 0, marginLeft: '8px' }}>
-                      <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                      <p style={{ fontSize: '12px', margin: '4px 0 0 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>{likes}</p>
-                    </div>
+                    <svg width="36" height="20" viewBox="0 0 36 20" style={{ display: 'block', alignSelf: 'flex-start', marginTop: '-1px' }} xmlns="http://www.w3.org/2000/svg">
+                      <polygon points="0,0 36,0 0,20" fill="#ffffff" />
+                    </svg>
                   </div>
-                  {showReply && (
-                    <div style={{ display: 'flex', gap: '12px', marginLeft: '50px' }}>
-                      <img key={replyAvatar} src={replyAvatar} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                )}
+                {commentMode === 'thread' && (
+                  <div style={{ backgroundColor: threadTheme === 'dark' ? TIKTOK_DARK_BG : TIKTOK_LIGHT_BG, padding: '20px 24px', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '20px', width: '500px' }}>
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                      <img key={avatar} src={avatar} style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                       <div style={{ flex: 1 }}>
-                        <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif' }}>{replyUsername}</p>
-                        <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '3px 0', lineHeight: 1.4, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'Arial, Helvetica, sans-serif' }}>{replyText}</p>
+                        <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif' }}>{username}</p>
+                        <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '3px 0', lineHeight: 1.4, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'Arial, Helvetica, sans-serif' }}>{commentText}</p>
                         <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 600, marginTop: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                          <span>{replyDate}</span><span>Reply</span>
+                          <span>{date}</span><span>Reply</span>
                         </div>
                       </div>
                       <div style={{ textAlign: 'center', color: TIKTOK_GRAY_TEXT, flexShrink: 0, marginLeft: '8px' }}>
-                        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                        <p style={{ fontSize: '11px', margin: '4px 0 0 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>{replyLikes}</p>
+                        <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                        <p style={{ fontSize: '12px', margin: '4px 0 0 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>{likes}</p>
                       </div>
                     </div>
-                  )}
-                </div>
-              )}
+                    {showReply && (
+                      <div style={{ display: 'flex', gap: '12px', marginLeft: '50px' }}>
+                        <img key={replyAvatar} src={replyAvatar} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                        <div style={{ flex: 1 }}>
+                          <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif' }}>{replyUsername}</p>
+                          <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '3px 0', lineHeight: 1.4, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'Arial, Helvetica, sans-serif' }}>{replyText}</p>
+                          <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 600, marginTop: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                            <span>{replyDate}</span><span>Reply</span>
+                          </div>
+                        </div>
+                        <div style={{ textAlign: 'center', color: TIKTOK_GRAY_TEXT, flexShrink: 0, marginLeft: '8px' }}>
+                          <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364 0z"></path></svg>
+                          <p style={{ fontSize: '11px', margin: '4px 0 0 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>{replyLikes}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -312,6 +329,12 @@ export default function Home() {
               <button onClick={() => setProductLayout('landscape')} className={`flex-1 py-2 rounded-md font-bold text-xs ${productLayout === 'landscape' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🖥️ LANDSCAPE</button>
             </div>
 
+            {/* ✅ FIX 4: Toggle Format Harga Baru */}
+            <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
+              <button onClick={() => setPriceFormat('exact')} className={`flex-1 py-2 rounded-md font-bold text-xs ${priceFormat === 'exact' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🔢 HARGA EXACT</button>
+              <button onClick={() => setPriceFormat('k-an')} className={`flex-1 py-2 rounded-md font-bold text-xs ${priceFormat === 'k-an' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🔥 HARGA K-AN</button>
+            </div>
+
             <div className="space-y-4">
               <h3 className="font-bold text-pink-600 uppercase text-xs tracking-widest">Detail Produk</h3>
               
@@ -323,20 +346,16 @@ export default function Home() {
               <input type="text" value={productTitle} onChange={(e) => setProductTitle(e.target.value)} placeholder="Nama Produk" className="w-full p-3 bg-slate-50 border rounded-xl" />
               
               <div className="grid grid-cols-2 gap-2">
-                <input type="text" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} placeholder="Harga (cth: Rp87.120)" className="w-full p-3 bg-slate-50 border rounded-xl font-bold text-pink-600" />
+                <input type="text" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} placeholder="Harga Baru (cth: Rp87.120)" className="w-full p-3 bg-slate-50 border rounded-xl font-bold text-pink-600" />
                 <input type="text" value={productOriginalPrice} onChange={(e) => setProductOriginalPrice(e.target.value)} placeholder="Harga Coret (cth: Rp238.000)" className="w-full p-3 bg-slate-50 border rounded-xl text-slate-400" />
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
-                <input type="text" value={freeShippingText} onChange={(e) => setFreeShippingText(e.target.value)} placeholder="Teks Label 1 (Free shipping)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
-                <input type="text" value={discountTagText} onChange={(e) => setDiscountTagText(e.target.value)} placeholder="Teks Label 2 (10% off)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
-              </div>
-
               <div className="grid grid-cols-3 gap-2">
+                <input type="text" value={freeShippingText} onChange={(e) => setFreeShippingText(e.target.value)} placeholder="Label Tambahan" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
                 <input type="text" value={productRating} onChange={(e) => setProductRating(e.target.value)} placeholder="Rating (4.9)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
                 <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="Terjual (1.1K sold)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
-                <input type="text" value={productTag} onChange={(e) => setProductTag(e.target.value)} placeholder="Pojok Kanan (-63%)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
               </div>
+              <p className="text-xs text-slate-400 font-medium italic">*Diskon persen otomatis dihitung dari harga</p>
             </div>
 
             <button onClick={exportProductImage} className="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-[0.98]">📸 Export Product Card</button>
@@ -364,14 +383,16 @@ export default function Home() {
                   flexShrink: 0
                 }}>
                   <img key={productImage} src={productImage} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                  {productTag && (
+                  
+                  {/* ✅ Badge Diskon Hasil Kalkulasi Otomatis */}
+                  {autoDiscountBadge && (
                     <div style={{ 
                       position: 'absolute', top: 0, right: 0, 
                       backgroundColor: '#fe2c55', color: '#fff', 
                       padding: '4px 8px', fontSize: '14px', fontWeight: 'bold', 
                       borderBottomLeftRadius: '8px', zIndex: 10 
                     }}>
-                      {productTag}
+                      {autoDiscountBadge}
                     </div>
                   )}
                 </div>
@@ -390,9 +411,13 @@ export default function Home() {
                     <span style={{ display: 'flex', alignItems: 'center', backgroundColor: '#e2f7f4', color: '#00b09b', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>
                       <TruckIcon /> {freeShippingText}
                     </span>
-                    <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>
-                      {discountTagText}
-                    </span>
+                    
+                    {/* ✅ Tag Diskon Hasil Kalkulasi Otomatis */}
+                    {autoDiscountTagText && (
+                      <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>
+                        {autoDiscountTagText}
+                      </span>
+                    )}
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#888', marginBottom: productLayout === 'portrait' ? '12px' : 'auto' }}>
@@ -406,13 +431,15 @@ export default function Home() {
 
                   {productLayout === 'portrait' ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: 'auto' }}>
-                      <span style={{ color: '#fe2c55', fontSize: '24px', fontWeight: 'bold', fontFamily: 'Arial, sans-serif' }}>{productPrice}</span>
+                      {/* ✅ Menggunakan State Harga yang diformat */}
+                      <span style={{ color: '#fe2c55', fontSize: '24px', fontWeight: 'bold', fontFamily: 'Arial, sans-serif' }}>{displayPrice}</span>
                       <del style={{ color: '#999999', fontSize: '14px', fontFamily: 'Arial, sans-serif' }}>{productOriginalPrice}</del>
                     </div>
                   ) : (
                     <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: '12px' }}>
                       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                        <span style={{ color: '#fe2c55', fontSize: '24px', fontWeight: 'bold', lineHeight: '24px', fontFamily: 'Arial, sans-serif' }}>{productPrice}</span>
+                        {/* ✅ Menggunakan State Harga yang diformat */}
+                        <span style={{ color: '#fe2c55', fontSize: '24px', fontWeight: 'bold', lineHeight: '24px', fontFamily: 'Arial, sans-serif' }}>{displayPrice}</span>
                         <del style={{ color: '#999999', fontSize: '14px', lineHeight: '14px', marginTop: '4px', fontFamily: 'Arial, sans-serif' }}>{productOriginalPrice}</del>
                       </div>
                       
@@ -440,9 +467,6 @@ export default function Home() {
       }}>
         <p style={{ color: '#64748b', fontSize: '14px' }}>
           &copy; {new Date().getFullYear()} <span style={{ fontWeight: 'bold', color: '#0f172a' }}>Aditya Satria Pratama</span>. All rights reserved.
-        </p>
-        <p style={{ color: '#94a3b8', fontSize: '12px', marginTop: '8px', fontStyle: 'italic' }}>
-          Powered by html-to-image (Stable Rendering).
         </p>
       </footer>
 
