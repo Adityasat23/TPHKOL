@@ -77,11 +77,13 @@ export default function Home() {
   const [productTitle, setProductTitle] = useState("[MALL] TIMEPHORIA - MILKYWAY Liptint Glow");
   const [productPrice, setProductPrice] = useState("87.120");
   const [productOriginalPrice, setProductOriginalPrice] = useState("238.000");
+  // ✅ STATE BARU: Unit Harga
+  const [productUnit, setProductUnit] = useState("/pcs");
   const [productSold, setProductSold] = useState("1.1K sold");
   const [productRating, setProductRating] = useState("4.9");
   const [freeShippingText, setFreeShippingText] = useState("Free shipping");
   
-  const [priceFormat, setPriceFormat] = useState<'exact' | 'k-an'>('exact');
+  const [priceFormat, setPriceFormat] = useState<'exact' | 'k-an'>('k-an');
   const [showShopeeLive, setShowShopeeLive] = useState(true);
 
   const productPreviewRef = useRef<HTMLDivElement>(null);
@@ -123,7 +125,6 @@ export default function Home() {
     }
   };
 
-  // EXPORT MENGGUNAKAN HTML-TO-IMAGE
   const exportCommentImage = async () => {
     if (!previewRef.current) return;
     try {
@@ -143,7 +144,7 @@ export default function Home() {
       const dataUrl = await toPng(productPreviewRef.current, { 
         cacheBust: true, 
         pixelRatio: 3, 
-        backgroundColor: 'transparent' // Luarnya transparent, dalamnya solid
+        backgroundColor: 'transparent' 
       });
       const link = document.createElement('a');
       link.download = `product-${productLayout}-${Date.now()}.png`;
@@ -154,7 +155,9 @@ export default function Home() {
     }
   };
 
-  // AUTO-MATH LOGIC & FIX HARGA Rp
+  // ==========================================
+  // AUTO-MATH LOGIC & FORMATTING
+  // ==========================================
   const getNum = (str: string) => parseInt(str.replace(/[^0-9]/g, ''), 10) || 0;
   const origPriceNum = getNum(productOriginalPrice);
   const newPriceNum = getNum(productPrice);
@@ -167,8 +170,9 @@ export default function Home() {
   const autoDiscountBadge = discountPct > 0 ? `-${discountPct}%` : '';
   const autoDiscountTagText = discountPct > 0 ? `${discountPct}% off` : '';
 
+  // Force Prefix Rp
   let rawPrice = productPrice.trim();
-  if (!rawPrice.toLowerCase().startsWith('rp')) rawPrice = 'Rp' + rawPrice;
+  if (rawPrice && !rawPrice.toLowerCase().startsWith('rp')) rawPrice = 'Rp' + rawPrice;
 
   let rawOrigPrice = productOriginalPrice.trim();
   if (rawOrigPrice && !rawOrigPrice.toLowerCase().startsWith('rp')) rawOrigPrice = 'Rp' + rawOrigPrice;
@@ -188,7 +192,7 @@ export default function Home() {
         <h1 className="text-5xl font-black text-[#0f172a] mb-2 tracking-tight">
           TPH <span className="text-[#94a3b8]">Editor Tools</span>
         </h1>
-        <p className="text-[#64748b] text-lg">Semoga membantu fren</p>
+        <p className="text-[#64748b] text-lg">Platform All-in-one untuk Kreator & Affiliate</p>
       </div>
 
       <div className="flex bg-white rounded-full shadow-sm border border-slate-200 p-1 mb-8 overflow-x-auto">
@@ -197,6 +201,9 @@ export default function Home() {
         <button onClick={() => setActiveTab('product')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'product' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>🛍️ PRODUCT CARD</button>
       </div>
 
+      {/* ========================================= */}
+      {/* TAB 1: DOWNLOADER */}
+      {/* ========================================= */}
       {activeTab === 'downloader' && (
         <div className="w-full max-w-2xl bg-white shadow-xl shadow-blue-100/50 rounded-3xl p-8 border border-slate-100 animate-in fade-in zoom-in duration-300">
           <form onSubmit={handleDownload} className="space-y-4">
@@ -221,6 +228,9 @@ export default function Home() {
         </div>
       )}
 
+      {/* ========================================= */}
+      {/* TAB 2: FAKE COMMENT */}
+      {/* ========================================= */}
       {activeTab === 'comment' && (
         <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in zoom-in duration-300">
           <div className="bg-white shadow-xl rounded-3xl p-6 border border-slate-100 space-y-6 h-fit">
@@ -361,13 +371,15 @@ export default function Home() {
 
               <input type="text" value={productTitle} onChange={(e) => setProductTitle(e.target.value)} placeholder="Nama Produk" className="w-full p-3 bg-slate-50 border rounded-xl" />
               
-              <div className="grid grid-cols-2 gap-2">
-                <input type="text" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} placeholder="Harga Baru (cth: 87.120)" className="w-full p-3 bg-slate-50 border rounded-xl font-bold text-pink-600" />
-                <input type="text" value={productOriginalPrice} onChange={(e) => setProductOriginalPrice(e.target.value)} placeholder="Harga Coret (cth: 238.000)" className="w-full p-3 bg-slate-50 border rounded-xl text-slate-400" />
+              {/* ✅ ADD OPTION: Unit Harga Tambahan */}
+              <div className="grid grid-cols-3 gap-2">
+                <input type="text" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} placeholder="Baru (87.120)" className="w-full p-3 bg-slate-50 border rounded-xl font-bold text-pink-600" />
+                <input type="text" value={productOriginalPrice} onChange={(e) => setProductOriginalPrice(e.target.value)} placeholder="Coret (238.000)" className="w-full p-3 bg-slate-50 border rounded-xl text-slate-400" />
+                <input type="text" value={productUnit} onChange={(e) => setProductUnit(e.target.value)} placeholder="Unit (cth: /pcs)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm font-bold text-slate-600" />
               </div>
 
               <div className="grid grid-cols-3 gap-2">
-                <input type="text" value={freeShippingText} onChange={(e) => setFreeShippingText(e.target.value)} placeholder="Label 1" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
+                <input type="text" value={freeShippingText} onChange={(e) => setFreeShippingText(e.target.value)} placeholder="Label Promo" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
                 <input type="text" value={productRating} onChange={(e) => setProductRating(e.target.value)} placeholder="Rating (4.9)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
                 <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="Terjual (1.1K)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
               </div>
@@ -400,7 +412,6 @@ export default function Home() {
                     boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
                     fontFamily: 'Arial, sans-serif'
                  }}>
-                    {/* ✅ FIX: Aspect ratio gambar dikunci mutlak (Anti melar) */}
                     <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
                        <img src={productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                        {autoDiscountBadge && (
@@ -409,7 +420,6 @@ export default function Home() {
                           </div>
                        )}
                     </div>
-                    {/* ✅ FIX: Background putih mutlak (Anti bolong/transparan) */}
                     <div style={{ padding: '8px', backgroundColor: '#ffffff' }}>
                        <div style={{ fontSize: '14px', lineHeight: '20px', color: '#222', maxHeight: '40px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordWrap: 'break-word', whiteSpace: 'normal' }}>
                           {showShopeeLive && (
@@ -427,13 +437,17 @@ export default function Home() {
                           </div>
                        </div>
 
-                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                             <span style={{ color: '#ee4d2d', fontSize: '20px', fontWeight: 'bold' }}>{displayPrice}</span>
+                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', gap: '8px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
+                             {/* ✅ FIX: Support Unit Shopee */}
+                             <span style={{ color: '#ee4d2d', fontSize: '20px', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
+                               {displayPrice}
+                               {productUnit && <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
+                             </span>
                              <ShopeeTicketIcon />
-                             <span style={{ fontSize: '12px', color: '#757575', marginLeft: '4px' }}>{productSold}</span>
+                             <span style={{ fontSize: '12px', color: '#757575', marginLeft: '4px', whiteSpace: 'nowrap' }}>{productSold}</span>
                           </div>
-                          <ShopeeDots />
+                          <div style={{ flexShrink: 0 }}><ShopeeDots /></div>
                        </div>
                     </div>
                  </div>
@@ -454,11 +468,10 @@ export default function Home() {
                   boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
                 }}>
                   
-                  {/* ✅ FIX: Aspect ratio gambar dikunci mutlak (Anti melar) */}
                   <div style={{ 
                     position: 'relative', 
                     width: productLayout === 'tiktok-portrait' ? '300px' : '200px', 
-                    height: productLayout === 'tiktok-portrait' ? '300px' : '220px', // Ukuran pasti
+                    height: productLayout === 'tiktok-portrait' ? '300px' : '220px',
                     flexShrink: 0,
                     backgroundColor: '#ffffff',
                     overflow: 'hidden'
@@ -477,7 +490,6 @@ export default function Home() {
                     )}
                   </div>
 
-                  {/* ✅ FIX: Background putih mutlak (Anti bolong/transparan) */}
                   <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#ffffff', boxSizing: 'border-box', minWidth: 0 }}>
                     
                     <div style={{ 
@@ -510,18 +522,41 @@ export default function Home() {
                     </div>
 
                     {productLayout === 'tiktok-portrait' ? (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: 'auto' }}>
-                        <span style={{ color: '#fe2c55', fontSize: '24px', fontWeight: 'bold', fontFamily: 'Arial, sans-serif' }}>{displayPrice}</span>
-                        <del style={{ color: '#999999', fontSize: '14px', fontFamily: 'Arial, sans-serif' }}>{rawOrigPrice}</del>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: 'auto', flexWrap: 'wrap' }}>
+                        <span style={{ color: '#fe2c55', fontSize: '24px', fontWeight: 'bold', fontFamily: 'Arial, sans-serif' }}>
+                          {displayPrice}
+                          {/* ✅ FIX: Unit TikTok Portrait */}
+                          {productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
+                        </span>
+                        
+                        {rawOrigPrice && (
+                          <div style={{ color: '#999999', fontSize: '14px', fontFamily: 'Arial, sans-serif' }}>
+                            <del>{rawOrigPrice}</del>
+                            {productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}
+                          </div>
+                        )}
                       </div>
                     ) : (
-                      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: '12px' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                          <span style={{ color: '#fe2c55', fontSize: '24px', fontWeight: 'bold', lineHeight: '24px', fontFamily: 'Arial, sans-serif' }}>{displayPrice}</span>
-                          <del style={{ color: '#999999', fontSize: '14px', lineHeight: '14px', marginTop: '4px', fontFamily: 'Arial, sans-serif' }}>{rawOrigPrice}</del>
+                      // ✅ FIX 2: Jarak 16px ditambahkan di gap agar teks tidak menabrak tombol Buy
+                      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: '12px', gap: '16px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, minWidth: 0 }}>
+                          
+                          <div style={{ color: '#fe2c55', fontSize: '24px', fontWeight: 'bold', lineHeight: '24px', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {displayPrice}
+                            {/* ✅ FIX: Unit TikTok Landscape Utama */}
+                            {productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
+                          </div>
+                          
+                          {rawOrigPrice && (
+                            <div style={{ color: '#999999', fontSize: '14px', lineHeight: '14px', marginTop: '4px', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              <del>{rawOrigPrice}</del>
+                              {/* ✅ FIX: Unit TikTok Landscape Coret */}
+                              {productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}
+                            </div>
+                          )}
                         </div>
                         
-                        <div style={{ display: 'flex', height: '32px' }}>
+                        <div style={{ display: 'flex', height: '32px', flexShrink: 0 }}>
                           <div style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '0 10px', display: 'flex', alignItems: 'center', borderTopLeftRadius: '4px', borderBottomLeftRadius: '4px' }}>
                             <CartIcon />
                           </div>
