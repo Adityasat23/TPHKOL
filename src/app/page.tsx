@@ -77,7 +77,6 @@ export default function Home() {
   const [productTitle, setProductTitle] = useState("[MALL] TIMEPHORIA - MILKYWAY Liptint Glow");
   const [productPrice, setProductPrice] = useState("87.120");
   const [productOriginalPrice, setProductOriginalPrice] = useState("238.000");
-  // ✅ STATE BARU: Unit Harga
   const [productUnit, setProductUnit] = useState("/pcs");
   const [productSold, setProductSold] = useState("1.1K sold");
   const [productRating, setProductRating] = useState("4.9");
@@ -125,6 +124,7 @@ export default function Home() {
     }
   };
 
+  // EXPORT MENGGUNAKAN HTML-TO-IMAGE
   const exportCommentImage = async () => {
     if (!previewRef.current) return;
     try {
@@ -182,6 +182,17 @@ export default function Home() {
     const kValue = Math.floor(newPriceNum / 1000);
     displayPrice = `Rp${kValue}K-an`;
   }
+
+  // ✅ FIX: DYNAMIC FONT SIZING CALCULATOR
+  // Mengukur panjang karakter harga + unit untuk mengecilkan font otomatis jika terlalu panjang
+  const priceStrLength = displayPrice.length + productUnit.length;
+  
+  // Font Size untuk TikTok Landscape (Ruang paling sempit)
+  const tiktokLsMainFontSize = priceStrLength > 11 ? '18px' : '24px';
+  // Font Size untuk TikTok Portrait
+  const tiktokPtMainFontSize = priceStrLength > 12 ? '20px' : '24px';
+  // Font Size untuk Shopee
+  const shopeeMainFontSize = priceStrLength > 12 ? '17px' : '20px';
 
   if (!isReady) return null;
 
@@ -371,17 +382,18 @@ export default function Home() {
 
               <input type="text" value={productTitle} onChange={(e) => setProductTitle(e.target.value)} placeholder="Nama Produk" className="w-full p-3 bg-slate-50 border rounded-xl" />
               
-              {/* ✅ ADD OPTION: Unit Harga Tambahan */}
               <div className="grid grid-cols-3 gap-2">
                 <input type="text" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} placeholder="Baru (87.120)" className="w-full p-3 bg-slate-50 border rounded-xl font-bold text-pink-600" />
                 <input type="text" value={productOriginalPrice} onChange={(e) => setProductOriginalPrice(e.target.value)} placeholder="Coret (238.000)" className="w-full p-3 bg-slate-50 border rounded-xl text-slate-400" />
                 <input type="text" value={productUnit} onChange={(e) => setProductUnit(e.target.value)} placeholder="Unit (cth: /pcs)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm font-bold text-slate-600" />
               </div>
 
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <input type="text" value={freeShippingText} onChange={(e) => setFreeShippingText(e.target.value)} placeholder="Label Promo" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
-                <input type="text" value={productRating} onChange={(e) => setProductRating(e.target.value)} placeholder="Rating (4.9)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
-                <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="Terjual (1.1K)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
+                <div className="grid grid-cols-2 gap-2">
+                  <input type="text" value={productRating} onChange={(e) => setProductRating(e.target.value)} placeholder="Rating" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
+                  <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="Terjual" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
+                </div>
               </div>
 
               {productLayout === 'shopee' && (
@@ -391,7 +403,7 @@ export default function Home() {
                 </div>
               )}
 
-              <p className="text-xs text-slate-400 font-medium italic">*Diskon otomatis dihitung. Format Rp otomatis ditambahkan.</p>
+              <p className="text-xs text-slate-400 font-medium italic">*Diskon persen otomatis dihitung. Teks otomatis mengecil jika kepanjangan.</p>
             </div>
 
             <button onClick={exportProductImage} className={`w-full text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-[0.98] ${productLayout === 'shopee' ? 'bg-orange-600 hover:bg-orange-700' : 'bg-pink-600 hover:bg-pink-700'}`}>📸 Export Product Card</button>
@@ -439,8 +451,8 @@ export default function Home() {
 
                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', gap: '8px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
-                             {/* ✅ FIX: Support Unit Shopee */}
-                             <span style={{ color: '#ee4d2d', fontSize: '20px', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
+                             {/* ✅ FIX: Dynamic Size untuk Shopee */}
+                             <span style={{ color: '#ee4d2d', fontSize: shopeeMainFontSize, fontWeight: 'bold', whiteSpace: 'nowrap' }}>
                                {displayPrice}
                                {productUnit && <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
                              </span>
@@ -501,10 +513,11 @@ export default function Home() {
                     </div>
                     
                     <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                      <span style={{ display: 'flex', alignItems: 'center', backgroundColor: '#e2f7f4', color: '#00b09b', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>
-                        <TruckIcon /> {freeShippingText}
-                      </span>
-                      
+                      {freeShippingText && (
+                        <span style={{ display: 'flex', alignItems: 'center', backgroundColor: '#e2f7f4', color: '#00b09b', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>
+                          <TruckIcon /> {freeShippingText}
+                        </span>
+                      )}
                       {autoDiscountTagText && (
                         <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>
                           {autoDiscountTagText}
@@ -523,9 +536,9 @@ export default function Home() {
 
                     {productLayout === 'tiktok-portrait' ? (
                       <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: 'auto', flexWrap: 'wrap' }}>
-                        <span style={{ color: '#fe2c55', fontSize: '24px', fontWeight: 'bold', fontFamily: 'Arial, sans-serif' }}>
+                        {/* ✅ FIX: Dynamic Size untuk TikTok Portrait */}
+                        <span style={{ color: '#fe2c55', fontSize: tiktokPtMainFontSize, fontWeight: 'bold', fontFamily: 'Arial, sans-serif' }}>
                           {displayPrice}
-                          {/* ✅ FIX: Unit TikTok Portrait */}
                           {productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
                         </span>
                         
@@ -537,20 +550,19 @@ export default function Home() {
                         )}
                       </div>
                     ) : (
-                      // ✅ FIX 2: Jarak 16px ditambahkan di gap agar teks tidak menabrak tombol Buy
-                      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: '12px', gap: '16px' }}>
+                      // ✅ FIX: Hapus overflow hidden & ellipsis agar teks muat, serta atur gap aman
+                      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: '12px', gap: '12px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, minWidth: 0 }}>
                           
-                          <div style={{ color: '#fe2c55', fontSize: '24px', fontWeight: 'bold', lineHeight: '24px', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {/* ✅ FIX: Dynamic Size untuk TikTok Landscape (Hapus ellipsis, biarkan word nowrap dengan font kecil) */}
+                          <div style={{ color: '#fe2c55', fontSize: tiktokLsMainFontSize, fontWeight: 'bold', lineHeight: '1.2', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>
                             {displayPrice}
-                            {/* ✅ FIX: Unit TikTok Landscape Utama */}
                             {productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
                           </div>
                           
                           {rawOrigPrice && (
-                            <div style={{ color: '#999999', fontSize: '14px', lineHeight: '14px', marginTop: '4px', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            <div style={{ color: '#999999', fontSize: '14px', lineHeight: '1.2', marginTop: '2px', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>
                               <del>{rawOrigPrice}</del>
-                              {/* ✅ FIX: Unit TikTok Landscape Coret */}
                               {productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}
                             </div>
                           )}
