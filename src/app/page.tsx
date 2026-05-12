@@ -264,7 +264,6 @@ export default function Home() {
               ) : (
                 <div className="grid grid-cols-2 gap-2">
                   <input type="text" value={likes} onChange={(e) => setLikes(e.target.value)} placeholder="Likes" className="p-3 bg-slate-50 border rounded-xl" />
-                  {/* ✅ FIX: Date Picker Kalender untuk Komentar Utama */}
                   <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="p-3 bg-slate-50 border rounded-xl" />
                 </div>
               )}
@@ -284,7 +283,6 @@ export default function Home() {
                       <input type="text" value={replyUsername} onChange={(e) => setReplyUsername(e.target.value)} placeholder="Reply Username" className="w-full p-3 bg-slate-50 border rounded-xl" />
                       <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="Likes" className="w-full p-3 bg-slate-50 border rounded-xl" />
                     </div>
-                    {/* ✅ FIX: Date Picker Kalender untuk Balasan */}
                     <div className="mb-2">
                       <input type="date" value={replyDate} onChange={(e) => setReplyDate(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl" />
                     </div>
@@ -301,8 +299,10 @@ export default function Home() {
               
               <div ref={previewRef} style={{ display: 'inline-flex', flexDirection: 'column', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                 {commentMode === 'sticker' && (
-                  <div style={{ display: 'inline-flex', flexDirection: 'column', filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.15))' }}>
-                    <div style={{ backgroundColor: '#ffffff', borderRadius: '16px 16px 16px 0px', padding: '16px 24px 26px 24px', display: 'flex', width: '100%', maxWidth: '380px', gap: '12px', alignItems: 'flex-start' }}>
+                  /* ✅ FIX: Hapus filter drop-shadow agar tidak ada shadow keluar kotak putihnya */
+                  <div style={{ display: 'inline-flex', flexDirection: 'column' }}>
+                    {/* ✅ FIX: Ganti padding bottom dari 26px jadi 12px agar tidak terlalu lebar jarak bawahnya */}
+                    <div style={{ backgroundColor: '#ffffff', borderRadius: '16px 16px 16px 0px', padding: '16px 24px 12px 24px', display: 'flex', width: '100%', maxWidth: '380px', gap: '12px', alignItems: 'flex-start' }}>
                       <img key={avatar} src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
                         <p style={{ color: '#8a8b91', fontSize: '14px', fontWeight: 'bold', margin: '0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
@@ -325,7 +325,6 @@ export default function Home() {
                           <span>{date}</span><span>Reply</span>
                         </div>
                       </div>
-                      {/* ✅ FIX: Anti-Mleyot untuk Ikon Like Utama */}
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: TIKTOK_GRAY_TEXT, flexShrink: 0, marginLeft: '8px', minWidth: '32px' }}>
                         <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" style={{ flexShrink: 0 }}><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                         <p style={{ fontSize: '12px', margin: '4px 0 0 0', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'center' }}>{likes}</p>
@@ -341,7 +340,6 @@ export default function Home() {
                             <span>{replyDate}</span><span>Reply</span>
                           </div>
                         </div>
-                        {/* ✅ FIX: Anti-Mleyot untuk Ikon Like Balasan */}
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: TIKTOK_GRAY_TEXT, flexShrink: 0, marginLeft: '8px', minWidth: '32px' }}>
                           <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" style={{ flexShrink: 0 }}><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                           <p style={{ fontSize: '11px', margin: '4px 0 0 0', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'center' }}>{replyLikes}</p>
