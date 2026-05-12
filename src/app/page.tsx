@@ -183,15 +183,10 @@ export default function Home() {
     displayPrice = `Rp${kValue}K-an`;
   }
 
-  // ✅ FIX: DYNAMIC FONT SIZING CALCULATOR
-  // Mengukur panjang karakter harga + unit untuk mengecilkan font otomatis jika terlalu panjang
+  // DYNAMIC FONT SIZING CALCULATOR
   const priceStrLength = displayPrice.length + productUnit.length;
-  
-  // Font Size untuk TikTok Landscape (Ruang paling sempit)
   const tiktokLsMainFontSize = priceStrLength > 11 ? '18px' : '24px';
-  // Font Size untuk TikTok Portrait
   const tiktokPtMainFontSize = priceStrLength > 12 ? '20px' : '24px';
-  // Font Size untuk Shopee
   const shopeeMainFontSize = priceStrLength > 12 ? '17px' : '20px';
 
   if (!isReady) return null;
@@ -269,7 +264,8 @@ export default function Home() {
               ) : (
                 <div className="grid grid-cols-2 gap-2">
                   <input type="text" value={likes} onChange={(e) => setLikes(e.target.value)} placeholder="Likes" className="p-3 bg-slate-50 border rounded-xl" />
-                  <input type="text" value={date} onChange={(e) => setDate(e.target.value)} placeholder="Date" className="p-3 bg-slate-50 border rounded-xl" />
+                  {/* ✅ FIX: Date Picker Kalender untuk Komentar Utama */}
+                  <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="p-3 bg-slate-50 border rounded-xl" />
                 </div>
               )}
               <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl min-h-[100px]" />
@@ -287,6 +283,10 @@ export default function Home() {
                     <div className="grid grid-cols-2 gap-2">
                       <input type="text" value={replyUsername} onChange={(e) => setReplyUsername(e.target.value)} placeholder="Reply Username" className="w-full p-3 bg-slate-50 border rounded-xl" />
                       <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="Likes" className="w-full p-3 bg-slate-50 border rounded-xl" />
+                    </div>
+                    {/* ✅ FIX: Date Picker Kalender untuk Balasan */}
+                    <div className="mb-2">
+                      <input type="date" value={replyDate} onChange={(e) => setReplyDate(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl" />
                     </div>
                     <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl min-h-[80px]" />
                   </>
@@ -325,9 +325,10 @@ export default function Home() {
                           <span>{date}</span><span>Reply</span>
                         </div>
                       </div>
-                      <div style={{ textAlign: 'center', color: TIKTOK_GRAY_TEXT, flexShrink: 0, marginLeft: '8px' }}>
-                        <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                        <p style={{ fontSize: '12px', margin: '4px 0 0 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>{likes}</p>
+                      {/* ✅ FIX: Anti-Mleyot untuk Ikon Like Utama */}
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: TIKTOK_GRAY_TEXT, flexShrink: 0, marginLeft: '8px', minWidth: '32px' }}>
+                        <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" style={{ flexShrink: 0 }}><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                        <p style={{ fontSize: '12px', margin: '4px 0 0 0', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'center' }}>{likes}</p>
                       </div>
                     </div>
                     {showReply && (
@@ -340,9 +341,10 @@ export default function Home() {
                             <span>{replyDate}</span><span>Reply</span>
                           </div>
                         </div>
-                        <div style={{ textAlign: 'center', color: TIKTOK_GRAY_TEXT, flexShrink: 0, marginLeft: '8px' }}>
-                          <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364 0z"></path></svg>
-                          <p style={{ fontSize: '11px', margin: '4px 0 0 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>{replyLikes}</p>
+                        {/* ✅ FIX: Anti-Mleyot untuk Ikon Like Balasan */}
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: TIKTOK_GRAY_TEXT, flexShrink: 0, marginLeft: '8px', minWidth: '32px' }}>
+                          <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" style={{ flexShrink: 0 }}><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                          <p style={{ fontSize: '11px', margin: '4px 0 0 0', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'center' }}>{replyLikes}</p>
                         </div>
                       </div>
                     )}
@@ -388,12 +390,10 @@ export default function Home() {
                 <input type="text" value={productUnit} onChange={(e) => setProductUnit(e.target.value)} placeholder="Unit (cth: /pcs)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm font-bold text-slate-600" />
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 <input type="text" value={freeShippingText} onChange={(e) => setFreeShippingText(e.target.value)} placeholder="Label Promo" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
-                <div className="grid grid-cols-2 gap-2">
-                  <input type="text" value={productRating} onChange={(e) => setProductRating(e.target.value)} placeholder="Rating" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
-                  <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="Terjual" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
-                </div>
+                <input type="text" value={productRating} onChange={(e) => setProductRating(e.target.value)} placeholder="Rating (4.9)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
+                <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="Terjual (1.1K)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
               </div>
 
               {productLayout === 'shopee' && (
@@ -403,7 +403,7 @@ export default function Home() {
                 </div>
               )}
 
-              <p className="text-xs text-slate-400 font-medium italic">*Diskon persen otomatis dihitung. Teks otomatis mengecil jika kepanjangan.</p>
+              <p className="text-xs text-slate-400 font-medium italic">*Diskon otomatis dihitung. Format Rp otomatis ditambahkan.</p>
             </div>
 
             <button onClick={exportProductImage} className={`w-full text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-[0.98] ${productLayout === 'shopee' ? 'bg-orange-600 hover:bg-orange-700' : 'bg-pink-600 hover:bg-pink-700'}`}>📸 Export Product Card</button>
@@ -451,7 +451,6 @@ export default function Home() {
 
                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', gap: '8px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
-                             {/* ✅ FIX: Dynamic Size untuk Shopee */}
                              <span style={{ color: '#ee4d2d', fontSize: shopeeMainFontSize, fontWeight: 'bold', whiteSpace: 'nowrap' }}>
                                {displayPrice}
                                {productUnit && <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
@@ -536,7 +535,6 @@ export default function Home() {
 
                     {productLayout === 'tiktok-portrait' ? (
                       <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: 'auto', flexWrap: 'wrap' }}>
-                        {/* ✅ FIX: Dynamic Size untuk TikTok Portrait */}
                         <span style={{ color: '#fe2c55', fontSize: tiktokPtMainFontSize, fontWeight: 'bold', fontFamily: 'Arial, sans-serif' }}>
                           {displayPrice}
                           {productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
@@ -550,11 +548,9 @@ export default function Home() {
                         )}
                       </div>
                     ) : (
-                      // ✅ FIX: Hapus overflow hidden & ellipsis agar teks muat, serta atur gap aman
                       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: '12px', gap: '12px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, minWidth: 0 }}>
                           
-                          {/* ✅ FIX: Dynamic Size untuk TikTok Landscape (Hapus ellipsis, biarkan word nowrap dengan font kecil) */}
                           <div style={{ color: '#fe2c55', fontSize: tiktokLsMainFontSize, fontWeight: 'bold', lineHeight: '1.2', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>
                             {displayPrice}
                             {productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
