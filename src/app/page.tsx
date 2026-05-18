@@ -116,13 +116,13 @@ export default function Home() {
   const productPreviewRef = useRef<HTMLDivElement>(null);
 
   // STATE: WA CHAT
-  const [waGroupName, setWaGroupName] = useState("TIMEPHORIA Team 💄");
+  const [waGroupName, setWaGroupName] = useState("KOL ASIK 💄");
   const [waGroupAvatar, setWaGroupAvatar] = useState(TIMEPHORIA_LOGO);
   const [waTheme, setWaTheme] = useState<'light' | 'dark'>('dark'); 
   const [waMessages, setWaMessages] = useState<WaMessage[]>([
-    { id: 1, sender: 'other', name: '+62 812-3456-7890', color: '#e53935', text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit? 😍', image: '', time: '10:15' },
-    { id: 2, sender: 'me', name: '', color: '', text: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Silakan diorder kak! 🙏', image: '', time: '10:16' },
-    { id: 3, sender: 'other', name: '~Siska', color: '#1e88e5', text: 'Wah mantap min! Ut enim ad minim veniam.', image: '', time: '10:17' },
+    { id: 1, sender: 'other', name: '+62 812-3456-7890', color: '#e53935', text: 'Besok lari?', image: '', time: '10:15' },
+    { id: 2, sender: 'me', name: '', color: '', text: 'izin gue mau pulang! 🙏', image: '', time: '10:16' },
+    { id: 3, sender: 'other', name: '~Siska', color: '#1e88e5', text: 'gue juga kak.', image: '', time: '10:17' },
   ]);
   const waPreviewRef = useRef<HTMLDivElement>(null);
 
@@ -274,7 +274,7 @@ export default function Home() {
         <h1 className="text-5xl font-black text-[#0f172a] mb-2 tracking-tight">
           TPH <span className="text-[#94a3b8]">Editor Tools</span>
         </h1>
-        <p className="text-[#64748b] text-lg">Platform All-in-one untuk Kreator & Affiliate</p>
+        <p className="text-[#64748b] text-lg">Semoga membantu guys</p>
       </div>
 
       {/* ✅ URUTAN TAB: Downloader -> Fake Comment -> Product Card -> WA Chat */}
