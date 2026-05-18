@@ -7,6 +7,9 @@ import { toPng } from 'html-to-image';
 const DEFAULT_AVATAR = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk8A8AAQsAzQ/8/GkAAAAASUVORK5CYII=";
 const DEFAULT_PRODUCT = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=";
 
+// ✅ FIXED TIMEPHORIA LOGO (Base64 SVG agar langsung muncul tanpa perlu file)
+const TIMEPHORIA_LOGO = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMjAwIDIwMCI+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSIxMDAiIGZpbGw9IiMwMDAwMDAiIC8+PHRleHQgeD0iMTAwIiB5PSIxMDgiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMCIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9ImJvbGQiIGxldHRlci1zcGFjaW5nPSIyIj5USU1FUEhPUklBPC90ZXh0Pjwvc3ZnPg==';
+
 // --- SVG Icons TikTok ---
 const TruckIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '4px' }}>
@@ -45,8 +48,37 @@ const ShopeeDots = () => (
   </svg>
 );
 
+// --- SVG Icons WhatsApp ---
+const WaBackIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="#ffffff"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+);
+const WaVideoIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+);
+const WaCallIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+);
+const WaDotsIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+);
+const WaTickIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="#53bdeb"><path d="M18 7l-1.41-1.41-6.34 6.34 1.41 1.41L18 7zm4.24-1.41L11.66 16.17 7.48 12l-1.41 1.41L11.66 19l12-12-1.42-1.41zM.41 13.41L6 19l1.41-1.41L1.83 12 .41 13.41z"/></svg>
+);
+
+// Tipe Data untuk WA Chat
+type WaMessage = {
+  id: number;
+  sender: 'me' | 'other';
+  name: string; // Nama pengirim (hanya muncul jika 'other')
+  color: string; // Warna nama acak untuk 'other'
+  text: string;
+  image: string; // Base64
+  time: string;
+};
+
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'downloader' | 'comment' | 'product'>('product');
+  // ✅ 4 TABS SEKARANG
+  const [activeTab, setActiveTab] = useState<'downloader' | 'comment' | 'product' | 'wa'>('wa');
   
   // STATE: FAKE COMMENT
   const [commentMode, setCommentMode] = useState<'sticker' | 'thread'>('sticker'); 
@@ -58,11 +90,9 @@ export default function Home() {
   const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
   const [replyTo, setReplyTo] = useState('creator');
   const [showReply, setShowReply] = useState(true);
-  const [replyUsername, setReplyUsername] = useState('Timephoria');
   const [replyText, setReplyText] = useState('BESOK!');
   const [replyLikes, setReplyLikes] = useState('5');
   const [replyDate, setReplyDate] = useState('2025-11-17');
-  const [replyAvatar, setReplyAvatar] = useState(DEFAULT_AVATAR);
   const previewRef = useRef<HTMLDivElement>(null);
 
   // STATE: DOWNLOADER
@@ -81,17 +111,27 @@ export default function Home() {
   const [productSold, setProductSold] = useState("1.1K sold");
   const [productRating, setProductRating] = useState("4.9");
   const [freeShippingText, setFreeShippingText] = useState("Free shipping");
-  
   const [priceFormat, setPriceFormat] = useState<'exact' | 'k-an'>('k-an');
   const [showShopeeLive, setShowShopeeLive] = useState(true);
-
   const productPreviewRef = useRef<HTMLDivElement>(null);
+
+  // ✅ STATE BARU: WA CHAT
+  const [waGroupName, setWaGroupName] = useState("TIMEPHORIA Team 💄");
+  const [waGroupAvatar, setWaGroupAvatar] = useState(TIMEPHORIA_LOGO);
+  const [waMessages, setWaMessages] = useState<WaMessage[]>([
+    { id: 1, sender: 'other', name: '+62 812-3456-7890', color: '#e53935', text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit? 😍', image: '', time: '10:15' },
+    { id: 2, sender: 'me', name: '', color: '', text: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Silakan diorder kak! 🙏', image: '', time: '10:16' },
+    { id: 3, sender: 'other', name: '~Siska', color: '#1e88e5', text: 'Wah mantap min! Ut enim ad minim veniam.', image: '', time: '10:17' },
+  ]);
+  const waPreviewRef = useRef<HTMLDivElement>(null);
 
   const TIKTOK_DARK_BG = "#121212";
   const TIKTOK_LIGHT_BG = "#ffffff";
   const TIKTOK_GRAY_TEXT = "#8a8b91";
   const TIKTOK_WHITE_TEXT = "#ffffff";
   const TIKTOK_BLACK_TEXT = "#161823";
+
+  const WA_COLORS = ['#e53935', '#d81b60', '#8e24aa', '#5e35b1', '#3949ab', '#1e88e5', '#039be5', '#00897b', '#00838f', '#2e7d32', '#43a047', '#f57c00', '#ef6c00', '#d84315'];
 
   const [isReady, setIsReady] = useState(false);
   useEffect(() => { setIsReady(true); }, []);
@@ -124,7 +164,32 @@ export default function Home() {
     }
   };
 
-  // EXPORT MENGGUNAKAN HTML-TO-IMAGE
+  // ✅ Fungsi Helper WA Chat
+  const addWaMessage = () => {
+    const randomColor = WA_COLORS[Math.floor(Math.random() * WA_COLORS.length)];
+    setWaMessages([...waMessages, { 
+      id: Date.now(), sender: 'other', name: 'User Baru', color: randomColor, text: 'Lorem ipsum dolor sit amet...', image: '', time: '12:00' 
+    }]);
+  };
+
+  const updateWaMessage = (id: number, field: keyof WaMessage, value: any) => {
+    setWaMessages(waMessages.map(msg => msg.id === id ? { ...msg, [field]: value } : msg));
+  };
+
+  const handleWaMessageImage = (id: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => updateWaMessage(id, 'image', reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeWaMessage = (id: number) => {
+    setWaMessages(waMessages.filter(msg => msg.id !== id));
+  };
+
+  // --- EXPORT FUNCTIONS ---
   const exportCommentImage = async () => {
     if (!previewRef.current) return;
     try {
@@ -141,23 +206,27 @@ export default function Home() {
     if (!productPreviewRef.current) return;
     try {
       await document.fonts.ready;
-      const dataUrl = await toPng(productPreviewRef.current, { 
-        cacheBust: true, 
-        pixelRatio: 3, 
-        backgroundColor: 'transparent' 
-      });
+      const dataUrl = await toPng(productPreviewRef.current, { cacheBust: true, pixelRatio: 3, backgroundColor: 'transparent' });
       const link = document.createElement('a');
       link.download = `product-${productLayout}-${Date.now()}.png`;
       link.href = dataUrl;
       link.click();
-    } catch (err) {
-      alert("Export Product Card gagal.");
-    }
+    } catch (err) { alert("Export Product Card gagal."); }
   };
 
-  // ==========================================
+  const exportWaImage = async () => {
+    if (!waPreviewRef.current) return;
+    try {
+      await document.fonts.ready;
+      const dataUrl = await toPng(waPreviewRef.current, { cacheBust: true, pixelRatio: 3, backgroundColor: 'transparent' });
+      const link = document.createElement('a');
+      link.download = `whatsapp-chat-${Date.now()}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) { alert("Export WA Chat gagal."); }
+  };
+
   // AUTO-MATH LOGIC & FORMATTING
-  // ==========================================
   const getNum = (str: string) => parseInt(str.replace(/[^0-9]/g, ''), 10) || 0;
   const origPriceNum = getNum(productOriginalPrice);
   const newPriceNum = getNum(productPrice);
@@ -170,10 +239,8 @@ export default function Home() {
   const autoDiscountBadge = discountPct > 0 ? `-${discountPct}%` : '';
   const autoDiscountTagText = discountPct > 0 ? `${discountPct}% off` : '';
 
-  // Force Prefix Rp
   let rawPrice = productPrice.trim();
   if (rawPrice && !rawPrice.toLowerCase().startsWith('rp')) rawPrice = 'Rp' + rawPrice;
-
   let rawOrigPrice = productOriginalPrice.trim();
   if (rawOrigPrice && !rawOrigPrice.toLowerCase().startsWith('rp')) rawOrigPrice = 'Rp' + rawOrigPrice;
 
@@ -183,7 +250,6 @@ export default function Home() {
     displayPrice = `Rp${kValue}K-an`;
   }
 
-  // DYNAMIC FONT SIZING CALCULATOR
   const priceStrLength = displayPrice.length + productUnit.length;
   const tiktokLsMainFontSize = priceStrLength > 11 ? '18px' : '24px';
   const tiktokPtMainFontSize = priceStrLength > 12 ? '20px' : '24px';
@@ -201,10 +267,11 @@ export default function Home() {
         <p className="text-[#64748b] text-lg">Platform All-in-one untuk Kreator & Affiliate</p>
       </div>
 
-      <div className="flex bg-white rounded-full shadow-sm border border-slate-200 p-1 mb-8 overflow-x-auto">
+      <div className="flex bg-white rounded-full shadow-sm border border-slate-200 p-1 mb-8 overflow-x-auto w-full max-w-4xl justify-center">
         <button onClick={() => setActiveTab('downloader')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'downloader' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>📥 DOWNLOADER</button>
         <button onClick={() => setActiveTab('comment')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'comment' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>💬 FAKE COMMENT</button>
         <button onClick={() => setActiveTab('product')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'product' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>🛍️ PRODUCT CARD</button>
+        <button onClick={() => setActiveTab('wa')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'wa' ? 'bg-[#008069] text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>💬 WA CHAT</button>
       </div>
 
       {/* ========================================= */}
@@ -235,7 +302,7 @@ export default function Home() {
       )}
 
       {/* ========================================= */}
-      {/* TAB 2: FAKE COMMENT */}
+      {/* TAB 2: FAKE COMMENT (FIXED TIMEPHORIA IDENTITY) */}
       {/* ========================================= */}
       {activeTab === 'comment' && (
         <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in zoom-in duration-300">
@@ -273,20 +340,17 @@ export default function Home() {
             {commentMode === 'thread' && (
               <div className="space-y-4 pt-4 border-t border-slate-100">
                 <div className="flex justify-between items-center">
-                  <h3 className="font-bold text-indigo-600 uppercase text-xs tracking-widest">Balasan (Reply)</h3>
+                  <h3 className="font-bold text-indigo-600 uppercase text-xs tracking-widest">Balasan (Fixed Timephoria)</h3>
                   <input type="checkbox" checked={showReply} onChange={() => setShowReply(!showReply)} />
                 </div>
                 {showReply && (
                   <>
-                    <input type="file" onChange={(e) => handleImageUpload(e, setReplyAvatar)} className="text-xs block w-full" />
+                    <p className="text-xs text-slate-400 italic">Nama dan Logo balasan sudah dikunci ke akun resmi Timephoria.</p>
                     <div className="grid grid-cols-2 gap-2">
-                      <input type="text" value={replyUsername} onChange={(e) => setReplyUsername(e.target.value)} placeholder="Reply Username" className="w-full p-3 bg-slate-50 border rounded-xl" />
-                      <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="Likes" className="w-full p-3 bg-slate-50 border rounded-xl" />
-                    </div>
-                    <div className="mb-2">
+                      <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="Likes Balasan" className="w-full p-3 bg-slate-50 border rounded-xl" />
                       <input type="date" value={replyDate} onChange={(e) => setReplyDate(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl" />
                     </div>
-                    <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl min-h-[80px]" />
+                    <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl min-h-[80px]" placeholder="Teks balasan admin..." />
                   </>
                 )}
               </div>
@@ -299,9 +363,7 @@ export default function Home() {
               
               <div ref={previewRef} style={{ display: 'inline-flex', flexDirection: 'column', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                 {commentMode === 'sticker' && (
-                  /* ✅ FIX: Hapus filter drop-shadow agar tidak ada shadow keluar kotak putihnya */
                   <div style={{ display: 'inline-flex', flexDirection: 'column' }}>
-                    {/* ✅ FIX: Ganti padding bottom dari 26px jadi 12px agar tidak terlalu lebar jarak bawahnya */}
                     <div style={{ backgroundColor: '#ffffff', borderRadius: '16px 16px 16px 0px', padding: '16px 24px 12px 24px', display: 'flex', width: '100%', maxWidth: '380px', gap: '12px', alignItems: 'flex-start' }}>
                       <img key={avatar} src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
@@ -332,9 +394,11 @@ export default function Home() {
                     </div>
                     {showReply && (
                       <div style={{ display: 'flex', gap: '12px', marginLeft: '50px' }}>
-                        <img key={replyAvatar} src={replyAvatar} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                        {/* ✅ FIX: Logo Timephoria dikunci paten */}
+                        <img src={TIMEPHORIA_LOGO} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                         <div style={{ flex: 1 }}>
-                          <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif' }}>{replyUsername}</p>
+                          {/* ✅ FIX: Nama Timephoria dikunci paten */}
+                          <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif' }}>Timephoria</p>
                           <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '3px 0', lineHeight: 1.4, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'Arial, Helvetica, sans-serif' }}>{replyText}</p>
                           <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 600, marginTop: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                             <span>{replyDate}</span><span>Reply</span>
@@ -359,7 +423,6 @@ export default function Home() {
       {/* ========================================= */}
       {activeTab === 'product' && (
         <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in zoom-in duration-300">
-          
           <div className="bg-white shadow-xl rounded-3xl p-6 border border-slate-100 space-y-6 h-fit">
             <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
               <button onClick={() => setProductLayout('tiktok-portrait')} className={`flex-1 py-2 rounded-md font-bold text-xs ${productLayout === 'tiktok-portrait' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>📱 TIKTOK PT</button>
@@ -400,8 +463,6 @@ export default function Home() {
                   <label className="text-sm font-bold text-slate-600">Tampilkan Label [LIVE]</label>
                 </div>
               )}
-
-              <p className="text-xs text-slate-400 font-medium italic">*Diskon otomatis dihitung. Format Rp otomatis ditambahkan.</p>
             </div>
 
             <button onClick={exportProductImage} className={`w-full text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-[0.98] ${productLayout === 'shopee' ? 'bg-orange-600 hover:bg-orange-700' : 'bg-pink-600 hover:bg-pink-700'}`}>📸 Export Product Card</button>
@@ -410,48 +471,30 @@ export default function Home() {
           <div className="bg-slate-100 rounded-3xl p-10 flex items-center justify-center min-h-[500px] overflow-hidden border border-slate-200">
             <div style={{ padding: '40px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent' }}>
               
-              {/* ========================================= */}
-              {/* RENDER KHUSUS: SHOPEE */}
-              {/* ========================================= */}
               {productLayout === 'shopee' && (
-                 <div ref={productPreviewRef} style={{
-                    backgroundColor: '#ffffff',
-                    borderRadius: '4px',
-                    width: '300px',
-                    overflow: 'hidden',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                    fontFamily: 'Arial, sans-serif'
-                 }}>
+                 <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '4px', width: '300px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', fontFamily: 'Arial, sans-serif' }}>
                     <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
                        <img src={productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                        {autoDiscountBadge && (
-                          <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#fff0f1', color: '#ee4d2d', padding: '4px 6px', fontSize: '14px', fontWeight: 'bold' }}>
-                             {autoDiscountBadge}
-                          </div>
+                          <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#fff0f1', color: '#ee4d2d', padding: '4px 6px', fontSize: '14px', fontWeight: 'bold' }}>{autoDiscountBadge}</div>
                        )}
                     </div>
                     <div style={{ padding: '8px', backgroundColor: '#ffffff' }}>
                        <div style={{ fontSize: '14px', lineHeight: '20px', color: '#222', maxHeight: '40px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordWrap: 'break-word', whiteSpace: 'normal' }}>
                           {showShopeeLive && (
-                             <span style={{ backgroundColor: '#ee4d2d', color: '#fff', fontSize: '10px', fontWeight: 'bold', padding: '1px 4px', borderRadius: '2px', marginRight: '6px', verticalAlign: 'middle', display: 'inline-flex', alignItems: 'center' }}>
-                                |・| LIVE
-                             </span>
+                             <span style={{ backgroundColor: '#ee4d2d', color: '#fff', fontSize: '10px', fontWeight: 'bold', padding: '1px 4px', borderRadius: '2px', marginRight: '6px', verticalAlign: 'middle', display: 'inline-flex', alignItems: 'center' }}>|・| LIVE</span>
                           )}
                           <span style={{ verticalAlign: 'middle' }}>{productTitle}</span>
                        </div>
-
                        <div style={{ marginTop: '8px' }}>
                           <div style={{ border: '1px solid #fabb05', display: 'inline-flex', alignItems: 'center', padding: '1px 4px', borderRadius: '2px', gap: '4px' }}>
-                             <StarYellow />
-                             <span style={{ fontSize: '12px', color: '#222' }}>{productRating}</span>
+                             <StarYellow /><span style={{ fontSize: '12px', color: '#222' }}>{productRating}</span>
                           </div>
                        </div>
-
                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', gap: '8px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
                              <span style={{ color: '#ee4d2d', fontSize: shopeeMainFontSize, fontWeight: 'bold', whiteSpace: 'nowrap' }}>
-                               {displayPrice}
-                               {productUnit && <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
+                               {displayPrice}{productUnit && <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
                              </span>
                              <ShopeeTicketIcon />
                              <span style={{ fontSize: '12px', color: '#757575', marginLeft: '4px', whiteSpace: 'nowrap' }}>{productSold}</span>
@@ -462,121 +505,228 @@ export default function Home() {
                  </div>
               )}
 
-              {/* ========================================= */}
-              {/* RENDER KHUSUS: TIKTOK (Portrait & Landscape) */}
-              {/* ========================================= */}
               {(productLayout === 'tiktok-portrait' || productLayout === 'tiktok-landscape') && (
-                <div ref={productPreviewRef} style={{ 
-                  backgroundColor: '#ffffff', 
-                  borderRadius: '12px', 
-                  overflow: 'hidden', 
-                  fontFamily: 'Arial, sans-serif',
-                  width: productLayout === 'tiktok-portrait' ? '300px' : '480px',
-                  display: 'flex',
-                  flexDirection: productLayout === 'tiktok-portrait' ? 'column' : 'row',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
-                }}>
-                  
-                  <div style={{ 
-                    position: 'relative', 
-                    width: productLayout === 'tiktok-portrait' ? '300px' : '200px', 
-                    height: productLayout === 'tiktok-portrait' ? '300px' : '220px',
-                    flexShrink: 0,
-                    backgroundColor: '#ffffff',
-                    overflow: 'hidden'
-                  }}>
+                <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: productLayout === 'tiktok-portrait' ? '300px' : '480px', display: 'flex', flexDirection: productLayout === 'tiktok-portrait' ? 'column' : 'row', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+                  <div style={{ position: 'relative', width: productLayout === 'tiktok-portrait' ? '300px' : '200px', height: productLayout === 'tiktok-portrait' ? '300px' : '220px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
                     <img key={productImage} src={productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                    
                     {autoDiscountBadge && (
-                      <div style={{ 
-                        position: 'absolute', top: 0, right: 0, 
-                        backgroundColor: '#fe2c55', color: '#fff', 
-                        padding: '4px 8px', fontSize: '14px', fontWeight: 'bold', 
-                        borderBottomLeftRadius: '8px', zIndex: 10 
-                      }}>
-                        {autoDiscountBadge}
-                      </div>
+                      <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#fe2c55', color: '#fff', padding: '4px 8px', fontSize: '14px', fontWeight: 'bold', borderBottomLeftRadius: '8px', zIndex: 10 }}>{autoDiscountBadge}</div>
                     )}
                   </div>
-
                   <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#ffffff', boxSizing: 'border-box', minWidth: 0 }}>
-                    
-                    <div style={{ 
-                      margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#222', lineHeight: '20px', 
-                      maxHeight: '40px', overflow: 'hidden', fontFamily: 'Arial, sans-serif',
-                      wordWrap: 'break-word', whiteSpace: 'normal'
-                    }}>
-                      {productTitle}
-                    </div>
-                    
+                    <div style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#222', lineHeight: '20px', maxHeight: '40px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', wordWrap: 'break-word', whiteSpace: 'normal' }}>{productTitle}</div>
                     <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                      {freeShippingText && (
-                        <span style={{ display: 'flex', alignItems: 'center', backgroundColor: '#e2f7f4', color: '#00b09b', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>
-                          <TruckIcon /> {freeShippingText}
-                        </span>
-                      )}
-                      {autoDiscountTagText && (
-                        <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>
-                          {autoDiscountTagText}
-                        </span>
-                      )}
+                      {freeShippingText && ( <span style={{ display: 'flex', alignItems: 'center', backgroundColor: '#e2f7f4', color: '#00b09b', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}><TruckIcon /> {freeShippingText}</span> )}
+                      {autoDiscountTagText && ( <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>{autoDiscountTagText}</span> )}
                     </div>
-
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#888', marginBottom: productLayout === 'tiktok-portrait' ? '12px' : 'auto' }}>
-                      {productLayout === 'tiktok-landscape' ? (
-                        <span style={{ display: 'flex', alignItems: 'center' }}><StarBlack/><StarBlack/><StarBlack/><StarBlack/><StarBlack/></span>
-                      ) : ( <StarYellow /> )}
+                      {productLayout === 'tiktok-landscape' ? ( <span style={{ display: 'flex', alignItems: 'center' }}><StarBlack/><StarBlack/><StarBlack/><StarBlack/><StarBlack/></span> ) : ( <StarYellow /> )}
                       <span style={{ color: productLayout === 'tiktok-landscape' ? '#222' : '#fabb05', fontWeight: productLayout === 'tiktok-landscape' ? 'normal' : 'bold', marginLeft: '2px' }}>{productRating}</span>
-                      <span style={{ color: '#ccc', margin: '0 4px' }}>|</span>
-                      <span>{productSold}</span>
+                      <span style={{ color: '#ccc', margin: '0 4px' }}>|</span><span>{productSold}</span>
                     </div>
 
                     {productLayout === 'tiktok-portrait' ? (
                       <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: 'auto', flexWrap: 'wrap' }}>
-                        <span style={{ color: '#fe2c55', fontSize: tiktokPtMainFontSize, fontWeight: 'bold', fontFamily: 'Arial, sans-serif' }}>
-                          {displayPrice}
-                          {productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
-                        </span>
-                        
+                        <span style={{ color: '#fe2c55', fontSize: tiktokPtMainFontSize, fontWeight: 'bold', fontFamily: 'Arial, sans-serif' }}>{displayPrice}{productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}</span>
                         {rawOrigPrice && (
                           <div style={{ color: '#999999', fontSize: '14px', fontFamily: 'Arial, sans-serif' }}>
-                            <del>{rawOrigPrice}</del>
-                            {productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}
+                            <del>{rawOrigPrice}</del>{productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}
                           </div>
                         )}
                       </div>
                     ) : (
                       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: '12px', gap: '12px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, minWidth: 0 }}>
-                          
                           <div style={{ color: '#fe2c55', fontSize: tiktokLsMainFontSize, fontWeight: 'bold', lineHeight: '1.2', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>
-                            {displayPrice}
-                            {productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
+                            {displayPrice}{productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
                           </div>
-                          
                           {rawOrigPrice && (
                             <div style={{ color: '#999999', fontSize: '14px', lineHeight: '1.2', marginTop: '2px', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>
-                              <del>{rawOrigPrice}</del>
-                              {productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}
+                              <del>{rawOrigPrice}</del>{productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}
                             </div>
                           )}
                         </div>
-                        
                         <div style={{ display: 'flex', height: '32px', flexShrink: 0 }}>
-                          <div style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '0 10px', display: 'flex', alignItems: 'center', borderTopLeftRadius: '4px', borderBottomLeftRadius: '4px' }}>
-                            <CartIcon />
-                          </div>
-                          <div style={{ backgroundColor: '#fe2c55', color: '#ffffff', padding: '0 16px', display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '14px', borderTopRightRadius: '4px', borderBottomRightRadius: '4px' }}>
-                            Buy
-                          </div>
+                          <div style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '0 10px', display: 'flex', alignItems: 'center', borderTopLeftRadius: '4px', borderBottomLeftRadius: '4px' }}><CartIcon /></div>
+                          <div style={{ backgroundColor: '#fe2c55', color: '#ffffff', padding: '0 16px', display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '14px', borderTopRightRadius: '4px', borderBottomRightRadius: '4px' }}>Buy</div>
                         </div>
                       </div>
                     )}
-
                   </div>
                 </div>
               )}
 
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================= */}
+      {/* TAB 4: FAKE WA CHAT (BARU) */}
+      {/* ========================================= */}
+      {activeTab === 'wa' && (
+        <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in zoom-in duration-300">
+          
+          <div className="bg-white shadow-xl rounded-3xl p-6 border border-slate-100 space-y-6 h-fit">
+            <div className="space-y-4">
+              <h3 className="font-bold text-[#008069] uppercase text-xs tracking-widest">Pengaturan Grup / Chat</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">Nama Grup / Kontak</label>
+                  <input type="text" value={waGroupName} onChange={(e) => setWaGroupName(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">Avatar / Profil (Opsional)</label>
+                  <input type="file" onChange={(e) => handleImageUpload(e, setWaGroupAvatar)} className="text-xs block w-full pt-3" />
+                </div>
+              </div>
+            </div>
+
+            <hr className="border-slate-100" />
+
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                 <h3 className="font-bold text-[#008069] uppercase text-xs tracking-widest">Daftar Chat</h3>
+                 <button onClick={addWaMessage} className="text-xs bg-[#008069] text-white px-3 py-1 rounded-md font-bold">+ Tambah Chat</button>
+              </div>
+              
+              <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+                {waMessages.map((msg, index) => (
+                  <div key={msg.id} className="p-4 bg-slate-50 border rounded-xl relative group">
+                    <button onClick={() => removeWaMessage(msg.id)} className="absolute top-2 right-2 text-red-500 text-xs font-bold bg-red-50 px-2 py-1 rounded">X</button>
+                    <div className="grid grid-cols-2 gap-2 mb-2">
+                      <select value={msg.sender} onChange={(e) => updateWaMessage(msg.id, 'sender', e.target.value)} className="p-2 bg-white border rounded-lg text-sm">
+                        <option value="other">Orang Lain</option>
+                        <option value="me">Saya (Hijau)</option>
+                      </select>
+                      {msg.sender === 'other' ? (
+                        <input type="text" value={msg.name} onChange={(e) => updateWaMessage(msg.id, 'name', e.target.value)} placeholder="Nama Pengirim" className="p-2 bg-white border rounded-lg text-sm" />
+                      ) : (
+                         <div className="p-2 text-sm text-slate-400 bg-slate-100 rounded-lg text-center cursor-not-allowed">Anda</div>
+                      )}
+                    </div>
+                    <textarea value={msg.text} onChange={(e) => updateWaMessage(msg.id, 'text', e.target.value)} placeholder="Isi pesan..." className="w-full p-2 bg-white border rounded-lg text-sm min-h-[60px] mb-2" />
+                    <div className="grid grid-cols-2 gap-2">
+                      <input type="time" value={msg.time} onChange={(e) => updateWaMessage(msg.id, 'time', e.target.value)} className="p-2 bg-white border rounded-lg text-sm" />
+                      <input type="file" onChange={(e) => handleWaMessageImage(msg.id, e)} className="text-xs p-2" />
+                    </div>
+                    {msg.image && (
+                      <button onClick={() => updateWaMessage(msg.id, 'image', '')} className="mt-2 text-xs text-red-500 block">Hapus Gambar</button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <button onClick={exportWaImage} className="w-full bg-[#008069] hover:bg-[#075e54] text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-[0.98]">📸 Export WA Chat</button>
+          </div>
+
+          {/* PREVIEW WHATSAPP (PIXEL STRICT) */}
+          <div className="bg-slate-200 rounded-3xl p-6 flex items-center justify-center min-h-[500px] overflow-hidden border border-slate-300">
+            <div style={{ padding: '20px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent' }}>
+              
+              <div ref={waPreviewRef} style={{ 
+                backgroundColor: '#efeae2', // Standard WA Background
+                width: '360px', 
+                height: '640px', // Standard mobile ratio
+                display: 'flex', 
+                flexDirection: 'column', 
+                fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
+                overflow: 'hidden',
+                boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+              }}>
+                
+                {/* WA Header */}
+                <div style={{ backgroundColor: '#008069', padding: '10px 16px 10px 8px', display: 'flex', alignItems: 'center', gap: '8px', zIndex: 10, flexShrink: 0 }}>
+                  <WaBackIcon />
+                  <img src={waGroupAvatar} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ color: '#fff', fontSize: '16px', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{waGroupName}</div>
+                    <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>tap here for group info</div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '16px', marginLeft: '8px' }}>
+                     <WaVideoIcon />
+                     <WaCallIcon />
+                     <WaDotsIcon />
+                  </div>
+                </div>
+
+                {/* WA Chat Body */}
+                <div style={{ flex: 1, padding: '16px', display: 'flex', flexDirection: 'column', gap: '4px', overflowY: 'hidden' }}>
+                   {waMessages.map((msg, index) => {
+                     const isMe = msg.sender === 'me';
+                     // Menentukan bentuk bubble (punya ekor atau tidak). Sederhanakan: semua punya ekor khas WA.
+                     return (
+                        <div key={msg.id} style={{ 
+                           display: 'flex', 
+                           flexDirection: 'column', 
+                           alignSelf: isMe ? 'flex-end' : 'flex-start',
+                           maxWidth: '85%',
+                           marginBottom: '8px'
+                        }}>
+                           <div style={{
+                              backgroundColor: isMe ? '#d9fdd3' : '#ffffff',
+                              padding: '6px 8px 6px 10px',
+                              borderRadius: '8px',
+                              borderTopLeftRadius: isMe ? '8px' : '0px',
+                              borderTopRightRadius: isMe ? '0px' : '8px',
+                              boxShadow: '0 1px 1px rgba(0,0,0,0.1)',
+                              position: 'relative'
+                           }}>
+                              {/* Ekor Bubble */}
+                              {isMe ? (
+                                <svg viewBox="0 0 8 13" width="8" height="13" style={{ position: 'absolute', top: 0, right: '-8px' }}>
+                                   <path d="M0 0h8v1L2.8 11.2C2 12.8.3 13 0 13V0z" fill="#d9fdd3" />
+                                </svg>
+                              ) : (
+                                <svg viewBox="0 0 8 13" width="8" height="13" style={{ position: 'absolute', top: 0, left: '-8px' }}>
+                                   <path d="M8 0H0v1l5.2 10.2C6 12.8 7.7 13 8 13V0z" fill="#ffffff" />
+                                </svg>
+                              )}
+
+                              {/* Sender Name (Other only) */}
+                              {!isMe && msg.name && (
+                                <div style={{ color: msg.color, fontSize: '13px', fontWeight: 'bold', marginBottom: '4px', lineHeight: '1.2' }}>
+                                   {msg.name}
+                                </div>
+                              )}
+
+                              {/* Uploaded Image */}
+                              {msg.image && (
+                                <img src={msg.image} style={{ width: '100%', borderRadius: '6px', marginBottom: '4px', maxHeight: '200px', objectFit: 'cover' }} />
+                              )}
+
+                              {/* Teks Pesan */}
+                              {msg.text && (
+                                <div style={{ color: '#111b21', fontSize: '14.5px', lineHeight: '20px', whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
+                                   {msg.text}
+                                   {/* Spacer tak terlihat agar waktu tidak menimpa teks terakhir */}
+                                   <span style={{ display: 'inline-block', width: isMe ? '60px' : '40px' }}></span> 
+                                </div>
+                              )}
+
+                              {/* Waktu & Tick */}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', position: 'absolute', bottom: '4px', right: '8px' }}>
+                                 <span style={{ fontSize: '11px', color: '#667781' }}>{msg.time}</span>
+                                 {isMe && <WaTickIcon />}
+                              </div>
+                           </div>
+                        </div>
+                     )
+                   })}
+                </div>
+
+                {/* WA Input Footer Biasa */}
+                <div style={{ padding: '8px', display: 'flex', gap: '8px', alignItems: 'flex-end', backgroundColor: 'transparent', flexShrink: 0 }}>
+                   <div style={{ flex: 1, backgroundColor: '#ffffff', borderRadius: '24px', padding: '10px 16px', display: 'flex', alignItems: 'center', color: '#8696a0', fontSize: '15px' }}>
+                      Message
+                   </div>
+                   <div style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: '#00a884', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
+                   </div>
+                </div>
+
+              </div>
             </div>
           </div>
         </div>
