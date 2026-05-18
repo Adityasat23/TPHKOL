@@ -1,4 +1,4 @@
- 'use client';
+'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import { toPng } from 'html-to-image';
@@ -103,7 +103,6 @@ export default function Home() {
   // STATE: PRODUCT CARD GENERATOR
   const [productLayout, setProductLayout] = useState<'tiktok-portrait' | 'tiktok-landscape' | 'shopee'>('tiktok-landscape');
   const [productImage, setProductImage] = useState(DEFAULT_PRODUCT);
-  // ✅ FIX: State dikurangi karena prefix sudah dipatenkan
   const [productTitle, setProductTitle] = useState("MILKYWAY Liptint Glow");
   const [productPrice, setProductPrice] = useState("87.120");
   const [productOriginalPrice, setProductOriginalPrice] = useState("238.000");
@@ -372,8 +371,9 @@ export default function Home() {
               
               <div ref={previewRef} style={{ display: 'inline-flex', flexDirection: 'column', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                 {commentMode === 'sticker' && (
-                  <div style={{ display: 'inline-flex', flexDirection: 'column' }}>
-                    <div style={{ backgroundColor: '#ffffff', borderRadius: '16px 16px 16px 0px', padding: '16px 24px 12px 24px', display: 'flex', width: '100%', maxWidth: '380px', gap: '12px', alignItems: 'flex-start' }}>
+                  /* ✅ FIX: Hardware Acceleration agar Background Putih tidak hilang saat diexport */
+                  <div style={{ display: 'inline-flex', flexDirection: 'column', isolation: 'isolate', transform: 'translateZ(0)' }}>
+                    <div style={{ backgroundColor: 'white', borderRadius: '16px 16px 16px 0px', padding: '16px 24px 12px 24px', display: 'flex', width: '100%', maxWidth: '380px', gap: '12px', alignItems: 'flex-start', border: '1px solid transparent' }}>
                       <img key={avatar} src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
                         <p style={{ color: '#8a8b91', fontSize: '14px', fontWeight: 'bold', margin: '0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
@@ -381,7 +381,7 @@ export default function Home() {
                       </div>
                     </div>
                     <svg width="36" height="20" viewBox="0 0 36 20" style={{ display: 'block', alignSelf: 'flex-start', marginTop: '-1px' }} xmlns="http://www.w3.org/2000/svg">
-                      <polygon points="0,0 36,0 0,20" fill="#ffffff" />
+                      <polygon points="0,0 36,0 0,20" fill="white" />
                     </svg>
                   </div>
                 )}
@@ -450,7 +450,6 @@ export default function Home() {
                 <input type="file" onChange={(e) => handleImageUpload(e, setProductImage)} className="text-xs block w-full mb-3" />
               </div>
 
-              {/* ✅ FIX: Input Nama Produk dikunci dengan Pre-text [MALL] TIMEPHORIA */}
               <div className="flex w-full bg-slate-50 border rounded-xl overflow-hidden focus-within:border-pink-500">
                 <span className="p-3 bg-slate-200 text-slate-500 font-bold text-sm flex items-center whitespace-nowrap border-r border-slate-300">
                   [MALL] TIMEPHORIA -
@@ -484,9 +483,6 @@ export default function Home() {
           <div className="bg-slate-100 rounded-3xl p-10 flex items-center justify-center min-h-[500px] overflow-hidden border border-slate-200">
             <div style={{ padding: '40px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent' }}>
               
-              {/* ========================================= */}
-              {/* RENDER KHUSUS: SHOPEE */}
-              {/* ========================================= */}
               {productLayout === 'shopee' && (
                  <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '4px', width: '300px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', fontFamily: 'Arial, sans-serif' }}>
                     <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
@@ -521,9 +517,6 @@ export default function Home() {
                  </div>
               )}
 
-              {/* ========================================= */}
-              {/* RENDER KHUSUS: TIKTOK */}
-              {/* ========================================= */}
               {(productLayout === 'tiktok-portrait' || productLayout === 'tiktok-landscape') && (
                 <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: productLayout === 'tiktok-portrait' ? '300px' : '480px', display: 'flex', flexDirection: productLayout === 'tiktok-portrait' ? 'column' : 'row', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
                   <div style={{ position: 'relative', width: productLayout === 'tiktok-portrait' ? '300px' : '200px', height: productLayout === 'tiktok-portrait' ? '300px' : '220px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
@@ -596,7 +589,6 @@ export default function Home() {
             <div className="space-y-4">
               <h3 className="font-bold text-[#008069] uppercase text-xs tracking-widest">Pengaturan Grup / Chat</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* ✅ FIX: Nama Grup Dikunci */}
                 <div>
                   <label className="block text-xs font-bold text-slate-500 mb-1">Nama Grup (Fixed)</label>
                   <input type="text" value="KOL TIMEPHORIA" disabled className="w-full p-3 bg-slate-200 text-slate-500 border rounded-xl font-bold cursor-not-allowed" />
@@ -647,7 +639,7 @@ export default function Home() {
             <button onClick={exportWaImage} className="w-full bg-[#008069] hover:bg-[#075e54] text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-[0.98]">📸 Export WA Chat</button>
           </div>
 
-          {/* PREVIEW WHATSAPP (PIXEL STRICT MODE) */}
+          {/* PREVIEW WHATSAPP */}
           <div className="bg-slate-200 rounded-3xl p-6 flex items-center justify-center min-h-[500px] overflow-hidden border border-slate-300">
             <div style={{ padding: '20px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent' }}>
               
