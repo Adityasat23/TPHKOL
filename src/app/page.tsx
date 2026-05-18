@@ -62,6 +62,7 @@ const WaDotsIcon = ({ color = "#ffffff" }) => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill={color}><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
 );
 const WaTickIcon = ({ isDark = false }) => (
+  // ✅ FIX: Centang ganda abu-abu untuk mode gelap
   <svg width="16" height="16" viewBox="0 0 24 24" fill={isDark ? "#8696a0" : "#53bdeb"}><path d="M18 7l-1.41-1.41-6.34 6.34 1.41 1.41L18 7zm4.24-1.41L11.66 16.17 7.48 12l-1.41 1.41L11.66 19l12-12-1.42-1.41zM.41 13.41L6 19l1.41-1.41L1.83 12 .41 13.41z"/></svg>
 );
 
@@ -77,7 +78,6 @@ type WaMessage = {
 };
 
 export default function Home() {
-  // ✅ TAB DEFAULT: WA CHAT
   const [activeTab, setActiveTab] = useState<'downloader' | 'comment' | 'product' | 'wa'>('wa');
   
   // STATE: FAKE COMMENT
@@ -118,7 +118,7 @@ export default function Home() {
   // ✅ STATE BARU: WA CHAT
   const [waGroupName, setWaGroupName] = useState("TIMEPHORIA Team 💄");
   const [waGroupAvatar, setWaGroupAvatar] = useState(TIMEPHORIA_LOGO);
-  const [waTheme, setWaTheme] = useState<'light' | 'dark'>('dark'); // ✅ DEF: Gelap
+  const [waTheme, setWaTheme] = useState<'light' | 'dark'>('dark'); 
   const [waMessages, setWaMessages] = useState<WaMessage[]>([
     { id: 1, sender: 'other', name: '+62 812-3456-7890', color: '#e53935', text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit? 😍', image: '', time: '10:15' },
     { id: 2, sender: 'me', name: '', color: '', text: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Silakan diorder kak! 🙏', image: '', time: '10:16' },
@@ -132,9 +132,9 @@ export default function Home() {
   const TIKTOK_WHITE_TEXT = "#ffffff";
   const TIKTOK_BLACK_TEXT = "#161823";
 
-  // ✅ PALET WARNA WA CHAT (Pixel Strict)
+  // PALET WARNA WA CHAT (Pixel Strict)
   const WA_TERANG_BG = '#efeae2';
-  const WA_GELAP_BG = '#0b141a'; // ✅ Hitam pekat standar WA Gelap Android
+  const WA_GELAP_BG = '#0b141a'; 
 
   const WA_COLORS = ['#e53935', '#d81b60', '#8e24aa', '#5e35b1', '#3949ab', '#1e88e5', '#039be5', '#00897b', '#00838f', '#2e7d32', '#43a047', '#f57c00', '#ef6c00', '#d84315'];
 
@@ -223,13 +223,12 @@ export default function Home() {
     if (!waPreviewRef.current) return;
     try {
       await document.fonts.ready;
-      // ✅ FIX: Memaksa warna background solid saat download agar tidak transparan bolong
       const bgExportColor = waTheme === 'dark' ? WA_GELAP_BG : WA_TERANG_BG;
       
       const dataUrl = await toPng(waPreviewRef.current, { 
         cacheBust: true, 
         pixelRatio: 3, 
-        backgroundColor: bgExportColor // ✅ Instruksi solid untuk html-to-image
+        backgroundColor: bgExportColor
       });
       const link = document.createElement('a');
       link.download = `whatsapp-${waTheme}-${Date.now()}.png`;
@@ -303,7 +302,7 @@ export default function Home() {
               {result.cover && <img src={result.cover} alt="thumbnail" className="w-40 h-40 object-cover rounded-2xl shadow-lg border-4 border-white" />}
               <div className="flex-1 text-center md:text-left w-full">
                 <h3 className="font-bold text-slate-800 text-xl mb-4 line-clamp-2">{result.title}</h3>
-                <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex col sm:flex-row gap-3">
                   {result.play && <a href={result.play} target="_blank" rel="noreferrer" className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl text-center shadow-lg">Unduh Video (MP4)</a>}
                   {result.music && <a href={result.music} target="_blank" rel="noreferrer" className="flex-1 bg-slate-800 hover:bg-black text-white font-bold py-3 rounded-xl text-center shadow-lg">Unduh MP3</a>}
                 </div>
@@ -579,7 +578,6 @@ export default function Home() {
           
           <div className="bg-white shadow-xl rounded-3xl p-6 border border-slate-100 space-y-6 h-fit">
             
-            {/* ✅ PENGAWAL THEME SAKELAR */}
             <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
                 <button onClick={() => setWaTheme('light')} className={`flex-1 py-2 rounded-md font-bold text-xs ${waTheme === 'light' ? 'bg-white shadow text-[#008069]' : 'text-slate-500'}`}>☀️ MODE TERANG</button>
                 <button onClick={() => setWaTheme('dark')} className={`flex-1 py-2 rounded-md font-bold text-xs ${waTheme === 'dark' ? 'bg-[#0b141a] shadow text-white' : 'text-slate-500'}`}>🌙 MODE MALAM</button>
@@ -643,7 +641,7 @@ export default function Home() {
             <div style={{ padding: '20px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent' }}>
               
               <div ref={waPreviewRef} style={{ 
-                backgroundColor: waTheme === 'dark' ? WA_GELAP_BG : WA_TERANG_BG, // ✅ LOGIKA BG
+                backgroundColor: waTheme === 'dark' ? WA_GELAP_BG : WA_TERANG_BG, 
                 width: '360px', 
                 height: '640px', 
                 display: 'flex', 
@@ -655,7 +653,7 @@ export default function Home() {
                 
                 {/* WA Header */}
                 <div style={{ 
-                    backgroundColor: waTheme === 'dark' ? '#202c33' : '#008069', // ✅ LOGIKA HEADER
+                    backgroundColor: waTheme === 'dark' ? '#202c33' : '#008069', 
                     padding: '10px 16px 10px 8px', 
                     display: 'flex', 
                     alignItems: 'center', 
@@ -667,7 +665,7 @@ export default function Home() {
                   <img src={waGroupAvatar} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ 
-                        color: waTheme === 'dark' ? '#e9edef' : '#ffffff', // ✅ LOGIKA TEKS NAMA
+                        color: waTheme === 'dark' ? '#e9edef' : '#ffffff', 
                         fontSize: '16px', 
                         fontWeight: 'bold', 
                         whiteSpace: 'nowrap', 
@@ -675,7 +673,7 @@ export default function Home() {
                         textOverflow: 'ellipsis' 
                     }}>{waGroupName}</div>
                     <div style={{ 
-                        color: waTheme === 'dark' ? '#8696a0' : 'rgba(255,255,255,0.8)', // ✅ LOGIKA TEKS SUB
+                        color: waTheme === 'dark' ? '#8696a0' : 'rgba(255,255,255,0.8)', 
                         fontSize: '13px', 
                         whiteSpace: 'nowrap', 
                         overflow: 'hidden', 
@@ -695,11 +693,12 @@ export default function Home() {
                      const isMe = msg.sender === 'me';
                      const isDark = waTheme === 'dark';
                      
-                     // ✅ LOGIKA WARNA BUBBLE (Pixel Strict WA)
                      let bubbleBg = '#ffffff';
                      if(isMe){
+                        // ✅ FIX: Warna hijau standard WA Android Dark Mode
                         bubbleBg = isDark ? '#005c4b' : '#d9fdd3';
                      } else {
+                        // ✅ FIX: Warna abu standard WA Android Dark Mode
                         bubbleBg = isDark ? '#202c33' : '#ffffff';
                      }
 
@@ -709,7 +708,9 @@ export default function Home() {
                            flexDirection: 'column', 
                            alignSelf: isMe ? 'flex-end' : 'flex-start',
                            maxWidth: '85%',
-                           marginBottom: '8px'
+                           marginBottom: '8px',
+                           // ✅ FIX: Mencegah overflow horizontal pada container bubble
+                           position: 'relative'
                         }}>
                            <div style={{
                               backgroundColor: bubbleBg,
@@ -718,11 +719,15 @@ export default function Home() {
                               borderTopLeftRadius: isMe ? '8px' : '0px',
                               borderTopRightRadius: isMe ? '0px' : '8px',
                               boxShadow: '0 1px 1px rgba(0,0,0,0.15)',
-                              position: 'relative'
+                              position: 'relative',
+                              // ✅ FIX ULTIMATE: Hapus border putih tebal & outline
+                              border: 'none', 
+                              outline: 'none'
                            }}>
                               {/* Ekor Bubble */}
                               {isMe ? (
-                                <svg viewBox="0 0 8 13" width="8" height="13" style={{ position: 'absolute', top: 0, right: '-8px' }}>
+                                // ✅ FIX: Sempurnakan posisi ekor kanan menyatu sempurna
+                                <svg viewBox="0 0 8 13" width="8" height="13" style={{ position: 'absolute', top: 0, right: '-7px' }}>
                                    <path d="M0 0h8v1L2.8 11.2C2 12.8.3 13 0 13V0z" fill={bubbleBg} />
                                 </svg>
                               ) : (
@@ -746,7 +751,7 @@ export default function Home() {
                               {/* Teks Pesan */}
                               {msg.text && (
                                 <div style={{ 
-                                    color: isDark ? '#e9edef' : '#111b21', // ✅ LOGIKA WARNA TEKS CHAT
+                                    color: isDark ? '#e9edef' : '#111b21', 
                                     fontSize: '14.5px', 
                                     lineHeight: '20px', 
                                     whiteSpace: 'pre-wrap', 
@@ -762,7 +767,7 @@ export default function Home() {
                               <div style={{ display: 'flex', alignItems: 'center', gap: '2px', position: 'absolute', bottom: '4px', right: '8px' }}>
                                  <span style={{ 
                                      fontSize: '11px', 
-                                     color: isDark ? 'rgba(233,237,239,0.6)' : '#667781' // ✅ LOGIKA WARNA WAKTU
+                                     color: isDark ? 'rgba(233,237,239,0.6)' : '#667781' 
                                  }}>{msg.time}</span>
                                  {isMe && <WaTickIcon isDark={isDark} />}
                               </div>
@@ -772,11 +777,11 @@ export default function Home() {
                    })}
                 </div>
 
-                {/* WA Input Footer (Abaikan fungsional, hanya UI) */}
+                {/* WA Input Footer Biasa */}
                 <div style={{ padding: '8px', display: 'flex', gap: '8px', alignItems: 'flex-end', backgroundColor: 'transparent', flexShrink: 0 }}>
                    <div style={{ 
                        flex: 1, 
-                       backgroundColor: waTheme === 'dark' ? '#2a3942' : '#ffffff', // ✅ LOGIKA BG INPUT
+                       backgroundColor: waTheme === 'dark' ? '#2a3942' : '#ffffff', 
                        borderRadius: '24px', 
                        padding: '10px 16px', 
                        display: 'flex', 
