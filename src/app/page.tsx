@@ -1,4 +1,4 @@
-'use client';
+ 'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import { toPng } from 'html-to-image';
@@ -77,7 +77,6 @@ type WaMessage = {
 };
 
 export default function Home() {
-  // ✅ URUTAN TAB DIRUBAH
   const [activeTab, setActiveTab] = useState<'downloader' | 'comment' | 'product' | 'wa'>('downloader');
   
   // STATE: FAKE COMMENT
@@ -104,7 +103,8 @@ export default function Home() {
   // STATE: PRODUCT CARD GENERATOR
   const [productLayout, setProductLayout] = useState<'tiktok-portrait' | 'tiktok-landscape' | 'shopee'>('tiktok-landscape');
   const [productImage, setProductImage] = useState(DEFAULT_PRODUCT);
-  const [productTitle, setProductTitle] = useState("[MALL] TIMEPHORIA - MILKYWAY Liptint Glow");
+  // ✅ FIX: State dikurangi karena prefix sudah dipatenkan
+  const [productTitle, setProductTitle] = useState("MILKYWAY Liptint Glow");
   const [productPrice, setProductPrice] = useState("87.120");
   const [productOriginalPrice, setProductOriginalPrice] = useState("238.000");
   const [productUnit, setProductUnit] = useState("/pcs");
@@ -116,7 +116,6 @@ export default function Home() {
   const productPreviewRef = useRef<HTMLDivElement>(null);
 
   // STATE: WA CHAT
-  const [waGroupName, setWaGroupName] = useState("KOL ASIK 💄");
   const [waGroupAvatar, setWaGroupAvatar] = useState(TIMEPHORIA_LOGO);
   const [waTheme, setWaTheme] = useState<'light' | 'dark'>('dark'); 
   const [waMessages, setWaMessages] = useState<WaMessage[]>([
@@ -277,7 +276,6 @@ export default function Home() {
         <p className="text-[#64748b] text-lg">Semoga membantu guys</p>
       </div>
 
-      {/* ✅ URUTAN TAB: Downloader -> Fake Comment -> Product Card -> WA Chat */}
       <div className="flex bg-white rounded-full shadow-sm border border-slate-200 p-1 mb-8 overflow-x-auto w-full max-w-4xl justify-center">
         <button onClick={() => setActiveTab('downloader')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'downloader' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>📥 DOWNLOADER</button>
         <button onClick={() => setActiveTab('comment')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'comment' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>💬 FAKE COMMENT</button>
@@ -452,7 +450,13 @@ export default function Home() {
                 <input type="file" onChange={(e) => handleImageUpload(e, setProductImage)} className="text-xs block w-full mb-3" />
               </div>
 
-              <input type="text" value={productTitle} onChange={(e) => setProductTitle(e.target.value)} placeholder="Nama Produk" className="w-full p-3 bg-slate-50 border rounded-xl" />
+              {/* ✅ FIX: Input Nama Produk dikunci dengan Pre-text [MALL] TIMEPHORIA */}
+              <div className="flex w-full bg-slate-50 border rounded-xl overflow-hidden focus-within:border-pink-500">
+                <span className="p-3 bg-slate-200 text-slate-500 font-bold text-sm flex items-center whitespace-nowrap border-r border-slate-300">
+                  [MALL] TIMEPHORIA -
+                </span>
+                <input type="text" value={productTitle} onChange={(e) => setProductTitle(e.target.value)} placeholder="Varian (cth: MILKYWAY Liptint Glow)" className="w-full p-3 bg-transparent focus:outline-none" />
+              </div>
               
               <div className="grid grid-cols-3 gap-2">
                 <input type="text" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} placeholder="Baru (87.120)" className="w-full p-3 bg-slate-50 border rounded-xl font-bold text-pink-600" />
@@ -496,7 +500,7 @@ export default function Home() {
                           {showShopeeLive && (
                              <span style={{ backgroundColor: '#ee4d2d', color: '#fff', fontSize: '10px', fontWeight: 'bold', padding: '1px 4px', borderRadius: '2px', marginRight: '6px', verticalAlign: 'middle', display: 'inline-flex', alignItems: 'center' }}>|・| LIVE</span>
                           )}
-                          <span style={{ verticalAlign: 'middle' }}>{productTitle}</span>
+                          <span style={{ verticalAlign: 'middle' }}>[MALL] TIMEPHORIA - {productTitle}</span>
                        </div>
                        <div style={{ marginTop: '8px' }}>
                           <div style={{ border: '1px solid #fabb05', display: 'inline-flex', alignItems: 'center', padding: '1px 4px', borderRadius: '2px', gap: '4px' }}>
@@ -529,7 +533,7 @@ export default function Home() {
                     )}
                   </div>
                   <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#ffffff', boxSizing: 'border-box', minWidth: 0 }}>
-                    <div style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#222', lineHeight: '20px', maxHeight: '40px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', wordWrap: 'break-word', whiteSpace: 'normal' }}>{productTitle}</div>
+                    <div style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#222', lineHeight: '20px', maxHeight: '40px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', wordWrap: 'break-word', whiteSpace: 'normal' }}>[MALL] TIMEPHORIA - {productTitle}</div>
                     <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                       {freeShippingText && ( <span style={{ display: 'flex', alignItems: 'center', backgroundColor: '#e2f7f4', color: '#00b09b', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}><TruckIcon /> {freeShippingText}</span> )}
                       {autoDiscountTagText && ( <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>{autoDiscountTagText}</span> )}
@@ -592,9 +596,10 @@ export default function Home() {
             <div className="space-y-4">
               <h3 className="font-bold text-[#008069] uppercase text-xs tracking-widest">Pengaturan Grup / Chat</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* ✅ FIX: Nama Grup Dikunci */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">Nama Grup / Kontak</label>
-                  <input type="text" value={waGroupName} onChange={(e) => setWaGroupName(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl" />
+                  <label className="block text-xs font-bold text-slate-500 mb-1">Nama Grup (Fixed)</label>
+                  <input type="text" value="KOL TIMEPHORIA" disabled className="w-full p-3 bg-slate-200 text-slate-500 border rounded-xl font-bold cursor-not-allowed" />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-500 mb-1">Avatar (Opsional)</label>
@@ -677,7 +682,7 @@ export default function Home() {
                         whiteSpace: 'nowrap', 
                         overflow: 'hidden', 
                         textOverflow: 'ellipsis' 
-                    }}>{waGroupName}</div>
+                    }}>KOL TIMEPHORIA</div>
                     <div style={{ 
                         color: waTheme === 'dark' ? '#8696a0' : 'rgba(255,255,255,0.8)', 
                         fontSize: '13px', 
@@ -711,27 +716,23 @@ export default function Home() {
                            display: 'flex', 
                            flexDirection: 'column', 
                            alignSelf: isMe ? 'flex-end' : 'flex-start',
-                           // ✅ FIX: Ukuran max-width dibuat lebih kecil agar persis seperti WA
                            maxWidth: '78%',
                            marginBottom: '8px',
                            position: 'relative'
                         }}>
                            <div style={{
                               backgroundColor: bubbleBg,
-                              // ✅ FIX: Padding dirapatkan agar lebih compact
                               padding: '4px 8px 6px 8px',
                               borderRadius: '8px',
                               borderTopLeftRadius: isMe ? '8px' : '0px',
                               borderTopRightRadius: isMe ? '0px' : '8px',
                               boxShadow: '0 1px 1px rgba(0,0,0,0.15)',
                               position: 'relative',
-                              // ✅ FIX ULTIMATE: Hapus border putih yang mengganggu di web
                               border: 'none', 
                               outline: 'none'
                            }}>
                               {/* Ekor Bubble */}
                               {isMe ? (
-                                // ✅ FIX: Ekor diatur presisi posisinya
                                 <svg viewBox="0 0 8 13" width="8" height="13" style={{ position: 'absolute', top: 0, right: '-7.5px' }}>
                                    <path d="M0 0h8v1L2.8 11.2C2 12.8.3 13 0 13V0z" fill={bubbleBg} />
                                 </svg>
@@ -750,7 +751,6 @@ export default function Home() {
 
                               {/* Uploaded Image */}
                               {msg.image && (
-                                // ✅ FIX: Lengkungan gambar dipertajam (borderRadius: 3px) agar terlihat menempel
                                 <img src={msg.image} style={{ width: '100%', borderRadius: '3px', marginBottom: '2px', maxHeight: '200px', objectFit: 'cover' }} />
                               )}
 
@@ -758,7 +758,6 @@ export default function Home() {
                               {msg.text && (
                                 <div style={{ 
                                     color: isDark ? '#e9edef' : '#111b21', 
-                                    // ✅ FIX: Font dikecilkan & line-height dirapatkan
                                     fontSize: '14.2px', 
                                     lineHeight: '19px', 
                                     whiteSpace: 'pre-wrap', 
