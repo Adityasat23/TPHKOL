@@ -120,9 +120,9 @@ export default function Home() {
   const [waGroupAvatar, setWaGroupAvatar] = useState(TIMEPHORIA_LOGO);
   const [waTheme, setWaTheme] = useState<'light' | 'dark'>('dark'); 
   const [waMessages, setWaMessages] = useState<WaMessage[]>([
-    { id: 1, sender: 'other', name: '+62 812-3456-7890', color: '#e53935', text: 'Besok lari?', image: '', time: '10:15' },
+    { id: 1, sender: 'other', name: 'Bamkis', color: '#e53935', text: 'Besok lari?', image: '', time: '10:15' },
     { id: 2, sender: 'me', name: '', color: '', text: 'izin gue mau pulang! 🙏', image: '', time: '10:16' },
-    { id: 3, sender: 'other', name: '~Siska', color: '#1e88e5', text: 'gue juga kak.', image: '', time: '10:17' },
+    { id: 3, sender: 'other', name: 'Indhi', color: '#1e88e5', text: 'gue juga kak.', image: '', time: '10:17' },
   ]);
   const waPreviewRef = useRef<HTMLDivElement>(null);
 
