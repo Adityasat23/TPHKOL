@@ -62,7 +62,6 @@ const WaDotsIcon = ({ color = "#ffffff" }) => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill={color}><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
 );
 const WaTickIcon = ({ isDark = false }) => (
-  // ✅ FIX: Centang ganda abu-abu untuk mode gelap
   <svg width="16" height="16" viewBox="0 0 24 24" fill={isDark ? "#8696a0" : "#53bdeb"}><path d="M18 7l-1.41-1.41-6.34 6.34 1.41 1.41L18 7zm4.24-1.41L11.66 16.17 7.48 12l-1.41 1.41L11.66 19l12-12-1.42-1.41zM.41 13.41L6 19l1.41-1.41L1.83 12 .41 13.41z"/></svg>
 );
 
@@ -70,15 +69,16 @@ const WaTickIcon = ({ isDark = false }) => (
 type WaMessage = {
   id: number;
   sender: 'me' | 'other';
-  name: string; // Nama pengirim (hanya muncul jika 'other')
-  color: string; // Warna nama acak untuk 'other'
+  name: string;
+  color: string; 
   text: string;
-  image: string; // Base64
+  image: string; 
   time: string;
 };
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'downloader' | 'comment' | 'product' | 'wa'>('wa');
+  // ✅ URUTAN TAB DIRUBAH
+  const [activeTab, setActiveTab] = useState<'downloader' | 'comment' | 'product' | 'wa'>('downloader');
   
   // STATE: FAKE COMMENT
   const [commentMode, setCommentMode] = useState<'sticker' | 'thread'>('sticker'); 
@@ -115,7 +115,7 @@ export default function Home() {
   const [showShopeeLive, setShowShopeeLive] = useState(true);
   const productPreviewRef = useRef<HTMLDivElement>(null);
 
-  // ✅ STATE BARU: WA CHAT
+  // STATE: WA CHAT
   const [waGroupName, setWaGroupName] = useState("TIMEPHORIA Team 💄");
   const [waGroupAvatar, setWaGroupAvatar] = useState(TIMEPHORIA_LOGO);
   const [waTheme, setWaTheme] = useState<'light' | 'dark'>('dark'); 
@@ -132,7 +132,7 @@ export default function Home() {
   const TIKTOK_WHITE_TEXT = "#ffffff";
   const TIKTOK_BLACK_TEXT = "#161823";
 
-  // PALET WARNA WA CHAT (Pixel Strict)
+  // PALET WARNA WA CHAT
   const WA_TERANG_BG = '#efeae2';
   const WA_GELAP_BG = '#0b141a'; 
 
@@ -169,7 +169,6 @@ export default function Home() {
     }
   };
 
-  // ✅ Fungsi Helper WA Chat
   const addWaMessage = () => {
     const randomColor = WA_COLORS[Math.floor(Math.random() * WA_COLORS.length)];
     setWaMessages([...waMessages, { 
@@ -278,11 +277,12 @@ export default function Home() {
         <p className="text-[#64748b] text-lg">Platform All-in-one untuk Kreator & Affiliate</p>
       </div>
 
+      {/* ✅ URUTAN TAB: Downloader -> Fake Comment -> Product Card -> WA Chat */}
       <div className="flex bg-white rounded-full shadow-sm border border-slate-200 p-1 mb-8 overflow-x-auto w-full max-w-4xl justify-center">
-        <button onClick={() => setActiveTab('wa')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'wa' ? 'bg-[#008069] text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>💬 WA CHAT</button>
+        <button onClick={() => setActiveTab('downloader')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'downloader' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>📥 DOWNLOADER</button>
         <button onClick={() => setActiveTab('comment')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'comment' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>💬 FAKE COMMENT</button>
         <button onClick={() => setActiveTab('product')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'product' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>🛍️ PRODUCT CARD</button>
-        <button onClick={() => setActiveTab('downloader')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'downloader' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>📥 DOWNLOADER</button>
+        <button onClick={() => setActiveTab('wa')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'wa' ? 'bg-[#008069] text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>💬 WA CHAT</button>
       </div>
 
       {/* ========================================= */}
@@ -302,7 +302,7 @@ export default function Home() {
               {result.cover && <img src={result.cover} alt="thumbnail" className="w-40 h-40 object-cover rounded-2xl shadow-lg border-4 border-white" />}
               <div className="flex-1 text-center md:text-left w-full">
                 <h3 className="font-bold text-slate-800 text-xl mb-4 line-clamp-2">{result.title}</h3>
-                <div className="flex col sm:flex-row gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   {result.play && <a href={result.play} target="_blank" rel="noreferrer" className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl text-center shadow-lg">Unduh Video (MP4)</a>}
                   {result.music && <a href={result.music} target="_blank" rel="noreferrer" className="flex-1 bg-slate-800 hover:bg-black text-white font-bold py-3 rounded-xl text-center shadow-lg">Unduh MP3</a>}
                 </div>
@@ -313,7 +313,7 @@ export default function Home() {
       )}
 
       {/* ========================================= */}
-      {/* TAB 2: FAKE COMMENT (FIXED TIMEPHORIA IDENTITY) */}
+      {/* TAB 2: FAKE COMMENT */}
       {/* ========================================= */}
       {activeTab === 'comment' && (
         <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in zoom-in duration-300">
@@ -480,6 +480,9 @@ export default function Home() {
           <div className="bg-slate-100 rounded-3xl p-10 flex items-center justify-center min-h-[500px] overflow-hidden border border-slate-200">
             <div style={{ padding: '40px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent' }}>
               
+              {/* ========================================= */}
+              {/* RENDER KHUSUS: SHOPEE */}
+              {/* ========================================= */}
               {productLayout === 'shopee' && (
                  <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '4px', width: '300px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', fontFamily: 'Arial, sans-serif' }}>
                     <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
@@ -514,6 +517,9 @@ export default function Home() {
                  </div>
               )}
 
+              {/* ========================================= */}
+              {/* RENDER KHUSUS: TIKTOK */}
+              {/* ========================================= */}
               {(productLayout === 'tiktok-portrait' || productLayout === 'tiktok-landscape') && (
                 <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: productLayout === 'tiktok-portrait' ? '300px' : '480px', display: 'flex', flexDirection: productLayout === 'tiktok-portrait' ? 'column' : 'row', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
                   <div style={{ position: 'relative', width: productLayout === 'tiktok-portrait' ? '300px' : '200px', height: productLayout === 'tiktok-portrait' ? '300px' : '220px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
@@ -695,10 +701,8 @@ export default function Home() {
                      
                      let bubbleBg = '#ffffff';
                      if(isMe){
-                        // ✅ FIX: Warna hijau standard WA Android Dark Mode
                         bubbleBg = isDark ? '#005c4b' : '#d9fdd3';
                      } else {
-                        // ✅ FIX: Warna abu standard WA Android Dark Mode
                         bubbleBg = isDark ? '#202c33' : '#ffffff';
                      }
 
@@ -707,31 +711,32 @@ export default function Home() {
                            display: 'flex', 
                            flexDirection: 'column', 
                            alignSelf: isMe ? 'flex-end' : 'flex-start',
-                           maxWidth: '85%',
+                           // ✅ FIX: Ukuran max-width dibuat lebih kecil agar persis seperti WA
+                           maxWidth: '78%',
                            marginBottom: '8px',
-                           // ✅ FIX: Mencegah overflow horizontal pada container bubble
                            position: 'relative'
                         }}>
                            <div style={{
                               backgroundColor: bubbleBg,
-                              padding: '6px 8px 6px 10px',
+                              // ✅ FIX: Padding dirapatkan agar lebih compact
+                              padding: '4px 8px 6px 8px',
                               borderRadius: '8px',
                               borderTopLeftRadius: isMe ? '8px' : '0px',
                               borderTopRightRadius: isMe ? '0px' : '8px',
                               boxShadow: '0 1px 1px rgba(0,0,0,0.15)',
                               position: 'relative',
-                              // ✅ FIX ULTIMATE: Hapus border putih tebal & outline
+                              // ✅ FIX ULTIMATE: Hapus border putih yang mengganggu di web
                               border: 'none', 
                               outline: 'none'
                            }}>
                               {/* Ekor Bubble */}
                               {isMe ? (
-                                // ✅ FIX: Sempurnakan posisi ekor kanan menyatu sempurna
-                                <svg viewBox="0 0 8 13" width="8" height="13" style={{ position: 'absolute', top: 0, right: '-7px' }}>
+                                // ✅ FIX: Ekor diatur presisi posisinya
+                                <svg viewBox="0 0 8 13" width="8" height="13" style={{ position: 'absolute', top: 0, right: '-7.5px' }}>
                                    <path d="M0 0h8v1L2.8 11.2C2 12.8.3 13 0 13V0z" fill={bubbleBg} />
                                 </svg>
                               ) : (
-                                <svg viewBox="0 0 8 13" width="8" height="13" style={{ position: 'absolute', top: 0, left: '-8px' }}>
+                                <svg viewBox="0 0 8 13" width="8" height="13" style={{ position: 'absolute', top: 0, left: '-7.5px' }}>
                                    <path d="M8 0H0v1l5.2 10.2C6 12.8 7.7 13 8 13V0z" fill={bubbleBg} />
                                 </svg>
                               )}
@@ -745,20 +750,21 @@ export default function Home() {
 
                               {/* Uploaded Image */}
                               {msg.image && (
-                                <img src={msg.image} style={{ width: '100%', borderRadius: '6px', marginBottom: '4px', maxHeight: '200px', objectFit: 'cover' }} />
+                                // ✅ FIX: Lengkungan gambar dipertajam (borderRadius: 3px) agar terlihat menempel
+                                <img src={msg.image} style={{ width: '100%', borderRadius: '3px', marginBottom: '2px', maxHeight: '200px', objectFit: 'cover' }} />
                               )}
 
                               {/* Teks Pesan */}
                               {msg.text && (
                                 <div style={{ 
                                     color: isDark ? '#e9edef' : '#111b21', 
-                                    fontSize: '14.5px', 
-                                    lineHeight: '20px', 
+                                    // ✅ FIX: Font dikecilkan & line-height dirapatkan
+                                    fontSize: '14.2px', 
+                                    lineHeight: '19px', 
                                     whiteSpace: 'pre-wrap', 
                                     wordWrap: 'break-word' 
                                 }}>
                                    {msg.text}
-                                   {/* Spacer agar waktu tidak menimpa */}
                                    <span style={{ display: 'inline-block', width: isMe ? '60px' : '40px' }}></span> 
                                 </div>
                               )}
@@ -777,7 +783,7 @@ export default function Home() {
                    })}
                 </div>
 
-                {/* WA Input Footer Biasa */}
+                {/* WA Input Footer */}
                 <div style={{ padding: '8px', display: 'flex', gap: '8px', alignItems: 'flex-end', backgroundColor: 'transparent', flexShrink: 0 }}>
                    <div style={{ 
                        flex: 1, 
