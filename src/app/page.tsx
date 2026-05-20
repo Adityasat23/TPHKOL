@@ -93,8 +93,6 @@ export default function Home() {
   const [replyLikes, setReplyLikes] = useState('5');
   const [replyDate, setReplyDate] = useState('2025-11-17');
   const previewRef = useRef<HTMLDivElement>(null);
-  const bubbleRef = useRef<HTMLDivElement>(null);
-  const [bubbleSize, setBubbleSize] = useState({ w: 340, h: 100 });
 
   // STATE: DOWNLOADER
   const [url, setUrl] = useState('');
@@ -144,14 +142,6 @@ export default function Home() {
 
   const [isReady, setIsReady] = useState(false);
   useEffect(() => { setIsReady(true); }, []);
-
-  // Ukur dimensi bubble sticker setiap kali konten berubah
-  useEffect(() => {
-    if (bubbleRef.current) {
-      const { offsetWidth, offsetHeight } = bubbleRef.current;
-      setBubbleSize({ w: offsetWidth, h: offsetHeight });
-    }
-  }, [commentText, replyTo, avatar, commentMode]);
 
   const handleDownload = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -394,60 +384,20 @@ export default function Home() {
             <div style={{ padding: '30px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent' }}>
               
               <div ref={previewRef} style={{ display: 'inline-flex', flexDirection: 'column', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                {commentMode === 'sticker' && (() => {
-                  const W = bubbleSize.w || 340;
-                  const H = bubbleSize.h || 100;
-                  const R = 18; // border-radius bubble
-                  const tailH = 22; // tinggi total ekor di bawah bubble
-                  const svgH = H + tailH;
-                  // Path: satu shape tertutup — bubble rounded + ekor TikTok
-                  // Ekor: dari H ke H+tailH, concave masuk lalu ujung bulat
-                  const path = [
-                    `M${R},0`,
-                    `H${W - R} Q${W},0 ${W},${R}`,
-                    `V${H - R} Q${W},${H} ${W - R},${H}`,
-                    `H28`,
-                    `C 14,${H} 4,${H + 7} 2,${H + 18}`,
-                    `C 1,${H + 22} 3,${H + 25} 6,${H + 25}`,
-                    `C 2,${H + 24} 0,${H + 21} 0,${H + 16}`,
-                    `C -1,${H + 7} 4,${H} 4,${H - 2}`,
-                    `C 4,${H - 6} 0,${H - 10} 0,${H - R}`,
-                    `V${R} Q0,0 ${R},0 Z`,
-                  ].join(' ');
-                  return (
-                    <div style={{ position: 'relative', display: 'inline-block' }}>
-                      {/* SVG background shape: bubble + ekor satu path */}
-                      <svg
-                        width={W} height={svgH}
-                        viewBox={`0 0 ${W} ${svgH}`}
-                        style={{ position: 'absolute', top: 0, left: 0, overflow: 'visible' }}
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d={path} fill="white" />
-                      </svg>
-                      {/* Konten bubble — diukur oleh bubbleRef */}
-                      <div
-                        ref={bubbleRef}
-                        style={{
-                          position: 'relative',
-                          zIndex: 1,
-                          padding: '16px 24px 12px 24px',
-                          display: 'flex',
-                          maxWidth: '380px',
-                          gap: '12px',
-                          alignItems: 'flex-start',
-                          marginBottom: `${tailH}px`,
-                        }}
-                      >
-                        <img key={avatar} src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-                        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-                          <p style={{ color: '#8a8b91', fontSize: '14px', fontWeight: 'bold', margin: '0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
-                          <p style={{ color: '#000000', fontSize: '18px', fontWeight: 'bold', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'Arial, Helvetica, sans-serif' }}>{commentText}</p>
-                        </div>
+                {commentMode === 'sticker' && (
+                  <div style={{ display: 'inline-flex', flexDirection: 'column', isolation: 'isolate', transform: 'translateZ(0)' }}>
+                    <div style={{ backgroundColor: 'white', borderRadius: '16px 16px 16px 0px', padding: '16px 24px 12px 24px', display: 'flex', width: '100%', maxWidth: '380px', gap: '12px', alignItems: 'flex-start', border: '1px solid transparent' }}>
+                      <img key={avatar} src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+                        <p style={{ color: '#8a8b91', fontSize: '14px', fontWeight: 'bold', margin: '0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
+                        <p style={{ color: '#000000', fontSize: '18px', fontWeight: 'bold', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'Arial, Helvetica, sans-serif' }}>{commentText}</p>
                       </div>
                     </div>
-                  );
-                })()}
+                    <svg width="13" height="11" viewBox="0 0 13 11" style={{ display: 'block', alignSelf: 'flex-start', marginTop: '-1px' }} xmlns="http://www.w3.org/2000/svg">
+                      <path d="M0,0 H13 Q8,0 5,4 Q2.5,7 1,9.5 Q0.3,10.5 0,11 Z" fill="white" />
+                    </svg>
+                  </div>
+                )}
                 {commentMode === 'thread' && (
                   <div style={{ backgroundColor: threadTheme === 'dark' ? TIKTOK_DARK_BG : TIKTOK_LIGHT_BG, padding: '20px 24px', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '20px', width: '500px' }}>
                     <div style={{ display: 'flex', gap: '12px' }}>
