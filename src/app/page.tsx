@@ -113,10 +113,10 @@ export default function Home() {
   const [freeShippingText, setFreeShippingText] = useState("Free shipping");
   const [showFreeShipping, setShowFreeShipping] = useState(true);
 
-  // ✅ STATE BARU: Pilihan Mata Uang
+  // Pilihan Mata Uang
   const [currency, setCurrency] = useState<'Rp' | 'RM' | '$'>('Rp');
-  
   const [priceFormat, setPriceFormat] = useState<'exact' | 'k-an'>('k-an');
+  
   const [showShopeeLive, setShowShopeeLive] = useState(true);
   const productPreviewRef = useRef<HTMLDivElement>(null);
 
@@ -136,7 +136,6 @@ export default function Home() {
   const TIKTOK_WHITE_TEXT = "#ffffff";
   const TIKTOK_BLACK_TEXT = "#161823";
 
-  // PALET WARNA WA CHAT
   const WA_TERANG_BG = '#efeae2';
   const WA_GELAP_BG = '#0b141a'; 
 
@@ -255,7 +254,6 @@ export default function Home() {
   const autoDiscountBadge = discountPct > 0 ? `-${discountPct}%` : '';
   const autoDiscountTagText = discountPct > 0 ? `${discountPct}% off` : '';
 
-  // ✅ FIX: Prefix mata uang disesuaikan dengan pilihan (Rp, RM, $)
   let rawPrice = productPrice.trim();
   if (rawPrice && !rawPrice.toLowerCase().startsWith(currency.toLowerCase())) rawPrice = currency + rawPrice;
   
@@ -263,7 +261,8 @@ export default function Home() {
   if (rawOrigPrice && !rawOrigPrice.toLowerCase().startsWith(currency.toLowerCase())) rawOrigPrice = currency + rawOrigPrice;
 
   let displayPrice = rawPrice;
-  if (priceFormat === 'k-an' && newPriceNum > 0) {
+  // ✅ LOGIKA K-AN: Hanya berlaku jika mata uang adalah Rupiah (Rp)
+  if (priceFormat === 'k-an' && newPriceNum > 0 && currency === 'Rp') {
     const kValue = Math.floor(newPriceNum / 1000);
     displayPrice = `${currency}${kValue}K-an`;
   }
@@ -282,10 +281,9 @@ export default function Home() {
         <h1 className="text-5xl font-black text-[#0f172a] mb-2 tracking-tight">
           TPH <span className="text-[#94a3b8]">Editor Tools</span>
         </h1>
-        <p className="text-[#64748b] text-lg">Platform All-in-one untuk Kreator & Affiliate</p>
+        <p className="text-[#64748b] text-lg">Semoga membantu guys</p>
       </div>
 
-      {/* ✅ URUTAN TAB: Downloader -> Fake Comment -> Product Card -> WA Chat */}
       <div className="flex bg-white rounded-full shadow-sm border border-slate-200 p-1 mb-8 overflow-x-auto w-full max-w-4xl justify-center">
         <button onClick={() => setActiveTab('downloader')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'downloader' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>📥 DOWNLOADER</button>
         <button onClick={() => setActiveTab('comment')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'comment' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>💬 FAKE COMMENT</button>
@@ -449,14 +447,17 @@ export default function Home() {
 
             <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
               <button onClick={() => setPriceFormat('exact')} className={`flex-1 py-2 rounded-md font-bold text-xs ${priceFormat === 'exact' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🔢 HARGA EXACT</button>
-              <button onClick={() => setPriceFormat('k-an')} className={`flex-1 py-2 rounded-md font-bold text-xs ${priceFormat === 'k-an' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🔥 HARGA K-AN</button>
+              {/* ✅ FIX: Tombol K-AN hanya muncul untuk mata uang IDR (Rp) */}
+              {currency === 'Rp' && (
+                <button onClick={() => setPriceFormat('k-an')} className={`flex-1 py-2 rounded-md font-bold text-xs ${priceFormat === 'k-an' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🔥 HARGA K-AN</button>
+              )}
             </div>
 
-            {/* ✅ MATA UANG TOGGLE */}
             <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
               <button onClick={() => setCurrency('Rp')} className={`flex-1 py-2 rounded-md font-bold text-xs ${currency === 'Rp' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🇮🇩 IDR (Rp)</button>
-              <button onClick={() => setCurrency('RM')} className={`flex-1 py-2 rounded-md font-bold text-xs ${currency === 'RM' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🇲🇾 MYR (RM)</button>
-              <button onClick={() => setCurrency('$')} className={`flex-1 py-2 rounded-md font-bold text-xs ${currency === '$' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🇺🇸 USD ($)</button>
+              {/* ✅ FIX: Force format harga ke 'exact' saat beralih ke RM atau USD */}
+              <button onClick={() => { setCurrency('RM'); setPriceFormat('exact'); }} className={`flex-1 py-2 rounded-md font-bold text-xs ${currency === 'RM' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🇲🇾 MYR (RM)</button>
+              <button onClick={() => { setCurrency('$'); setPriceFormat('exact'); }} className={`flex-1 py-2 rounded-md font-bold text-xs ${currency === '$' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🇺🇸 USD ($)</button>
             </div>
 
             <div className="space-y-4">
@@ -622,7 +623,7 @@ export default function Home() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-500 mb-1">Nama Grup (Fixed)</label>
-                  <input type="text" value="KOL TIMEPHORIA" disabled className="w-full p-3 bg-slate-200 text-slate-500 border rounded-xl font-bold cursor-not-allowed" />
+                  <input type="text" value="KOL ASIK 💄" disabled className="w-full p-3 bg-slate-200 text-slate-500 border rounded-xl font-bold cursor-not-allowed" />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-500 mb-1">Avatar (Opsional)</label>
@@ -705,7 +706,7 @@ export default function Home() {
                         whiteSpace: 'nowrap', 
                         overflow: 'hidden', 
                         textOverflow: 'ellipsis' 
-                    }}>KOL TIMEPHORIA</div>
+                    }}>KOL ASIK 💄</div>
                     <div style={{ 
                         color: waTheme === 'dark' ? '#8696a0' : 'rgba(255,255,255,0.8)', 
                         fontSize: '13px', 
