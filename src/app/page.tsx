@@ -77,17 +77,17 @@ type WaMessage = {
 };
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'downloader' | 'comment' | 'product' | 'wa'>('downloader');
+  const [activeTab, setActiveTab] = useState<'downloader' | 'comment' | 'product' | 'wa'>('comment');
   
   // STATE: FAKE COMMENT
   const [commentMode, setCommentMode] = useState<'sticker' | 'thread'>('sticker'); 
   const [threadTheme, setThreadTheme] = useState<'dark' | 'light'>('dark');
-  const [username, setUsername] = useState('jetroyefta');
-  const [commentText, setCommentText] = useState("Ini Bigsale nya kapan");
+  const [username, setUsername] = useState('bamkiss');
+  const [commentText, setCommentText] = useState("busetdah timephoria\napaan lagi nih 😭😭😭");
   const [likes, setLikes] = useState('52');
   const [date, setDate] = useState('2025-11-16');
   const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
-  const [replyTo, setReplyTo] = useState('creator');
+  const [replyTo, setReplyTo] = useState('bamkiss');
   const [showReply, setShowReply] = useState(true);
   const [replyText, setReplyText] = useState('BESOK!');
   const [replyLikes, setReplyLikes] = useState('5');
@@ -110,6 +110,7 @@ export default function Home() {
   const [productSold, setProductSold] = useState("1.1K sold");
   const [productRating, setProductRating] = useState("4.9");
   
+  const [freeShippingText, setFreeShippingText] = useState("Free shipping");
   const [showFreeShipping, setShowFreeShipping] = useState(true);
 
   // Pilihan Mata Uang
@@ -238,16 +239,8 @@ export default function Home() {
     } catch (err) { alert("Export WA Chat gagal."); }
   };
 
-  // ==========================================
   // AUTO-MATH LOGIC & CURRENCY FORMATTING
-  // ==========================================
-  const getNum = (str: string) => {
-    if (currency === 'Rp') {
-      return parseInt(str.replace(/[^0-9]/g, ''), 10) || 0;
-    }
-    return parseFloat(str.replace(/[^0-9.]/g, '')) || 0;
-  };
-  
+  const getNum = (str: string) => parseInt(str.replace(/[^0-9]/g, ''), 10) || 0;
   const origPriceNum = getNum(productOriginalPrice);
   const newPriceNum = getNum(productPrice);
   
@@ -266,7 +259,6 @@ export default function Home() {
   if (rawOrigPrice && !rawOrigPrice.toLowerCase().startsWith(currency.toLowerCase())) rawOrigPrice = currency + rawOrigPrice;
 
   let displayPrice = rawPrice;
-  // ✅ LOGIKA K-AN: Hanya berlaku jika mata uang adalah Rupiah (Rp)
   if (priceFormat === 'k-an' && newPriceNum > 0 && currency === 'Rp') {
     const kValue = Math.floor(newPriceNum / 1000);
     displayPrice = `${currency}${kValue}K-an`;
@@ -286,7 +278,7 @@ export default function Home() {
         <h1 className="text-5xl font-black text-[#0f172a] mb-2 tracking-tight">
           TPH <span className="text-[#94a3b8]">Editor Tools</span>
         </h1>
-        <p className="text-[#64748b] text-lg">Semoga membantu guys</p>
+        <p className="text-[#64748b] text-lg">Platform All-in-one untuk Kreator & Affiliate</p>
       </div>
 
       <div className="flex bg-white rounded-full shadow-sm border border-slate-200 p-1 mb-8 overflow-x-auto w-full max-w-4xl justify-center">
@@ -385,16 +377,18 @@ export default function Home() {
               
               <div ref={previewRef} style={{ display: 'inline-flex', flexDirection: 'column', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                 {commentMode === 'sticker' && (
+                  /* ✅ FIX: RE-DESIGN TOTAL TOKCOMMENT PIXEL STRICT */
                   <div style={{ display: 'inline-flex', flexDirection: 'column', isolation: 'isolate', transform: 'translateZ(0)' }}>
-                    <div style={{ backgroundColor: 'white', borderRadius: '16px 16px 16px 0px', padding: '16px 24px 12px 24px', display: 'flex', width: '100%', maxWidth: '380px', gap: '12px', alignItems: 'flex-start', border: '1px solid transparent' }}>
-                      <img key={avatar} src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                    <div style={{ backgroundColor: 'white', borderRadius: '12px 12px 12px 0px', padding: '24px 28px', display: 'flex', width: '100%', maxWidth: '480px', gap: '16px', alignItems: 'flex-start', border: '1px solid transparent' }}>
+                      <img key={avatar} src={avatar} style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, marginTop: '2px' }} />
                       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-                        <p style={{ color: '#8a8b91', fontSize: '14px', fontWeight: 'bold', margin: '0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
-                        <p style={{ color: '#000000', fontSize: '18px', fontWeight: 'bold', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'Arial, Helvetica, sans-serif' }}>{commentText}</p>
+                        <p style={{ color: '#757575', fontSize: '18px', fontWeight: 'bold', margin: '0 0 4px 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
+                        <p style={{ color: '#000000', fontSize: '28px', fontWeight: '800', margin: '0', lineHeight: 1.2, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'Arial, Helvetica, sans-serif' }}>{commentText}</p>
                       </div>
                     </div>
-                    <svg width="13" height="11" viewBox="0 0 13 11" style={{ display: 'block', alignSelf: 'flex-start', marginTop: '-1px' }} xmlns="http://www.w3.org/2000/svg">
-                      <path d="M0,0 H13 Q8,0 5,4 Q2.5,7 1,9.5 Q0.3,10.5 0,11 Z" fill="white" />
+                    {/* ✅ FIX: CUSTOM SVG BEZIER CURVE EKOR TOKCOMMENT PRESISI */}
+                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style={{ display: 'block', alignSelf: 'flex-start', marginTop: '-1px' }} xmlns="http://www.w3.org/2000/svg">
+                      <path d="M0 0H28L5.5 24.5C3.5 27.5 0 26 0 22V0Z" fill="white" />
                     </svg>
                   </div>
                 )}
@@ -452,7 +446,6 @@ export default function Home() {
 
             <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
               <button onClick={() => setPriceFormat('exact')} className={`flex-1 py-2 rounded-md font-bold text-xs ${priceFormat === 'exact' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🔢 HARGA EXACT</button>
-              {/* ✅ FIX: Tombol K-AN hanya muncul untuk mata uang IDR (Rp) */}
               {currency === 'Rp' && (
                 <button onClick={() => setPriceFormat('k-an')} className={`flex-1 py-2 rounded-md font-bold text-xs ${priceFormat === 'k-an' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🔥 HARGA K-AN</button>
               )}
@@ -460,7 +453,6 @@ export default function Home() {
 
             <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
               <button onClick={() => setCurrency('Rp')} className={`flex-1 py-2 rounded-md font-bold text-xs ${currency === 'Rp' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🇮🇩 IDR (Rp)</button>
-              {/* ✅ FIX: Force format harga ke 'exact' saat beralih ke RM atau USD */}
               <button onClick={() => { setCurrency('RM'); setPriceFormat('exact'); }} className={`flex-1 py-2 rounded-md font-bold text-xs ${currency === 'RM' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🇲🇾 MYR (RM)</button>
               <button onClick={() => { setCurrency('$'); setPriceFormat('exact'); }} className={`flex-1 py-2 rounded-md font-bold text-xs ${currency === '$' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🇺🇸 USD ($)</button>
             </div>
@@ -486,7 +478,8 @@ export default function Home() {
                 <input type="text" value={productUnit} onChange={(e) => setProductUnit(e.target.value)} placeholder="Unit (cth: /pcs)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm font-bold text-slate-600" />
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
+                <input type="text" value={freeShippingText} onChange={(e) => setFreeShippingText(e.target.value)} placeholder="Label Promo" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
                 <input type="text" value={productRating} onChange={(e) => setProductRating(e.target.value)} placeholder="Rating (4.9)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
                 <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="Terjual (1.1K)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
               </div>
@@ -494,7 +487,7 @@ export default function Home() {
               <div className="flex flex-col gap-2 mt-2 px-1">
                 <div className="flex items-center gap-2">
                   <input type="checkbox" checked={showFreeShipping} onChange={e => setShowFreeShipping(e.target.checked)} className="accent-pink-600 w-4 h-4" />
-                  <label className="text-sm font-bold text-slate-600">Tampilkan Free Shipping</label>
+                  <label className="text-sm font-bold text-slate-600">Tampilkan Label Promo 1</label>
                 </div>
                 {productLayout === 'shopee' && (
                   <div className="flex items-center gap-2">
@@ -564,7 +557,7 @@ export default function Home() {
                   <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#ffffff', boxSizing: 'border-box', minWidth: 0 }}>
                     <div style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#222', lineHeight: '20px', maxHeight: '40px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', wordWrap: 'break-word', whiteSpace: 'normal' }}>[MALL] TIMEPHORIA - {productTitle}</div>
                     <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                      {showFreeShipping && ( <span style={{ display: 'flex', alignItems: 'center', backgroundColor: '#e2f7f4', color: '#00b09b', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}><TruckIcon /> Free Shipping</span> )}
+                      {showFreeShipping && freeShippingText && ( <span style={{ display: 'flex', alignItems: 'center', backgroundColor: '#e2f7f4', color: '#00b09b', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}><TruckIcon /> {freeShippingText}</span> )}
                       {autoDiscountTagText && ( <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>{autoDiscountTagText}</span> )}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#888', marginBottom: productLayout === 'tiktok-portrait' ? '12px' : 'auto' }}>
