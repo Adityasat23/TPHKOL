@@ -111,9 +111,11 @@ export default function Home() {
   const [productRating, setProductRating] = useState("4.9");
   
   const [freeShippingText, setFreeShippingText] = useState("Free shipping");
-  // ✅ STATE BARU: Toggle untuk on/off fitur Free Shipping
   const [showFreeShipping, setShowFreeShipping] = useState(true);
 
+  // ✅ STATE BARU: Pilihan Mata Uang
+  const [currency, setCurrency] = useState<'Rp' | 'RM' | '$'>('Rp');
+  
   const [priceFormat, setPriceFormat] = useState<'exact' | 'k-an'>('k-an');
   const [showShopeeLive, setShowShopeeLive] = useState(true);
   const productPreviewRef = useRef<HTMLDivElement>(null);
@@ -238,7 +240,9 @@ export default function Home() {
     } catch (err) { alert("Export WA Chat gagal."); }
   };
 
-  // AUTO-MATH LOGIC & FORMATTING
+  // ==========================================
+  // AUTO-MATH LOGIC & CURRENCY FORMATTING
+  // ==========================================
   const getNum = (str: string) => parseInt(str.replace(/[^0-9]/g, ''), 10) || 0;
   const origPriceNum = getNum(productOriginalPrice);
   const newPriceNum = getNum(productPrice);
@@ -251,15 +255,17 @@ export default function Home() {
   const autoDiscountBadge = discountPct > 0 ? `-${discountPct}%` : '';
   const autoDiscountTagText = discountPct > 0 ? `${discountPct}% off` : '';
 
+  // ✅ FIX: Prefix mata uang disesuaikan dengan pilihan (Rp, RM, $)
   let rawPrice = productPrice.trim();
-  if (rawPrice && !rawPrice.toLowerCase().startsWith('rp')) rawPrice = 'Rp' + rawPrice;
+  if (rawPrice && !rawPrice.toLowerCase().startsWith(currency.toLowerCase())) rawPrice = currency + rawPrice;
+  
   let rawOrigPrice = productOriginalPrice.trim();
-  if (rawOrigPrice && !rawOrigPrice.toLowerCase().startsWith('rp')) rawOrigPrice = 'Rp' + rawOrigPrice;
+  if (rawOrigPrice && !rawOrigPrice.toLowerCase().startsWith(currency.toLowerCase())) rawOrigPrice = currency + rawOrigPrice;
 
   let displayPrice = rawPrice;
   if (priceFormat === 'k-an' && newPriceNum > 0) {
     const kValue = Math.floor(newPriceNum / 1000);
-    displayPrice = `Rp${kValue}K-an`;
+    displayPrice = `${currency}${kValue}K-an`;
   }
 
   const priceStrLength = displayPrice.length + productUnit.length;
@@ -276,9 +282,10 @@ export default function Home() {
         <h1 className="text-5xl font-black text-[#0f172a] mb-2 tracking-tight">
           TPH <span className="text-[#94a3b8]">Editor Tools</span>
         </h1>
-        <p className="text-[#64748b] text-lg">Semoga membantu ya guys</p>
+        <p className="text-[#64748b] text-lg">Platform All-in-one untuk Kreator & Affiliate</p>
       </div>
 
+      {/* ✅ URUTAN TAB: Downloader -> Fake Comment -> Product Card -> WA Chat */}
       <div className="flex bg-white rounded-full shadow-sm border border-slate-200 p-1 mb-8 overflow-x-auto w-full max-w-4xl justify-center">
         <button onClick={() => setActiveTab('downloader')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'downloader' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>📥 DOWNLOADER</button>
         <button onClick={() => setActiveTab('comment')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'comment' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>💬 FAKE COMMENT</button>
@@ -445,6 +452,13 @@ export default function Home() {
               <button onClick={() => setPriceFormat('k-an')} className={`flex-1 py-2 rounded-md font-bold text-xs ${priceFormat === 'k-an' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🔥 HARGA K-AN</button>
             </div>
 
+            {/* ✅ MATA UANG TOGGLE */}
+            <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
+              <button onClick={() => setCurrency('Rp')} className={`flex-1 py-2 rounded-md font-bold text-xs ${currency === 'Rp' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🇮🇩 IDR (Rp)</button>
+              <button onClick={() => setCurrency('RM')} className={`flex-1 py-2 rounded-md font-bold text-xs ${currency === 'RM' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🇲🇾 MYR (RM)</button>
+              <button onClick={() => setCurrency('$')} className={`flex-1 py-2 rounded-md font-bold text-xs ${currency === '$' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🇺🇸 USD ($)</button>
+            </div>
+
             <div className="space-y-4">
               <h3 className="font-bold text-pink-600 uppercase text-xs tracking-widest">Detail Produk</h3>
               
@@ -472,11 +486,10 @@ export default function Home() {
                 <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="Terjual (1.1K)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
               </div>
 
-              {/* ✅ FIX: Tambahkan Checkbox Label Promo di sini */}
               <div className="flex flex-col gap-2 mt-2 px-1">
                 <div className="flex items-center gap-2">
                   <input type="checkbox" checked={showFreeShipping} onChange={e => setShowFreeShipping(e.target.checked)} className="accent-pink-600 w-4 h-4" />
-                  <label className="text-sm font-bold text-slate-600">Tampilkan Free Shipping</label>
+                  <label className="text-sm font-bold text-slate-600">Tampilkan Label Promo 1</label>
                 </div>
                 {productLayout === 'shopee' && (
                   <div className="flex items-center gap-2">
@@ -485,6 +498,8 @@ export default function Home() {
                   </div>
                 )}
               </div>
+
+              <p className="text-xs text-slate-400 font-medium italic">*Diskon otomatis dihitung. Format {currency} otomatis ditambahkan.</p>
             </div>
 
             <button onClick={exportProductImage} className={`w-full text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-[0.98] ${productLayout === 'shopee' ? 'bg-orange-600 hover:bg-orange-700' : 'bg-pink-600 hover:bg-pink-700'}`}>📸 Export Product Card</button>
@@ -544,7 +559,6 @@ export default function Home() {
                   <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#ffffff', boxSizing: 'border-box', minWidth: 0 }}>
                     <div style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#222', lineHeight: '20px', maxHeight: '40px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', wordWrap: 'break-word', whiteSpace: 'normal' }}>[MALL] TIMEPHORIA - {productTitle}</div>
                     <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                      {/* ✅ FIX: Gunakan variabel state showFreeShipping */}
                       {showFreeShipping && freeShippingText && ( <span style={{ display: 'flex', alignItems: 'center', backgroundColor: '#e2f7f4', color: '#00b09b', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}><TruckIcon /> {freeShippingText}</span> )}
                       {autoDiscountTagText && ( <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>{autoDiscountTagText}</span> )}
                     </div>
