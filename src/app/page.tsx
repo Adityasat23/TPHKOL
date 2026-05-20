@@ -82,12 +82,12 @@ export default function Home() {
   // STATE: FAKE COMMENT
   const [commentMode, setCommentMode] = useState<'sticker' | 'thread'>('sticker'); 
   const [threadTheme, setThreadTheme] = useState<'dark' | 'light'>('dark');
-  const [username, setUsername] = useState('bamkiss');
+  const [username, setUsername] = useState('yeftajethro');
   const [commentText, setCommentText] = useState("busetdah timephoria\napaan lagi nih 😭😭😭");
   const [likes, setLikes] = useState('52');
   const [date, setDate] = useState('2025-11-16');
   const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
-  const [replyTo, setReplyTo] = useState('bamkiss');
+  const [replyTo, setReplyTo] = useState('yeftajethro');
   const [showReply, setShowReply] = useState(true);
   const [replyText, setReplyText] = useState('BESOK!');
   const [replyLikes, setReplyLikes] = useState('5');
