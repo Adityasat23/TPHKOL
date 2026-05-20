@@ -393,8 +393,8 @@ export default function Home() {
                         <p style={{ color: '#000000', fontSize: '18px', fontWeight: 'bold', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'Arial, Helvetica, sans-serif' }}>{commentText}</p>
                       </div>
                     </div>
-                    <svg width="20" height="14" viewBox="0 0 20 14" style={{ display: 'block', alignSelf: 'flex-start', marginTop: '-1px' }} xmlns="http://www.w3.org/2000/svg">
-                      <path d="M0,0 H20 L3.5,11.5 C2,13 0,14 0,14 Z" fill="white" />
+                    <svg width="13" height="11" viewBox="0 0 13 11" style={{ display: 'block', alignSelf: 'flex-start', marginTop: '-1px' }} xmlns="http://www.w3.org/2000/svg">
+                      <path d="M0,0 H13 Q8,0 5,4 Q2.5,7 1,9.5 Q0.3,10.5 0,11 Z" fill="white" />
                     </svg>
                   </div>
                 )}
