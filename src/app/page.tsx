@@ -109,7 +109,11 @@ export default function Home() {
   const [productUnit, setProductUnit] = useState("/pcs");
   const [productSold, setProductSold] = useState("1.1K sold");
   const [productRating, setProductRating] = useState("4.9");
+  
   const [freeShippingText, setFreeShippingText] = useState("Free shipping");
+  // ✅ STATE BARU: Toggle untuk on/off fitur Free Shipping
+  const [showFreeShipping, setShowFreeShipping] = useState(true);
+
   const [priceFormat, setPriceFormat] = useState<'exact' | 'k-an'>('k-an');
   const [showShopeeLive, setShowShopeeLive] = useState(true);
   const productPreviewRef = useRef<HTMLDivElement>(null);
@@ -272,7 +276,7 @@ export default function Home() {
         <h1 className="text-5xl font-black text-[#0f172a] mb-2 tracking-tight">
           TPH <span className="text-[#94a3b8]">Editor Tools</span>
         </h1>
-        <p className="text-[#64748b] text-lg">Semoga membantu guys</p>
+        <p className="text-[#64748b] text-lg">Platform All-in-one untuk Kreator & Affiliate</p>
       </div>
 
       <div className="flex bg-white rounded-full shadow-sm border border-slate-200 p-1 mb-8 overflow-x-auto w-full max-w-4xl justify-center">
@@ -371,7 +375,6 @@ export default function Home() {
               
               <div ref={previewRef} style={{ display: 'inline-flex', flexDirection: 'column', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                 {commentMode === 'sticker' && (
-                  /* ✅ FIX: Hardware Acceleration agar Background Putih tidak hilang saat diexport */
                   <div style={{ display: 'inline-flex', flexDirection: 'column', isolation: 'isolate', transform: 'translateZ(0)' }}>
                     <div style={{ backgroundColor: 'white', borderRadius: '16px 16px 16px 0px', padding: '16px 24px 12px 24px', display: 'flex', width: '100%', maxWidth: '380px', gap: '12px', alignItems: 'flex-start', border: '1px solid transparent' }}>
                       <img key={avatar} src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
@@ -469,12 +472,19 @@ export default function Home() {
                 <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="Terjual (1.1K)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
               </div>
 
-              {productLayout === 'shopee' && (
-                <div className="flex items-center gap-2 mt-2 px-1">
-                  <input type="checkbox" checked={showShopeeLive} onChange={e => setShowShopeeLive(e.target.checked)} className="accent-orange-600 w-4 h-4" />
-                  <label className="text-sm font-bold text-slate-600">Tampilkan Label [LIVE]</label>
+              {/* ✅ FIX: Tambahkan Checkbox Label Promo di sini */}
+              <div className="flex flex-col gap-2 mt-2 px-1">
+                <div className="flex items-center gap-2">
+                  <input type="checkbox" checked={showFreeShipping} onChange={e => setShowFreeShipping(e.target.checked)} className="accent-pink-600 w-4 h-4" />
+                  <label className="text-sm font-bold text-slate-600">Tampilkan Label Promo 1</label>
                 </div>
-              )}
+                {productLayout === 'shopee' && (
+                  <div className="flex items-center gap-2">
+                    <input type="checkbox" checked={showShopeeLive} onChange={e => setShowShopeeLive(e.target.checked)} className="accent-orange-600 w-4 h-4" />
+                    <label className="text-sm font-bold text-slate-600">Tampilkan Label [LIVE]</label>
+                  </div>
+                )}
+              </div>
             </div>
 
             <button onClick={exportProductImage} className={`w-full text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-[0.98] ${productLayout === 'shopee' ? 'bg-orange-600 hover:bg-orange-700' : 'bg-pink-600 hover:bg-pink-700'}`}>📸 Export Product Card</button>
@@ -483,6 +493,9 @@ export default function Home() {
           <div className="bg-slate-100 rounded-3xl p-10 flex items-center justify-center min-h-[500px] overflow-hidden border border-slate-200">
             <div style={{ padding: '40px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent' }}>
               
+              {/* ========================================= */}
+              {/* RENDER KHUSUS: SHOPEE */}
+              {/* ========================================= */}
               {productLayout === 'shopee' && (
                  <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '4px', width: '300px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', fontFamily: 'Arial, sans-serif' }}>
                     <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
@@ -517,6 +530,9 @@ export default function Home() {
                  </div>
               )}
 
+              {/* ========================================= */}
+              {/* RENDER KHUSUS: TIKTOK */}
+              {/* ========================================= */}
               {(productLayout === 'tiktok-portrait' || productLayout === 'tiktok-landscape') && (
                 <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: productLayout === 'tiktok-portrait' ? '300px' : '480px', display: 'flex', flexDirection: productLayout === 'tiktok-portrait' ? 'column' : 'row', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
                   <div style={{ position: 'relative', width: productLayout === 'tiktok-portrait' ? '300px' : '200px', height: productLayout === 'tiktok-portrait' ? '300px' : '220px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
@@ -528,7 +544,8 @@ export default function Home() {
                   <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#ffffff', boxSizing: 'border-box', minWidth: 0 }}>
                     <div style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#222', lineHeight: '20px', maxHeight: '40px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', wordWrap: 'break-word', whiteSpace: 'normal' }}>[MALL] TIMEPHORIA - {productTitle}</div>
                     <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                      {freeShippingText && ( <span style={{ display: 'flex', alignItems: 'center', backgroundColor: '#e2f7f4', color: '#00b09b', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}><TruckIcon /> {freeShippingText}</span> )}
+                      {/* ✅ FIX: Gunakan variabel state showFreeShipping */}
+                      {showFreeShipping && freeShippingText && ( <span style={{ display: 'flex', alignItems: 'center', backgroundColor: '#e2f7f4', color: '#00b09b', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}><TruckIcon /> {freeShippingText}</span> )}
                       {autoDiscountTagText && ( <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>{autoDiscountTagText}</span> )}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#888', marginBottom: productLayout === 'tiktok-portrait' ? '12px' : 'auto' }}>
@@ -639,7 +656,7 @@ export default function Home() {
             <button onClick={exportWaImage} className="w-full bg-[#008069] hover:bg-[#075e54] text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-[0.98]">📸 Export WA Chat</button>
           </div>
 
-          {/* PREVIEW WHATSAPP */}
+          {/* PREVIEW WHATSAPP (PIXEL STRICT MODE) */}
           <div className="bg-slate-200 rounded-3xl p-6 flex items-center justify-center min-h-[500px] overflow-hidden border border-slate-300">
             <div style={{ padding: '20px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent' }}>
               
