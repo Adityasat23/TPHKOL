@@ -384,105 +384,20 @@ export default function Home() {
             <div style={{ padding: '30px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent' }}>
               
               <div ref={previewRef} style={{ display: 'inline-flex', flexDirection: 'column', fontFamily: 'Arial, Helvetica, sans-serif' }}>
-  {commentMode === 'sticker' && (
-  <div
-    style={{
-      display: 'inline-flex',
-      flexDirection: 'column',
-      isolation: 'isolate',
-      transform: 'translateZ(0)',
-    }}
-  >
-    {/* MAIN BUBBLE */}
-    <div
-      style={{
-        backgroundColor: 'white',
-        borderRadius: '18px',
-        padding: '14px 20px 12px 20px',
-        display: 'flex',
-        width: '100%',
-        maxWidth: '380px',
-        gap: '12px',
-        alignItems: 'flex-start',
-        boxShadow: '0 1px 2px rgba(0,0,0,0.06)',
-        position: 'relative',
-      }}
-    >
-      {/* AVATAR */}
-      <img
-        key={avatar}
-        src={avatar}
-        style={{
-          width: '40px',
-          height: '40px',
-          borderRadius: '50%',
-          objectFit: 'cover',
-          flexShrink: 0,
-        }}
-      />
-
-      {/* CONTENT */}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          width: '100%',
-          minWidth: 0,
-        }}
-      >
-        {/* REPLY TEXT */}
-        <p
-          style={{
-            color: '#8a8b91',
-            fontSize: '13px',
-            fontWeight: 600,
-            margin: '0 0 3px 0',
-            fontFamily: 'Arial, Helvetica, sans-serif',
-            lineHeight: 1.2,
-          }}
-        >
-          Reply to {replyTo}'s comment
-        </p>
-
-        {/* MAIN COMMENT */}
-        <p
-          style={{
-            color: '#000000',
-            fontSize: '18px',
-            fontWeight: 600,
-            margin: 0,
-            lineHeight: 1.25,
-            whiteSpace: 'pre-wrap',
-            wordWrap: 'break-word',
-            fontFamily: 'Arial, Helvetica, sans-serif',
-          }}
-        >
-          {commentText}
-        </p>
-      </div>
-    </div>
-
-    {/* TIKTOK STYLE TAIL */}
-    <svg
-      width="16"
-      height="10"
-      viewBox="0 0 16 10"
-      style={{
-        display: 'block',
-        alignSelf: 'flex-start',
-        marginTop: '-1px',
-        marginLeft: '8px',
-      }}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M0 0C4 0 7 1.5 10 4.5C12 6.5 13.5 8.5 16 10H0V0Z"
-        fill="white"
-      />
-    </svg>
-  </div>
-)}
+                {commentMode === 'sticker' && (
+                  <div style={{ display: 'inline-flex', flexDirection: 'column', isolation: 'isolate', transform: 'translateZ(0)' }}>
+                    <div style={{ backgroundColor: 'white', borderRadius: '16px 16px 16px 0px', padding: '16px 24px 12px 24px', display: 'flex', width: '100%', maxWidth: '380px', gap: '12px', alignItems: 'flex-start', border: '1px solid transparent' }}>
+                      <img key={avatar} src={avatar} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+                        <p style={{ color: '#8a8b91', fontSize: '14px', fontWeight: 'bold', margin: '0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
+                        <p style={{ color: '#000000', fontSize: '18px', fontWeight: 'bold', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'Arial, Helvetica, sans-serif' }}>{commentText}</p>
+                      </div>
+                    </div>
+                    <svg width="20" height="14" viewBox="0 0 20 14" style={{ display: 'block', alignSelf: 'flex-start', marginTop: '-1px' }} xmlns="http://www.w3.org/2000/svg">
+                      <path d="M0,0 H20 L3.5,11.5 C2,13 0,14 0,14 Z" fill="white" />
+                    </svg>
+                  </div>
+                )}
                 {commentMode === 'thread' && (
                   <div style={{ backgroundColor: threadTheme === 'dark' ? TIKTOK_DARK_BG : TIKTOK_LIGHT_BG, padding: '20px 24px', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '20px', width: '500px' }}>
                     <div style={{ display: 'flex', gap: '12px' }}>
