@@ -110,7 +110,6 @@ export default function Home() {
   const [productSold, setProductSold] = useState("1.1K sold");
   const [productRating, setProductRating] = useState("4.9");
   
-  // ✅ FIX: Hapus state text manual untuk Free Shipping, sisakan showFreeShipping (Toggle On/Off)
   const [showFreeShipping, setShowFreeShipping] = useState(true);
 
   // Pilihan Mata Uang
@@ -196,7 +195,6 @@ export default function Home() {
     setWaMessages(waMessages.filter(msg => msg.id !== id));
   };
 
-  // --- EXPORT FUNCTIONS ---
   const exportCommentImage = async () => {
     if (!previewRef.current) return;
     try {
@@ -239,15 +237,10 @@ export default function Home() {
     } catch (err) { alert("Export WA Chat gagal."); }
   };
 
-  // ==========================================
-  // ✅ FIX: LOGIKA PARSING ANGKA (SUPPORT DECIMAL UNTUK RM/USD)
-  // ==========================================
   const getNum = (str: string, curr: string) => {
-    // Jika Rupiah, buang semua tanda baca (titik dianggap pemisah ribuan)
     if (curr === 'Rp') {
       return parseInt(str.replace(/[^0-9]/g, ''), 10) || 0;
     }
-    // Jika RM atau USD, simpan titik sebagai desimal (contoh: 26.9 tetap 26.9)
     return parseFloat(str.replace(/[^0-9.]/g, '')) || 0;
   };
 
@@ -255,7 +248,6 @@ export default function Home() {
   const newPriceNum = getNum(productPrice, currency);
   
   let discountPct = 0;
-  // Kalkulasi diskon menggunakan Math.round agar bulat sempurna
   if (origPriceNum > 0 && newPriceNum > 0 && origPriceNum > newPriceNum) {
     discountPct = Math.round(((origPriceNum - newPriceNum) / origPriceNum) * 100);
   }
@@ -283,42 +275,55 @@ export default function Home() {
   if (!isReady) return null;
 
   return (
-    <main className="min-h-screen bg-[#f8fafc] flex flex-col items-center py-10 px-4 font-sans text-[#1e293b]">
+    <main className="min-h-screen bg-[#0F1115] flex flex-col items-center py-12 px-4 font-sans text-[#F3F4F6] relative overflow-hidden selection:bg-[#C084FC]/30 selection:text-[#F3F4F6]">
       
-      <div className="max-w-3xl w-full text-center mb-8">
-        <h1 className="text-5xl font-black text-[#0f172a] mb-2 tracking-tight">
-          TPH <span className="text-[#94a3b8]">Editor Tools</span>
+      {/* --- AMBIENT BACKGROUND GLOW (TIMEPHORIA DARK VIBE) --- */}
+      <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[radial-gradient(circle_at_top,rgba(168,139,250,0.12),transparent_60%)] -z-10 pointer-events-none"></div>
+      
+      {/* Subtle Grain/Noise Overlay */}
+      <div className="absolute inset-0 opacity-[0.03] mix-blend-soft-light pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGZpbHRlciBpZD0ibiI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuNyIgbnVtT2N0YXZlcz0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNuKSIvPjwvc3ZnPg==')]"></div>
+
+      {/* --- EDITORIAL HERO SECTION --- */}
+      <div className="max-w-3xl w-full text-center mb-14 mt-6 relative z-10">
+        <span className="inline-block py-1.5 px-4 rounded-full bg-[#171A21] border border-white/5 text-[#A78BFA] text-xs font-bold tracking-widest mb-6 shadow-sm">
+          INTERNAL TOOLS
+        </span>
+        <h1 className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-[#F3F4F6] to-[#A1A1AA] mb-5 tracking-tighter leading-tight">
+          Create Faster.<br />Edit Smarter.
         </h1>
-        <p className="text-[#64748b] text-lg">Semoga membantu guys</p>
+        <p className="text-[#A1A1AA] text-lg md:text-xl font-medium tracking-wide max-w-xl mx-auto leading-[1.6]">
+          Exclusive utilities for Timephoria content creators.
+        </p>
       </div>
 
-      <div className="flex bg-white rounded-full shadow-sm border border-slate-200 p-1 mb-8 overflow-x-auto w-full max-w-4xl justify-center">
-        <button onClick={() => setActiveTab('downloader')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'downloader' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>📥 DOWNLOADER</button>
-        <button onClick={() => setActiveTab('comment')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'comment' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>💬 FAKE COMMENT</button>
-        <button onClick={() => setActiveTab('product')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'product' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>🛍️ PRODUCT CARD</button>
-        <button onClick={() => setActiveTab('wa')} className={`px-5 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'wa' ? 'bg-[#008069] text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>💬 WA CHAT</button>
+      {/* --- NAVIGATION TABS --- */}
+      <div className="flex bg-[#171A21]/70 backdrop-blur-xl rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.2)] border border-[#262A35] p-1.5 mb-10 w-full max-w-4xl justify-center gap-1 z-10 overflow-x-auto">
+        <button onClick={() => setActiveTab('downloader')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'downloader' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>📥 DOWNLOADER</button>
+        <button onClick={() => setActiveTab('comment')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'comment' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>💬 FAKE COMMENT</button>
+        <button onClick={() => setActiveTab('product')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'product' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>🛍️ PRODUCT CARD</button>
+        <button onClick={() => setActiveTab('wa')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'wa' ? 'bg-[#008069] text-[#F3F4F6] shadow-lg shadow-[#008069]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>💬 WA CHAT</button>
       </div>
 
       {/* ========================================= */}
       {/* TAB 1: DOWNLOADER */}
       {/* ========================================= */}
       {activeTab === 'downloader' && (
-        <div className="w-full max-w-2xl bg-white shadow-xl shadow-blue-100/50 rounded-3xl p-8 border border-slate-100 animate-in fade-in zoom-in duration-300">
+        <div className="w-full max-w-2xl bg-[#171A21]/90 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 rounded-[2rem] p-8 border border-[#262A35] z-10 animate-in fade-in zoom-in-95">
           <form onSubmit={handleDownload} className="space-y-4">
-            <div className="relative">
-              <input type="text" placeholder="Baru bisa download TikTok" className="w-full pl-5 pr-32 py-5 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-blue-500 text-slate-800" value={url} onChange={(e) => setUrl(e.target.value)} required />
-              <button type="submit" disabled={loading} className="absolute right-2 top-2 bottom-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 rounded-xl disabled:opacity-50">{loading ? '...' : 'Download'}</button>
+            <div className="relative group">
+              <input type="text" placeholder="Paste link TikTok di sini..." className="w-full pl-6 pr-40 py-5 bg-[#1D212B] border border-[#262A35] rounded-2xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 text-[#F3F4F6] transition-all placeholder:text-[#71717A] font-medium" value={url} onChange={(e) => setUrl(e.target.value)} required />
+              <button type="submit" disabled={loading} className="absolute right-2 top-2 bottom-2 bg-[#F3F4F6] hover:bg-white text-[#0F1115] font-bold px-8 rounded-xl disabled:opacity-50 transition-all shadow-md active:scale-95">{loading ? 'Processing...' : 'Download'}</button>
             </div>
           </form>
-          {error && <div className="mt-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-lg text-sm">{error}</div>}
+          {error && <div className="mt-6 p-4 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-sm font-medium">{error}</div>}
           {result && (
-            <div className="mt-10 flex flex-col md:flex-row gap-6 items-center">
-              {result.cover && <img src={result.cover} alt="thumbnail" className="w-40 h-40 object-cover rounded-2xl shadow-lg border-4 border-white" />}
+            <div className="mt-8 flex flex-col md:flex-row gap-8 items-center bg-[#1D212B] p-6 rounded-2xl border border-white/5">
+              {result.cover && <img src={result.cover} alt="thumbnail" className="w-32 h-32 object-cover rounded-2xl shadow-md border-2 border-[#262A35]" />}
               <div className="flex-1 text-center md:text-left w-full">
-                <h3 className="font-bold text-slate-800 text-xl mb-4 line-clamp-2">{result.title}</h3>
+                <h3 className="font-bold text-[#F3F4F6] text-lg mb-4 line-clamp-2 leading-snug">{result.title}</h3>
                 <div className="flex flex-col sm:flex-row gap-3">
-                  {result.play && <a href={result.play} target="_blank" rel="noreferrer" className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl text-center shadow-lg">Unduh Video (MP4)</a>}
-                  {result.music && <a href={result.music} target="_blank" rel="noreferrer" className="flex-1 bg-slate-800 hover:bg-black text-white font-bold py-3 rounded-xl text-center shadow-lg">Unduh MP3</a>}
+                  {result.play && <a href={result.play} target="_blank" rel="noreferrer" className="flex-1 bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] font-bold py-3 rounded-xl text-center shadow-lg hover:shadow-xl transition-all active:scale-95">Unduh Video</a>}
+                  {result.music && <a href={result.music} target="_blank" rel="noreferrer" className="flex-1 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] hover:bg-[#262A35] font-bold py-3 rounded-xl text-center shadow-sm transition-all active:scale-95">Unduh MP3</a>}
                 </div>
               </div>
             </div>
@@ -330,70 +335,89 @@ export default function Home() {
       {/* TAB 2: FAKE COMMENT */}
       {/* ========================================= */}
       {activeTab === 'comment' && (
-        <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in zoom-in duration-300">
-          <div className="bg-white shadow-xl rounded-3xl p-6 border border-slate-100 space-y-6 h-fit">
-            <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
-              <button onClick={() => setCommentMode('sticker')} className={`flex-1 py-2 rounded-md font-bold text-xs ${commentMode === 'sticker' ? 'bg-white shadow text-blue-600' : 'text-slate-500'}`}>STICKER BUBBLE</button>
-              <button onClick={() => setCommentMode('thread')} className={`flex-1 py-2 rounded-md font-bold text-xs ${commentMode === 'thread' ? 'bg-white shadow text-blue-600' : 'text-slate-500'}`}>THREAD COMMENT</button>
+        <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 z-10 animate-in fade-in zoom-in-95">
+          <div className="bg-[#171A21]/90 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 rounded-[2rem] p-8 border border-[#262A35] space-y-8 h-fit">
+            
+            <div className="flex gap-2 bg-[#1D212B] p-1.5 rounded-xl border border-white/5">
+              <button onClick={() => setCommentMode('sticker')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${commentMode === 'sticker' ? 'bg-[#262A35] shadow-sm text-[#F3F4F6]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>STICKER BUBBLE</button>
+              <button onClick={() => setCommentMode('thread')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${commentMode === 'thread' ? 'bg-[#262A35] shadow-sm text-[#F3F4F6]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>THREAD COMMENT</button>
             </div>
+
             {commentMode === 'thread' && (
-              <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
-                <button onClick={() => setThreadTheme('dark')} className={`flex-1 py-2 rounded-md font-bold text-xs ${threadTheme === 'dark' ? 'bg-slate-800 text-white' : 'text-slate-500'}`}>🌙 DARK MODE</button>
-                <button onClick={() => setThreadTheme('light')} className={`flex-1 py-2 rounded-md font-bold text-xs ${threadTheme === 'light' ? 'bg-white text-slate-900 shadow' : 'text-slate-500'}`}>☀️ LIGHT MODE</button>
+              <div className="flex gap-2 bg-[#1D212B] p-1.5 rounded-xl border border-white/5">
+                <button onClick={() => setThreadTheme('dark')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${threadTheme === 'dark' ? 'bg-[#262A35] text-[#F3F4F6] shadow-sm' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🌙 DARK MODE</button>
+                <button onClick={() => setThreadTheme('light')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${threadTheme === 'light' ? 'bg-white text-slate-900 shadow-sm' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>☀️ LIGHT MODE</button>
               </div>
             )}
             
-            <div className="space-y-4">
-              <h3 className="font-bold text-blue-600 uppercase text-xs tracking-widest">Komentar Utama</h3>
-              <input type="file" onChange={(e) => handleImageUpload(e, setAvatar)} className="text-xs block w-full" />
+            <div className="space-y-5">
+              <h3 className="font-bold text-[#A78BFA] uppercase text-xs tracking-widest flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#C084FC]"></span> Komentar Utama
+              </h3>
               
+              <div>
+                <label className="block text-xs font-bold text-[#A1A1AA] mb-2">Avatar Profil</label>
+                <input type="file" onChange={(e) => handleImageUpload(e, setAvatar)} className="text-sm block w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#1D212B] file:text-[#A78BFA] hover:file:bg-[#262A35] transition-all cursor-pointer text-[#71717A]" />
+              </div>
+
               {commentMode === 'thread' && (
-                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" className="w-full p-3 bg-slate-50 border rounded-xl" />
+                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium text-[#F3F4F6] placeholder-[#71717A]" />
               )}
               
               {commentMode === 'sticker' ? (
-                 <input type="text" value={replyTo} onChange={(e) => setReplyTo(e.target.value)} placeholder="Reply to username..." className="w-full p-3 bg-slate-50 border rounded-xl" />
+                 <input type="text" value={replyTo} onChange={(e) => setReplyTo(e.target.value)} placeholder="Reply to username..." className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium text-[#F3F4F6] placeholder-[#71717A]" />
               ) : (
-                <div className="grid grid-cols-2 gap-2">
-                  <input type="text" value={likes} onChange={(e) => setLikes(e.target.value)} placeholder="Likes" className="p-3 bg-slate-50 border rounded-xl" />
-                  <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="p-3 bg-slate-50 border rounded-xl" />
+                <div className="grid grid-cols-2 gap-3">
+                  <input type="text" value={likes} onChange={(e) => setLikes(e.target.value)} placeholder="Jumlah Likes" className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium text-[#F3F4F6] placeholder-[#71717A]" />
+                  <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium text-[#A1A1AA]" style={{ colorScheme: 'dark' }} />
                 </div>
               )}
-              <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl min-h-[100px]" />
+              <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} className="w-full p-4 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium min-h-[120px] resize-y text-[#F3F4F6] placeholder-[#71717A] leading-[1.6]" placeholder="Isi komentar..." />
             </div>
 
             {commentMode === 'thread' && (
-              <div className="space-y-4 pt-4 border-t border-slate-100">
+              <div className="space-y-5 pt-6 border-t border-white/5">
                 <div className="flex justify-between items-center">
-                  <h3 className="font-bold text-indigo-600 uppercase text-xs tracking-widest">Balasan (Fixed Timephoria)</h3>
-                  <input type="checkbox" checked={showReply} onChange={() => setShowReply(!showReply)} />
+                  <h3 className="font-bold text-[#A78BFA] uppercase text-xs tracking-widest flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#C084FC]"></span> Balasan Brand
+                  </h3>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" checked={showReply} onChange={() => setShowReply(!showReply)} className="sr-only peer" />
+                    <div className="w-9 h-5 bg-[#262A35] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#C084FC]"></div>
+                  </label>
                 </div>
                 {showReply && (
-                  <>
-                    <p className="text-xs text-slate-400 italic">Nama dan Logo balasan sudah dikunci ke akun resmi Timephoria.</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="Likes Balasan" className="w-full p-3 bg-slate-50 border rounded-xl" />
-                      <input type="date" value={replyDate} onChange={(e) => setReplyDate(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl" />
+                  <div className="animate-in fade-in slide-in-from-top-2 duration-300 space-y-3">
+                    <p className="text-[11px] text-[#71717A] font-medium">Avatar & Nama diset otomatis ke Timephoria.</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="Likes Balasan" className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium text-[#F3F4F6] placeholder-[#71717A]" />
+                      <input type="date" value={replyDate} onChange={(e) => setReplyDate(e.target.value)} className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium text-[#A1A1AA]" style={{ colorScheme: 'dark' }} />
                     </div>
-                    <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full p-3 bg-slate-50 border rounded-xl min-h-[80px]" placeholder="Teks balasan admin..." />
-                  </>
+                    <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full p-4 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium min-h-[80px] text-[#F3F4F6] placeholder-[#71717A] leading-[1.6]" placeholder="Teks balasan admin..." />
+                  </div>
                 )}
               </div>
             )}
-            <button onClick={exportCommentImage} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-[0.98]">📸 Export PNG HD</button>
+            
+            <button onClick={exportCommentImage} className="w-full bg-gradient-to-r from-[#A78BFA] to-[#C084FC] hover:from-[#B79BFB] hover:to-[#D09DFD] text-[#0F1115] font-bold py-4 rounded-xl shadow-lg shadow-[#A78BFA]/10 hover:shadow-xl hover:shadow-[#A78BFA]/20 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]">
+              📸 Download Image
+            </button>
           </div>
 
-          <div className="bg-[#0f172a] rounded-3xl p-10 flex items-center justify-center min-h-[500px] overflow-hidden">
-            <div style={{ padding: '30px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent' }}>
-              
-              <div ref={previewRef} style={{ display: 'inline-flex', flexDirection: 'column', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+          {/* PREVIEW CONTAINER */}
+          <div className="bg-[#0F1115] border border-[#262A35] rounded-[2rem] p-10 flex items-center justify-center min-h-[500px] overflow-hidden shadow-inner relative">
+            <div className="absolute inset-0 opacity-[0.05] bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+            
+            <div style={{ padding: '30px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
+              <div ref={previewRef} style={{ display: 'inline-flex', flexDirection: 'column', fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
+                
                 {commentMode === 'sticker' && (
                   <div style={{ display: 'inline-flex', flexDirection: 'column', isolation: 'isolate', transform: 'translateZ(0)' }}>
-                    <div style={{ backgroundColor: 'white', borderRadius: '12px 12px 12px 0px', padding: '24px 28px', display: 'flex', width: '100%', maxWidth: '480px', gap: '16px', alignItems: 'flex-start', border: '1px solid transparent' }}>
+                    <div style={{ backgroundColor: 'white', borderRadius: '16px 16px 16px 0px', padding: '24px 28px', display: 'flex', width: '100%', maxWidth: '480px', gap: '16px', alignItems: 'flex-start', border: '1px solid transparent', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.1)' }}>
                       <img key={avatar} src={avatar} style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, marginTop: '2px' }} />
                       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
-                        <p style={{ color: '#757575', fontSize: '18px', fontWeight: 'bold', margin: '0 0 4px 0', fontFamily: 'Arial, Helvetica, sans-serif' }}>Reply to {replyTo}'s comment</p>
-                        <p style={{ color: '#000000', fontSize: '28px', fontWeight: '800', margin: '0', lineHeight: 1.2, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'Arial, Helvetica, sans-serif' }}>{commentText}</p>
+                        <p style={{ color: '#757575', fontSize: '16px', fontWeight: '600', margin: '0 0 6px 0', fontFamily: 'inherit' }}>Reply to {replyTo}'s comment</p>
+                        <p style={{ color: '#000000', fontSize: '24px', fontWeight: '800', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'inherit', letterSpacing: '-0.02em' }}>{commentText}</p>
                       </div>
                     </div>
                     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style={{ display: 'block', alignSelf: 'flex-start', marginTop: '-1px' }} xmlns="http://www.w3.org/2000/svg">
@@ -401,35 +425,36 @@ export default function Home() {
                     </svg>
                   </div>
                 )}
+
                 {commentMode === 'thread' && (
-                  <div style={{ backgroundColor: threadTheme === 'dark' ? TIKTOK_DARK_BG : TIKTOK_LIGHT_BG, padding: '20px 24px', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '20px', width: '500px' }}>
-                    <div style={{ display: 'flex', gap: '12px' }}>
-                      <img key={avatar} src={avatar} style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                  <div style={{ backgroundColor: threadTheme === 'dark' ? TIKTOK_DARK_BG : TIKTOK_LIGHT_BG, padding: '24px', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '20px', width: '500px', boxShadow: threadTheme === 'light' ? '0 10px 40px -10px rgba(0,0,0,0.1)' : '0 10px 40px -10px rgba(0,0,0,0.5)' }}>
+                    <div style={{ display: 'flex', gap: '14px' }}>
+                      <img key={avatar} src={avatar} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                       <div style={{ flex: 1 }}>
-                        <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif' }}>{username}</p>
-                        <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '3px 0', lineHeight: 1.4, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'Arial, Helvetica, sans-serif' }}>{commentText}</p>
-                        <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 600, marginTop: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                        <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'inherit' }}>{username}</p>
+                        <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '4px 0', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'inherit' }}>{commentText}</p>
+                        <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 500, marginTop: '8px', fontFamily: 'inherit' }}>
                           <span>{date}</span><span>Reply</span>
                         </div>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: TIKTOK_GRAY_TEXT, flexShrink: 0, marginLeft: '8px', minWidth: '32px' }}>
-                        <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" style={{ flexShrink: 0 }}><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                        <p style={{ fontSize: '12px', margin: '4px 0 0 0', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'center' }}>{likes}</p>
+                        <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                        <p style={{ fontSize: '12px', margin: '4px 0 0 0', fontFamily: 'inherit', textAlign: 'center', fontWeight: 600 }}>{likes}</p>
                       </div>
                     </div>
                     {showReply && (
-                      <div style={{ display: 'flex', gap: '12px', marginLeft: '50px' }}>
-                        <img src={TIMEPHORIA_LOGO} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                      <div style={{ display: 'flex', gap: '14px', marginLeft: '54px' }}>
+                        <img src={TIMEPHORIA_LOGO} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                         <div style={{ flex: 1 }}>
-                          <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'Arial, Helvetica, sans-serif' }}>Timephoria</p>
-                          <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '3px 0', lineHeight: 1.4, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'Arial, Helvetica, sans-serif' }}>{replyText}</p>
-                          <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 600, marginTop: '8px', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                          <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'inherit' }}>Timephoria</p>
+                          <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '4px 0', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'inherit' }}>{replyText}</p>
+                          <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 500, marginTop: '8px', fontFamily: 'inherit' }}>
                             <span>{replyDate}</span><span>Reply</span>
                           </div>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: TIKTOK_GRAY_TEXT, flexShrink: 0, marginLeft: '8px', minWidth: '32px' }}>
-                          <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" style={{ flexShrink: 0 }}><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                          <p style={{ fontSize: '11px', margin: '4px 0 0 0', fontFamily: 'Arial, Helvetica, sans-serif', textAlign: 'center' }}>{replyLikes}</p>
+                          <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                          <p style={{ fontSize: '11px', margin: '4px 0 0 0', fontFamily: 'inherit', textAlign: 'center', fontWeight: 600 }}>{replyLikes}</p>
                         </div>
                       </div>
                     )}
@@ -445,82 +470,94 @@ export default function Home() {
       {/* TAB 3: PRODUCT CARD GENERATOR */}
       {/* ========================================= */}
       {activeTab === 'product' && (
-        <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in zoom-in duration-300">
-          <div className="bg-white shadow-xl rounded-3xl p-6 border border-slate-100 space-y-6 h-fit">
-            <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
-              <button onClick={() => setProductLayout('tiktok-portrait')} className={`flex-1 py-2 rounded-md font-bold text-xs ${productLayout === 'tiktok-portrait' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>📱 TIKTOK POTRAIT</button>
-              <button onClick={() => setProductLayout('tiktok-landscape')} className={`flex-1 py-2 rounded-md font-bold text-xs ${productLayout === 'tiktok-landscape' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🖥️ TIKTOK LANDSCAPE</button>
-              <button onClick={() => setProductLayout('shopee')} className={`flex-1 py-2 rounded-md font-bold text-xs ${productLayout === 'shopee' ? 'bg-white shadow text-orange-600' : 'text-slate-500'}`}>🛒 SHOPEE</button>
+        <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 z-10 animate-in fade-in zoom-in-95">
+          <div className="bg-[#171A21]/90 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 rounded-[2rem] p-8 border border-[#262A35] space-y-8 h-fit">
+            
+            <div className="flex gap-2 bg-[#1D212B] p-1.5 rounded-xl border border-white/5">
+              <button onClick={() => setProductLayout('tiktok-portrait')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${productLayout === 'tiktok-portrait' ? 'bg-[#262A35] shadow-sm text-pink-400' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>📱 TK PORTRAIT</button>
+              <button onClick={() => setProductLayout('tiktok-landscape')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${productLayout === 'tiktok-landscape' ? 'bg-[#262A35] shadow-sm text-pink-400' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🖥️ TK LANDSCAPE</button>
+              <button onClick={() => setProductLayout('shopee')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${productLayout === 'shopee' ? 'bg-[#262A35] shadow-sm text-orange-400' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🛒 SHOPEE</button>
             </div>
 
-            <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
-              <button onClick={() => setPriceFormat('exact')} className={`flex-1 py-2 rounded-md font-bold text-xs ${priceFormat === 'exact' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🔢 HARGA EXACT</button>
+            <div className="flex gap-2 bg-[#1D212B] p-1.5 rounded-xl border border-white/5">
+              <button onClick={() => setPriceFormat('exact')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${priceFormat === 'exact' ? 'bg-[#262A35] shadow-sm text-[#F3F4F6]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🔢 HARGA EXACT</button>
               {currency === 'Rp' && (
-                <button onClick={() => setPriceFormat('k-an')} className={`flex-1 py-2 rounded-md font-bold text-xs ${priceFormat === 'k-an' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🔥 HARGA K-AN</button>
+                <button onClick={() => setPriceFormat('k-an')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${priceFormat === 'k-an' ? 'bg-[#262A35] shadow-sm text-[#F3F4F6]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🔥 HARGA K-AN</button>
               )}
             </div>
 
-            <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
-              <button onClick={() => setCurrency('Rp')} className={`flex-1 py-2 rounded-md font-bold text-xs ${currency === 'Rp' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🇮🇩 IDR (Rp)</button>
-              <button onClick={() => { setCurrency('RM'); setPriceFormat('exact'); }} className={`flex-1 py-2 rounded-md font-bold text-xs ${currency === 'RM' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🇲🇾 MYR (RM)</button>
-              <button onClick={() => { setCurrency('$'); setPriceFormat('exact'); }} className={`flex-1 py-2 rounded-md font-bold text-xs ${currency === '$' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🇺🇸 USD ($)</button>
+            <div className="flex gap-2 bg-[#1D212B] p-1.5 rounded-xl border border-white/5">
+              <button onClick={() => setCurrency('Rp')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${currency === 'Rp' ? 'bg-[#262A35] shadow-sm text-[#F3F4F6]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🇮🇩 IDR (Rp)</button>
+              <button onClick={() => { setCurrency('RM'); setPriceFormat('exact'); }} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${currency === 'RM' ? 'bg-[#262A35] shadow-sm text-[#F3F4F6]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🇲🇾 MYR (RM)</button>
+              <button onClick={() => { setCurrency('$'); setPriceFormat('exact'); }} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${currency === '$' ? 'bg-[#262A35] shadow-sm text-[#F3F4F6]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🇺🇸 USD ($)</button>
             </div>
 
-            <div className="space-y-4">
-              <h3 className="font-bold text-pink-600 uppercase text-xs tracking-widest">Detail Produk</h3>
+            <div className="space-y-5">
+              <h3 className="font-bold text-pink-400 uppercase text-xs tracking-widest flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-pink-400"></span> Detail Produk
+              </h3>
               
               <div>
-                <label className="block text-xs font-bold text-slate-500 mb-1">Foto Produk</label>
-                <input type="file" onChange={(e) => handleImageUpload(e, setProductImage)} className="text-xs block w-full mb-3" />
+                <label className="block text-xs font-bold text-[#A1A1AA] mb-2">Foto Produk</label>
+                <input type="file" onChange={(e) => handleImageUpload(e, setProductImage)} className="text-sm block w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#1D212B] file:text-pink-400 hover:file:bg-[#262A35] transition-all cursor-pointer text-[#71717A]" />
               </div>
 
-              <div className="flex w-full bg-slate-50 border rounded-xl overflow-hidden focus-within:border-pink-500">
-                <span className="p-3 bg-slate-200 text-slate-500 font-bold text-sm flex items-center whitespace-nowrap border-r border-slate-300">
+              <div className="flex w-full bg-[#1D212B] border border-[#262A35] rounded-xl overflow-hidden focus-within:border-pink-400 focus-within:ring-4 focus-within:ring-pink-400/10 transition-all">
+                <span className="p-3.5 bg-[#262A35]/50 text-[#A1A1AA] font-bold text-sm flex items-center whitespace-nowrap border-r border-[#262A35]">
                   [MALL] TIMEPHORIA -
                 </span>
-                <input type="text" value={productTitle} onChange={(e) => setProductTitle(e.target.value)} placeholder="Varian (cth: MILKYWAY Liptint Glow)" className="w-full p-3 bg-transparent focus:outline-none" />
+                <input type="text" value={productTitle} onChange={(e) => setProductTitle(e.target.value)} placeholder="Varian Produk" className="w-full p-3.5 bg-transparent focus:outline-none text-sm font-medium text-[#F3F4F6]" />
               </div>
               
-              <div className="grid grid-cols-3 gap-2">
-                <input type="text" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} placeholder={`Baru (${currency === 'Rp' ? '87.120' : '26.9'})`} className="w-full p-3 bg-slate-50 border rounded-xl font-bold text-pink-600" />
-                <input type="text" value={productOriginalPrice} onChange={(e) => setProductOriginalPrice(e.target.value)} placeholder={`Coret (${currency === 'Rp' ? '238.000' : '29'})`} className="w-full p-3 bg-slate-50 border rounded-xl text-slate-400" />
-                <input type="text" value={productUnit} onChange={(e) => setProductUnit(e.target.value)} placeholder="Unit (cth: /pcs)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm font-bold text-slate-600" />
+              <div className="grid grid-cols-3 gap-3">
+                <input type="text" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} placeholder={`Baru (${currency === 'Rp' ? '87.120' : '26.9'})`} className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl font-bold text-pink-400 focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-400/10 transition-all text-sm placeholder-[#71717A]" />
+                <input type="text" value={productOriginalPrice} onChange={(e) => setProductOriginalPrice(e.target.value)} placeholder={`Coret (${currency === 'Rp' ? '238.000' : '29'})`} className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl text-[#A1A1AA] focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-400/10 transition-all text-sm font-medium placeholder-[#71717A]" />
+                <input type="text" value={productUnit} onChange={(e) => setProductUnit(e.target.value)} placeholder="Unit (/pcs)" className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl text-[#A1A1AA] focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-400/10 transition-all text-sm font-bold placeholder-[#71717A]" />
               </div>
 
-              {/* ✅ FIX: Kolom input 'freeShippingText' dihilangkan */}
-              <div className="grid grid-cols-2 gap-2">
-                <input type="text" value={productRating} onChange={(e) => setProductRating(e.target.value)} placeholder="Rating (4.9)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
-                <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="Terjual (1.1K)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
+              <div className="grid grid-cols-2 gap-3">
+                <input type="text" value={productRating} onChange={(e) => setProductRating(e.target.value)} placeholder="Rating (4.9)" className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-400/10 transition-all text-sm font-medium text-[#F3F4F6] placeholder-[#71717A]" />
+                <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="Terjual (1.1K)" className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-400/10 transition-all text-sm font-medium text-[#F3F4F6] placeholder-[#71717A]" />
               </div>
 
-              {/* ✅ FIX: Checkbox untuk Toggle On/Off Label Promo Free Shipping */}
-              <div className="flex flex-col gap-2 mt-2 px-1">
-                <div className="flex items-center gap-2">
-                  <input type="checkbox" checked={showFreeShipping} onChange={e => setShowFreeShipping(e.target.checked)} className="accent-pink-600 w-4 h-4" />
-                  <label className="text-sm font-bold text-slate-600">Tampilkan Label Free Shipping</label>
-                </div>
-                {productLayout === 'shopee' && (
-                  <div className="flex items-center gap-2">
-                    <input type="checkbox" checked={showShopeeLive} onChange={e => setShowShopeeLive(e.target.checked)} className="accent-orange-600 w-4 h-4" />
-                    <label className="text-sm font-bold text-slate-600">Tampilkan Label [LIVE]</label>
+              <div className="flex flex-col gap-3 mt-4 p-4 bg-[#1D212B] rounded-xl border border-white/5">
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <div className="relative flex items-center justify-center">
+                    <input type="checkbox" checked={showFreeShipping} onChange={e => setShowFreeShipping(e.target.checked)} className="peer sr-only" />
+                    <div className="w-5 h-5 border-2 border-[#71717A] rounded peer-checked:bg-pink-500 peer-checked:border-pink-500 transition-all"></div>
+                    <svg className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
                   </div>
+                  <span className="text-sm font-semibold text-[#A1A1AA] group-hover:text-[#F3F4F6] transition-colors">Tampilkan Label Free Shipping</span>
+                </label>
+                
+                {productLayout === 'shopee' && (
+                  <label className="flex items-center gap-3 cursor-pointer group">
+                    <div className="relative flex items-center justify-center">
+                      <input type="checkbox" checked={showShopeeLive} onChange={e => setShowShopeeLive(e.target.checked)} className="peer sr-only" />
+                      <div className="w-5 h-5 border-2 border-[#71717A] rounded peer-checked:bg-orange-500 peer-checked:border-orange-500 transition-all"></div>
+                      <svg className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                    <span className="text-sm font-semibold text-[#A1A1AA] group-hover:text-[#F3F4F6] transition-colors">Tampilkan Label [LIVE]</span>
+                  </label>
                 )}
               </div>
 
-              <p className="text-xs text-slate-400 font-medium italic">*Diskon otomatis dihitung. Format {currency} otomatis ditambahkan.</p>
+              <p className="text-[11px] text-[#71717A] font-medium italic mt-2">*Diskon & format mata uang otomatis dihitung.</p>
             </div>
 
-            <button onClick={exportProductImage} className={`w-full text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-[0.98] ${productLayout === 'shopee' ? 'bg-orange-600 hover:bg-orange-700' : 'bg-pink-600 hover:bg-pink-700'}`}>📸 Export Product Card</button>
+            <button onClick={exportProductImage} className={`w-full text-[#0F1115] font-bold py-4 rounded-xl shadow-lg transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98] ${productLayout === 'shopee' ? 'bg-gradient-to-r from-orange-400 to-orange-500 shadow-orange-500/10 hover:shadow-xl hover:shadow-orange-500/20' : 'bg-gradient-to-r from-pink-400 to-rose-500 shadow-pink-500/10 hover:shadow-xl hover:shadow-pink-500/20'}`}>
+              📸 Download Product Card
+            </button>
           </div>
 
-          <div className="bg-slate-100 rounded-3xl p-10 flex items-center justify-center min-h-[500px] overflow-hidden border border-slate-200">
-            <div style={{ padding: '40px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent' }}>
+          <div className="bg-[#0F1115] border border-[#262A35] rounded-[2rem] p-10 flex items-center justify-center min-h-[500px] overflow-hidden shadow-inner relative">
+            <div className="absolute inset-0 opacity-[0.05] bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+
+            <div style={{ padding: '40px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
               
-              {/* ========================================= */}
-              {/* RENDER KHUSUS: SHOPEE */}
-              {/* ========================================= */}
+              {/* SHOPEE RENDER (Keep original colors for accurate output) */}
               {productLayout === 'shopee' && (
-                 <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '4px', width: '300px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', fontFamily: 'Arial, sans-serif' }}>
+                 <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '4px', width: '300px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.5)', fontFamily: 'Arial, sans-serif' }}>
                     <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
                        <img src={productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                        {autoDiscountBadge && (
@@ -553,11 +590,9 @@ export default function Home() {
                  </div>
               )}
 
-              {/* ========================================= */}
-              {/* RENDER KHUSUS: TIKTOK */}
-              {/* ========================================= */}
+              {/* TIKTOK RENDER (Keep original colors for accurate output) */}
               {(productLayout === 'tiktok-portrait' || productLayout === 'tiktok-landscape') && (
-                <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: productLayout === 'tiktok-portrait' ? '300px' : '480px', display: 'flex', flexDirection: productLayout === 'tiktok-portrait' ? 'column' : 'row', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+                <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: productLayout === 'tiktok-portrait' ? '300px' : '480px', display: 'flex', flexDirection: productLayout === 'tiktok-portrait' ? 'column' : 'row', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}>
                   <div style={{ position: 'relative', width: productLayout === 'tiktok-portrait' ? '300px' : '200px', height: productLayout === 'tiktok-portrait' ? '300px' : '220px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
                     <img key={productImage} src={productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                     {autoDiscountBadge && (
@@ -567,7 +602,6 @@ export default function Home() {
                   <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#ffffff', boxSizing: 'border-box', minWidth: 0 }}>
                     <div style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#222', lineHeight: '20px', maxHeight: '40px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', wordWrap: 'break-word', whiteSpace: 'normal' }}>[MALL] TIMEPHORIA - {productTitle}</div>
                     <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                      {/* ✅ FIX: Logika Tampil Label Free Shipping */}
                       {showFreeShipping && ( <span style={{ display: 'flex', alignItems: 'center', backgroundColor: '#e2f7f4', color: '#00b09b', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}><TruckIcon /> Free shipping</span> )}
                       {autoDiscountTagText && ( <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>{autoDiscountTagText}</span> )}
                     </div>
@@ -617,71 +651,79 @@ export default function Home() {
       {/* TAB 4: FAKE WA CHAT */}
       {/* ========================================= */}
       {activeTab === 'wa' && (
-        <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in zoom-in duration-300">
+        <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 z-10 animate-in fade-in zoom-in-95">
           
-          <div className="bg-white shadow-xl rounded-3xl p-6 border border-slate-100 space-y-6 h-fit">
+          <div className="bg-[#171A21]/90 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 rounded-[2rem] p-8 border border-[#262A35] space-y-8 h-fit">
             
-            <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
-                <button onClick={() => setWaTheme('light')} className={`flex-1 py-2 rounded-md font-bold text-xs ${waTheme === 'light' ? 'bg-white shadow text-[#008069]' : 'text-slate-500'}`}>☀️ MODE TERANG</button>
-                <button onClick={() => setWaTheme('dark')} className={`flex-1 py-2 rounded-md font-bold text-xs ${waTheme === 'dark' ? 'bg-[#0b141a] shadow text-white' : 'text-slate-500'}`}>🌙 MODE MALAM</button>
+            <div className="flex gap-2 bg-[#1D212B] p-1.5 rounded-xl border border-white/5">
+                <button onClick={() => setWaTheme('light')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${waTheme === 'light' ? 'bg-[#262A35] shadow-sm text-[#00a884]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>☀️ MODE TERANG</button>
+                <button onClick={() => setWaTheme('dark')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${waTheme === 'dark' ? 'bg-[#262A35] shadow-sm text-[#00a884]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🌙 MODE MALAM</button>
             </div>
 
             <div className="space-y-4">
-              <h3 className="font-bold text-[#008069] uppercase text-xs tracking-widest">Pengaturan Grup / Chat</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <h3 className="font-bold text-[#00a884] uppercase text-xs tracking-widest flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#00a884]"></span> Grup / Chat Settings
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">Nama Grup (Fixed)</label>
-                  <input type="text" value="KOL ASIK 💄" disabled className="w-full p-3 bg-slate-200 text-slate-500 border rounded-xl font-bold cursor-not-allowed" />
+                  <label className="block text-xs font-bold text-[#A1A1AA] mb-2">Nama Grup (Fixed)</label>
+                  <input type="text" value="KOL ASIK 💄" disabled className="w-full p-3.5 bg-[#111318] text-[#71717A] border border-[#262A35] rounded-xl font-bold cursor-not-allowed text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">Avatar (Opsional)</label>
-                  <input type="file" onChange={(e) => handleImageUpload(e, setWaGroupAvatar)} className="text-xs block w-full pt-3" />
+                  <label className="block text-xs font-bold text-[#A1A1AA] mb-2">Avatar Grup</label>
+                  <input type="file" onChange={(e) => handleImageUpload(e, setWaGroupAvatar)} className="text-sm block w-full file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#008069]/20 file:text-[#00a884] hover:file:bg-[#008069]/40 transition-all cursor-pointer text-[#71717A]" />
                 </div>
               </div>
             </div>
 
-            <hr className="border-slate-100" />
+            <hr className="border-white/5" />
 
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                 <h3 className="font-bold text-[#008069] uppercase text-xs tracking-widest">Daftar Chat</h3>
-                 <button onClick={addWaMessage} className="text-xs bg-[#008069] text-white px-3 py-1 rounded-md font-bold">+ Tambah Chat</button>
+                 <h3 className="font-bold text-[#00a884] uppercase text-xs tracking-widest flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#00a884]"></span> Daftar Chat
+                 </h3>
+                 <button onClick={addWaMessage} className="text-xs bg-[#008069] hover:bg-[#00a884] text-[#F3F4F6] px-4 py-2 rounded-lg font-bold shadow-md shadow-[#008069]/20 transition-all active:scale-95">+ Tambah</button>
               </div>
               
-              <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+              <div className="space-y-4 max-h-[400px] overflow-y-auto pr-3 custom-scrollbar">
                 {waMessages.map((msg, index) => (
-                  <div key={msg.id} className="p-4 bg-slate-50 border rounded-xl relative group">
-                    <button onClick={() => removeWaMessage(msg.id)} className="absolute top-2 right-2 text-red-500 text-xs font-bold bg-red-50 px-2 py-1 rounded">X</button>
-                    <div className="grid grid-cols-2 gap-2 mb-2">
-                      <select value={msg.sender} onChange={(e) => updateWaMessage(msg.id, 'sender', e.target.value)} className="p-2 bg-white border rounded-lg text-sm">
-                        <option value="other">Orang Lain</option>
+                  <div key={msg.id} className="p-5 bg-[#1D212B] border border-[#262A35] rounded-2xl relative group hover:border-[#4B5563] transition-all">
+                    <button onClick={() => removeWaMessage(msg.id)} className="absolute -top-2 -right-2 text-red-400 text-xs font-bold bg-[#262A35] shadow-sm border border-[#4B5563] w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500/20 hover:text-red-300">✕</button>
+                    <div className="grid grid-cols-2 gap-3 mb-3">
+                      <select value={msg.sender} onChange={(e) => updateWaMessage(msg.id, 'sender', e.target.value)} className="p-2.5 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] rounded-xl text-sm font-medium focus:outline-none focus:border-[#00a884] focus:ring-2 focus:ring-[#00a884]/20">
+                        <option value="other">Orang Lain (Kiri)</option>
                         <option value="me">Saya (Kanan)</option>
                       </select>
                       {msg.sender === 'other' ? (
-                        <input type="text" value={msg.name} onChange={(e) => updateWaMessage(msg.id, 'name', e.target.value)} placeholder="Nama Pengirim" className="p-2 bg-white border rounded-lg text-sm" />
+                        <input type="text" value={msg.name} onChange={(e) => updateWaMessage(msg.id, 'name', e.target.value)} placeholder="Nama Pengirim" className="p-2.5 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] placeholder-[#71717A] rounded-xl text-sm font-medium focus:outline-none focus:border-[#00a884] focus:ring-2 focus:ring-[#00a884]/20" />
                       ) : (
-                         <div className="p-2 text-sm text-slate-400 bg-slate-100 rounded-lg text-center cursor-not-allowed">Anda</div>
+                         <div className="p-2.5 text-sm font-medium text-[#71717A] bg-[#111318] border border-transparent rounded-xl text-center cursor-not-allowed">Anda</div>
                       )}
                     </div>
-                    <textarea value={msg.text} onChange={(e) => updateWaMessage(msg.id, 'text', e.target.value)} placeholder="Isi pesan..." className="w-full p-2 bg-white border rounded-lg text-sm min-h-[60px] mb-2" />
-                    <div className="grid grid-cols-2 gap-2">
-                      <input type="time" value={msg.time} onChange={(e) => updateWaMessage(msg.id, 'time', e.target.value)} className="p-2 bg-white border rounded-lg text-sm" />
-                      <input type="file" onChange={(e) => handleWaMessageImage(msg.id, e)} className="text-xs p-2" />
+                    <textarea value={msg.text} onChange={(e) => updateWaMessage(msg.id, 'text', e.target.value)} placeholder="Isi pesan..." className="w-full p-3 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] placeholder-[#71717A] rounded-xl text-sm min-h-[60px] mb-3 focus:outline-none focus:border-[#00a884] focus:ring-2 focus:ring-[#00a884]/20 font-medium leading-[1.6]" />
+                    <div className="grid grid-cols-2 gap-3 items-center">
+                      <input type="time" value={msg.time} onChange={(e) => updateWaMessage(msg.id, 'time', e.target.value)} className="p-2.5 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] rounded-xl text-sm font-medium focus:outline-none focus:border-[#00a884]" style={{ colorScheme: 'dark' }} />
+                      <input type="file" onChange={(e) => handleWaMessageImage(msg.id, e)} className="text-[10px] p-2 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:bg-[#262A35] file:text-[#A1A1AA] cursor-pointer text-[#71717A]" />
                     </div>
                     {msg.image && (
-                      <button onClick={() => updateWaMessage(msg.id, 'image', '')} className="mt-2 text-xs text-red-500 block">Hapus Gambar</button>
+                      <button onClick={() => updateWaMessage(msg.id, 'image', '')} className="mt-3 text-[11px] font-bold text-red-400 hover:text-red-300 transition-colors flex items-center gap-1">✕ Hapus Gambar Terlampir</button>
                     )}
                   </div>
                 ))}
               </div>
             </div>
 
-            <button onClick={exportWaImage} className="w-full bg-[#008069] hover:bg-[#075e54] text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-[0.98]">📸 Export WA Chat</button>
+            <button onClick={exportWaImage} className="w-full bg-[#008069] hover:bg-[#00a884] text-[#F3F4F6] font-bold py-4 rounded-xl shadow-lg shadow-[#008069]/10 hover:shadow-xl hover:shadow-[#008069]/20 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]">
+              📸 Download WA Chat
+            </button>
           </div>
 
           {/* PREVIEW WHATSAPP (PIXEL STRICT MODE) */}
-          <div className="bg-slate-200 rounded-3xl p-6 flex items-center justify-center min-h-[500px] overflow-hidden border border-slate-300">
-            <div style={{ padding: '20px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent' }}>
+          <div className="bg-[#0F1115] border border-[#262A35] rounded-[2rem] p-6 flex items-center justify-center min-h-[500px] overflow-hidden shadow-inner relative">
+             <div className="absolute inset-0 opacity-[0.05] bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+            
+            <div style={{ padding: '20px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
               
               <div ref={waPreviewRef} style={{ 
                 backgroundColor: waTheme === 'dark' ? WA_GELAP_BG : WA_TERANG_BG, 
@@ -691,7 +733,7 @@ export default function Home() {
                 flexDirection: 'column', 
                 fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
                 overflow: 'hidden',
-                boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                boxShadow: '0 12px 32px rgba(0,0,0,0.5)'
               }}>
                 
                 {/* WA Header */}
@@ -840,13 +882,20 @@ export default function Home() {
       )}
 
       <footer style={{ 
-        marginTop: '80px', paddingTop: '40px', paddingBottom: '20px', textAlign: 'center', width: '100%', maxWidth: '1152px', borderTop: '1px solid #e2e8f0' 
+        marginTop: '80px', paddingTop: '40px', paddingBottom: '30px', textAlign: 'center', width: '100%', maxWidth: '1152px', borderTop: '1px solid rgba(255,255,255,0.05)', zIndex: 10 
       }}>
-        <p style={{ color: '#64748b', fontSize: '14px' }}>
-          &copy; {new Date().getFullYear()} <span style={{ fontWeight: 'bold', color: '#0f172a' }}>Aditya Satria Pratama</span>. All rights reserved.
+        <p style={{ color: '#71717A', fontSize: '14px', fontWeight: 500 }}>
+          &copy; {new Date().getFullYear()} <span style={{ fontWeight: 'bold', color: '#A1A1AA' }}>Aditya Satria Pratama</span>. All rights reserved.
         </p>
       </footer>
 
+      {/* Global CSS for Custom Scrollbar in WA list */}
+      <style dangerouslySetInnerHTML={{__html: `
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #262A35; border-radius: 20px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #4B5563; }
+      `}} />
     </main>
   );
 }
