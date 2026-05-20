@@ -286,10 +286,10 @@ export default function Home() {
       {/* --- EDITORIAL HERO SECTION --- */}
       <div className="max-w-3xl w-full text-center mb-14 mt-6 relative z-10">
         <h1 className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-[#F3F4F6] to-[#A1A1AA] mb-5 tracking-tighter leading-tight">
-          TPH Editing Tools.<br />.
+          TPH Editing Tools<br />
         </h1>
         <p className="text-[#A1A1AA] text-lg md:text-xl font-medium tracking-wide max-w-xl mx-auto leading-[1.6]">
-          Semoga Membantu Guys.
+          Semoga Membantu Guys
         </p>
       </div>
 
