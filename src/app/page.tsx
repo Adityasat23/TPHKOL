@@ -77,7 +77,7 @@ type WaMessage = {
 };
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'downloader' | 'comment' | 'product' | 'wa'>('comment');
+  const [activeTab, setActiveTab] = useState<'downloader' | 'comment' | 'product' | 'wa'>('product');
   
   // STATE: FAKE COMMENT
   const [commentMode, setCommentMode] = useState<'sticker' | 'thread'>('sticker'); 
@@ -110,7 +110,7 @@ export default function Home() {
   const [productSold, setProductSold] = useState("1.1K sold");
   const [productRating, setProductRating] = useState("4.9");
   
-  const [freeShippingText, setFreeShippingText] = useState("Free shipping");
+  // ✅ FIX: Hapus state text manual untuk Free Shipping, sisakan showFreeShipping (Toggle On/Off)
   const [showFreeShipping, setShowFreeShipping] = useState(true);
 
   // Pilihan Mata Uang
@@ -239,12 +239,23 @@ export default function Home() {
     } catch (err) { alert("Export WA Chat gagal."); }
   };
 
-  // AUTO-MATH LOGIC & CURRENCY FORMATTING
-  const getNum = (str: string) => parseInt(str.replace(/[^0-9]/g, ''), 10) || 0;
-  const origPriceNum = getNum(productOriginalPrice);
-  const newPriceNum = getNum(productPrice);
+  // ==========================================
+  // ✅ FIX: LOGIKA PARSING ANGKA (SUPPORT DECIMAL UNTUK RM/USD)
+  // ==========================================
+  const getNum = (str: string, curr: string) => {
+    // Jika Rupiah, buang semua tanda baca (titik dianggap pemisah ribuan)
+    if (curr === 'Rp') {
+      return parseInt(str.replace(/[^0-9]/g, ''), 10) || 0;
+    }
+    // Jika RM atau USD, simpan titik sebagai desimal (contoh: 26.9 tetap 26.9)
+    return parseFloat(str.replace(/[^0-9.]/g, '')) || 0;
+  };
+
+  const origPriceNum = getNum(productOriginalPrice, currency);
+  const newPriceNum = getNum(productPrice, currency);
   
   let discountPct = 0;
+  // Kalkulasi diskon menggunakan Math.round agar bulat sempurna
   if (origPriceNum > 0 && newPriceNum > 0 && origPriceNum > newPriceNum) {
     discountPct = Math.round(((origPriceNum - newPriceNum) / origPriceNum) * 100);
   }
@@ -278,7 +289,7 @@ export default function Home() {
         <h1 className="text-5xl font-black text-[#0f172a] mb-2 tracking-tight">
           TPH <span className="text-[#94a3b8]">Editor Tools</span>
         </h1>
-        <p className="text-[#64748b] text-lg">Platform All-in-one untuk Kreator & Affiliate</p>
+        <p className="text-[#64748b] text-lg">Semoga membantu guys</p>
       </div>
 
       <div className="flex bg-white rounded-full shadow-sm border border-slate-200 p-1 mb-8 overflow-x-auto w-full max-w-4xl justify-center">
@@ -377,7 +388,6 @@ export default function Home() {
               
               <div ref={previewRef} style={{ display: 'inline-flex', flexDirection: 'column', fontFamily: 'Arial, Helvetica, sans-serif' }}>
                 {commentMode === 'sticker' && (
-                  /* ✅ FIX: RE-DESIGN TOTAL TOKCOMMENT PIXEL STRICT */
                   <div style={{ display: 'inline-flex', flexDirection: 'column', isolation: 'isolate', transform: 'translateZ(0)' }}>
                     <div style={{ backgroundColor: 'white', borderRadius: '12px 12px 12px 0px', padding: '24px 28px', display: 'flex', width: '100%', maxWidth: '480px', gap: '16px', alignItems: 'flex-start', border: '1px solid transparent' }}>
                       <img key={avatar} src={avatar} style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, marginTop: '2px' }} />
@@ -386,7 +396,6 @@ export default function Home() {
                         <p style={{ color: '#000000', fontSize: '28px', fontWeight: '800', margin: '0', lineHeight: 1.2, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'Arial, Helvetica, sans-serif' }}>{commentText}</p>
                       </div>
                     </div>
-                    {/* ✅ FIX: CUSTOM SVG BEZIER CURVE EKOR TOKCOMMENT PRESISI */}
                     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style={{ display: 'block', alignSelf: 'flex-start', marginTop: '-1px' }} xmlns="http://www.w3.org/2000/svg">
                       <path d="M0 0H28L5.5 24.5C3.5 27.5 0 26 0 22V0Z" fill="white" />
                     </svg>
@@ -439,8 +448,8 @@ export default function Home() {
         <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in zoom-in duration-300">
           <div className="bg-white shadow-xl rounded-3xl p-6 border border-slate-100 space-y-6 h-fit">
             <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
-              <button onClick={() => setProductLayout('tiktok-portrait')} className={`flex-1 py-2 rounded-md font-bold text-xs ${productLayout === 'tiktok-portrait' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>📱 TIKTOK PT</button>
-              <button onClick={() => setProductLayout('tiktok-landscape')} className={`flex-1 py-2 rounded-md font-bold text-xs ${productLayout === 'tiktok-landscape' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🖥️ TIKTOK LS</button>
+              <button onClick={() => setProductLayout('tiktok-portrait')} className={`flex-1 py-2 rounded-md font-bold text-xs ${productLayout === 'tiktok-portrait' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>📱 TIKTOK POTRAIT</button>
+              <button onClick={() => setProductLayout('tiktok-landscape')} className={`flex-1 py-2 rounded-md font-bold text-xs ${productLayout === 'tiktok-landscape' ? 'bg-white shadow text-pink-600' : 'text-slate-500'}`}>🖥️ TIKTOK LANDSCAPE</button>
               <button onClick={() => setProductLayout('shopee')} className={`flex-1 py-2 rounded-md font-bold text-xs ${productLayout === 'shopee' ? 'bg-white shadow text-orange-600' : 'text-slate-500'}`}>🛒 SHOPEE</button>
             </div>
 
@@ -473,21 +482,22 @@ export default function Home() {
               </div>
               
               <div className="grid grid-cols-3 gap-2">
-                <input type="text" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} placeholder="Baru (87.120)" className="w-full p-3 bg-slate-50 border rounded-xl font-bold text-pink-600" />
-                <input type="text" value={productOriginalPrice} onChange={(e) => setProductOriginalPrice(e.target.value)} placeholder="Coret (238.000)" className="w-full p-3 bg-slate-50 border rounded-xl text-slate-400" />
+                <input type="text" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} placeholder={`Baru (${currency === 'Rp' ? '87.120' : '26.9'})`} className="w-full p-3 bg-slate-50 border rounded-xl font-bold text-pink-600" />
+                <input type="text" value={productOriginalPrice} onChange={(e) => setProductOriginalPrice(e.target.value)} placeholder={`Coret (${currency === 'Rp' ? '238.000' : '29'})`} className="w-full p-3 bg-slate-50 border rounded-xl text-slate-400" />
                 <input type="text" value={productUnit} onChange={(e) => setProductUnit(e.target.value)} placeholder="Unit (cth: /pcs)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm font-bold text-slate-600" />
               </div>
 
-              <div className="grid grid-cols-3 gap-2">
-                <input type="text" value={freeShippingText} onChange={(e) => setFreeShippingText(e.target.value)} placeholder="Label Promo" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
+              {/* ✅ FIX: Kolom input 'freeShippingText' dihilangkan */}
+              <div className="grid grid-cols-2 gap-2">
                 <input type="text" value={productRating} onChange={(e) => setProductRating(e.target.value)} placeholder="Rating (4.9)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
                 <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="Terjual (1.1K)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
               </div>
 
+              {/* ✅ FIX: Checkbox untuk Toggle On/Off Label Promo Free Shipping */}
               <div className="flex flex-col gap-2 mt-2 px-1">
                 <div className="flex items-center gap-2">
                   <input type="checkbox" checked={showFreeShipping} onChange={e => setShowFreeShipping(e.target.checked)} className="accent-pink-600 w-4 h-4" />
-                  <label className="text-sm font-bold text-slate-600">Tampilkan Label Promo 1</label>
+                  <label className="text-sm font-bold text-slate-600">Tampilkan Label Free Shipping</label>
                 </div>
                 {productLayout === 'shopee' && (
                   <div className="flex items-center gap-2">
@@ -557,7 +567,8 @@ export default function Home() {
                   <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#ffffff', boxSizing: 'border-box', minWidth: 0 }}>
                     <div style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#222', lineHeight: '20px', maxHeight: '40px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', wordWrap: 'break-word', whiteSpace: 'normal' }}>[MALL] TIMEPHORIA - {productTitle}</div>
                     <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                      {showFreeShipping && freeShippingText && ( <span style={{ display: 'flex', alignItems: 'center', backgroundColor: '#e2f7f4', color: '#00b09b', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}><TruckIcon /> {freeShippingText}</span> )}
+                      {/* ✅ FIX: Logika Tampil Label Free Shipping */}
+                      {showFreeShipping && ( <span style={{ display: 'flex', alignItems: 'center', backgroundColor: '#e2f7f4', color: '#00b09b', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}><TruckIcon /> Free shipping</span> )}
                       {autoDiscountTagText && ( <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>{autoDiscountTagText}</span> )}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#888', marginBottom: productLayout === 'tiktok-portrait' ? '12px' : 'auto' }}>
