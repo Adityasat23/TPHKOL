@@ -471,8 +471,8 @@ export default function Home() {
           <div className="bg-[#171A21]/90 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 rounded-[2rem] p-8 border border-[#262A35] space-y-8 h-fit">
             
             <div className="flex gap-2 bg-[#1D212B] p-1.5 rounded-xl border border-white/5">
-              <button onClick={() => setProductLayout('tiktok-portrait')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${productLayout === 'tiktok-portrait' ? 'bg-[#262A35] shadow-sm text-pink-400' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>📱 TK PORTRAIT</button>
-              <button onClick={() => setProductLayout('tiktok-landscape')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${productLayout === 'tiktok-landscape' ? 'bg-[#262A35] shadow-sm text-pink-400' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🖥️ TK LANDSCAPE</button>
+              <button onClick={() => setProductLayout('tiktok-portrait')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${productLayout === 'tiktok-portrait' ? 'bg-[#262A35] shadow-sm text-pink-400' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>📱 TIKTOK PORTRAIT</button>
+              <button onClick={() => setProductLayout('tiktok-landscape')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${productLayout === 'tiktok-landscape' ? 'bg-[#262A35] shadow-sm text-pink-400' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🖥️ TIKTOK LANDSCAPE</button>
               <button onClick={() => setProductLayout('shopee')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${productLayout === 'shopee' ? 'bg-[#262A35] shadow-sm text-orange-400' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🛒 SHOPEE</button>
             </div>
 
