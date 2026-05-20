@@ -110,7 +110,6 @@ export default function Home() {
   const [productSold, setProductSold] = useState("1.1K sold");
   const [productRating, setProductRating] = useState("4.9");
   
-  const [freeShippingText, setFreeShippingText] = useState("Free shipping");
   const [showFreeShipping, setShowFreeShipping] = useState(true);
 
   // Pilihan Mata Uang
@@ -242,7 +241,13 @@ export default function Home() {
   // ==========================================
   // AUTO-MATH LOGIC & CURRENCY FORMATTING
   // ==========================================
-  const getNum = (str: string) => parseInt(str.replace(/[^0-9]/g, ''), 10) || 0;
+  const getNum = (str: string) => {
+    if (currency === 'Rp') {
+      return parseInt(str.replace(/[^0-9]/g, ''), 10) || 0;
+    }
+    return parseFloat(str.replace(/[^0-9.]/g, '')) || 0;
+  };
+  
   const origPriceNum = getNum(productOriginalPrice);
   const newPriceNum = getNum(productPrice);
   
@@ -388,8 +393,8 @@ export default function Home() {
                         <p style={{ color: '#000000', fontSize: '18px', fontWeight: 'bold', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'Arial, Helvetica, sans-serif' }}>{commentText}</p>
                       </div>
                     </div>
-                    <svg width="36" height="20" viewBox="0 0 36 20" style={{ display: 'block', alignSelf: 'flex-start', marginTop: '-1px' }} xmlns="http://www.w3.org/2000/svg">
-                      <polygon points="0,0 36,0 0,20" fill="white" />
+                    <svg width="20" height="14" viewBox="0 0 20 14" style={{ display: 'block', alignSelf: 'flex-start', marginTop: '-1px' }} xmlns="http://www.w3.org/2000/svg">
+                      <path d="M0,0 H20 L3.5,11.5 C2,13 0,14 0,14 Z" fill="white" />
                     </svg>
                   </div>
                 )}
@@ -481,8 +486,7 @@ export default function Home() {
                 <input type="text" value={productUnit} onChange={(e) => setProductUnit(e.target.value)} placeholder="Unit (cth: /pcs)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm font-bold text-slate-600" />
               </div>
 
-              <div className="grid grid-cols-3 gap-2">
-                <input type="text" value={freeShippingText} onChange={(e) => setFreeShippingText(e.target.value)} placeholder="Label Promo" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
+              <div className="grid grid-cols-2 gap-2">
                 <input type="text" value={productRating} onChange={(e) => setProductRating(e.target.value)} placeholder="Rating (4.9)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
                 <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="Terjual (1.1K)" className="w-full p-3 bg-slate-50 border rounded-xl text-sm" />
               </div>
@@ -490,7 +494,7 @@ export default function Home() {
               <div className="flex flex-col gap-2 mt-2 px-1">
                 <div className="flex items-center gap-2">
                   <input type="checkbox" checked={showFreeShipping} onChange={e => setShowFreeShipping(e.target.checked)} className="accent-pink-600 w-4 h-4" />
-                  <label className="text-sm font-bold text-slate-600">Tampilkan Label Promo 1</label>
+                  <label className="text-sm font-bold text-slate-600">Tampilkan Free Shipping</label>
                 </div>
                 {productLayout === 'shopee' && (
                   <div className="flex items-center gap-2">
@@ -560,7 +564,7 @@ export default function Home() {
                   <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#ffffff', boxSizing: 'border-box', minWidth: 0 }}>
                     <div style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#222', lineHeight: '20px', maxHeight: '40px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', wordWrap: 'break-word', whiteSpace: 'normal' }}>[MALL] TIMEPHORIA - {productTitle}</div>
                     <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                      {showFreeShipping && freeShippingText && ( <span style={{ display: 'flex', alignItems: 'center', backgroundColor: '#e2f7f4', color: '#00b09b', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}><TruckIcon /> {freeShippingText}</span> )}
+                      {showFreeShipping && ( <span style={{ display: 'flex', alignItems: 'center', backgroundColor: '#e2f7f4', color: '#00b09b', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}><TruckIcon /> Free Shipping</span> )}
                       {autoDiscountTagText && ( <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>{autoDiscountTagText}</span> )}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#888', marginBottom: productLayout === 'tiktok-portrait' ? '12px' : 'auto' }}>
