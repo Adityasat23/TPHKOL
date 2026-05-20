@@ -276,7 +276,7 @@ export default function Home() {
         <h1 className="text-5xl font-black text-[#0f172a] mb-2 tracking-tight">
           TPH <span className="text-[#94a3b8]">Editor Tools</span>
         </h1>
-        <p className="text-[#64748b] text-lg">Platform All-in-one untuk Kreator & Affiliate</p>
+        <p className="text-[#64748b] text-lg">Semoga membantu ya guys</p>
       </div>
 
       <div className="flex bg-white rounded-full shadow-sm border border-slate-200 p-1 mb-8 overflow-x-auto w-full max-w-4xl justify-center">
@@ -476,7 +476,7 @@ export default function Home() {
               <div className="flex flex-col gap-2 mt-2 px-1">
                 <div className="flex items-center gap-2">
                   <input type="checkbox" checked={showFreeShipping} onChange={e => setShowFreeShipping(e.target.checked)} className="accent-pink-600 w-4 h-4" />
-                  <label className="text-sm font-bold text-slate-600">Tampilkan Label Promo 1</label>
+                  <label className="text-sm font-bold text-slate-600">Tampilkan Free Shipping</label>
                 </div>
                 {productLayout === 'shopee' && (
                   <div className="flex items-center gap-2">
