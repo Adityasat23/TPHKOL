@@ -10,45 +10,25 @@ const DEFAULT_PRODUCT = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABC
 // FIXED TIMEPHORIA LOGO (Base64 SVG)
 const TIMEPHORIA_LOGO = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMjAwIDIwMCI+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSIxMDAiIGZpbGw9IiMwMDAwMDAiIC8+PHRleHQgeD0iMTAwIiB5PSIxMDgiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMCIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9ImJvbGQiIGxldHRlci1zcGFjaW5nPSIyIj5USU1FUEhPUklBPC90ZXh0Pjwvc3ZnPg==';
 
-// --- SVG Icons TikTok ---
+// --- SVG Icons ---
 const TruckIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '4px' }}>
-    <path d="M20 8h-3V4H3v13h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM8 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm12 0c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-7l2.12 2.83H17V11h2z" />
-  </svg>
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '4px' }}><path d="M20 8h-3V4H3v13h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM8 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm12 0c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-7l2.12 2.83H17V11h2z" /></svg>
 );
 const StarYellow = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="#fabb05" style={{ marginRight: '2px' }}>
-    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-  </svg>
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="#fabb05" style={{ marginRight: '2px' }}><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
 );
 const StarBlack = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="#222" style={{ marginRight: '1px' }}>
-    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-  </svg>
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="#222" style={{ marginRight: '1px' }}><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
 );
 const CartIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
-  </svg>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" /></svg>
 );
-
-// --- SVG Icons Shopee ---
 const ShopeeTicketIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M4 8C4 6.89543 4.89543 6 6 6H18C19.1046 6 20 6.89543 20 8V9.5C18.6193 9.5 17.5 10.6193 17.5 12C17.5 13.3807 18.6193 14.5 20 14.5V16C20 17.1046 19.1046 18 18 18H6C4.89543 18 4 17.1046 4 16V14.5C5.38071 14.5 6.5 13.3807 6.5 12C6.5 10.6193 5.38071 9.5 4 9.5V8Z" stroke="#ee4d2d" strokeWidth="1.5"/>
-    <circle cx="17" cy="17" r="5" fill="#ee4d2d" stroke="#fff" strokeWidth="1.5" />
-    <path d="M15 17L16.5 18.5L19 15.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 8C4 6.89543 4.89543 6 6 6H18C19.1046 6 20 6.89543 20 8V9.5C18.6193 9.5 17.5 10.6193 17.5 12C17.5 13.3807 18.6193 14.5 20 14.5V16C20 17.1046 19.1046 18 18 18H6C4.89543 18 4 17.1046 4 16V14.5C5.38071 14.5 6.5 13.3807 6.5 12C6.5 10.6193 5.38071 9.5 4 9.5V8Z" stroke="#ee4d2d" strokeWidth="1.5"/><circle cx="17" cy="17" r="5" fill="#ee4d2d" stroke="#fff" strokeWidth="1.5" /><path d="M15 17L16.5 18.5L19 15.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
 );
 const ShopeeDots = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="#757575">
-    <circle cx="5" cy="12" r="2" />
-    <circle cx="12" cy="12" r="2" />
-    <circle cx="19" cy="12" r="2" />
-  </svg>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="#757575"><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" /></svg>
 );
-
-// --- SVG Icons WhatsApp ---
 const WaBackIcon = ({ color = "#ffffff" }) => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill={color}><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
 );
@@ -65,8 +45,7 @@ const WaTickIcon = ({ isDark = false }) => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill={isDark ? "#8696a0" : "#53bdeb"}><path d="M18 7l-1.41-1.41-6.34 6.34 1.41 1.41L18 7zm4.24-1.41L11.66 16.17 7.48 12l-1.41 1.41L11.66 19l12-12-1.42-1.41zM.41 13.41L6 19l1.41-1.41L1.83 12 .41 13.41z"/></svg>
 );
 
-// Tipe Data untuk WA Chat
-type WaMessage = {
+interface WaMessage {
   id: number;
   sender: 'me' | 'other';
   name: string;
@@ -74,11 +53,11 @@ type WaMessage = {
   text: string;
   image: string; 
   time: string;
-};
+}
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'downloader' | 'comment' | 'product' | 'wa'>('product');
-  
+
   // STATE: FAKE COMMENT
   const [commentMode, setCommentMode] = useState<'sticker' | 'thread'>('sticker'); 
   const [threadTheme, setThreadTheme] = useState<'dark' | 'light'>('dark');
@@ -94,7 +73,6 @@ export default function Home() {
   const [replyDate, setReplyDate] = useState('2025-11-17');
   const previewRef = useRef<HTMLDivElement>(null);
 
-  // STATE: DOWNLOADER
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
@@ -103,21 +81,16 @@ export default function Home() {
   // STATE: PRODUCT CARD GENERATOR
   const [productLayout, setProductLayout] = useState<'tiktok-portrait' | 'tiktok-landscape' | 'shopee'>('tiktok-landscape');
   const [productImage, setProductImage] = useState(DEFAULT_PRODUCT);
-  const [productTitle, setProductTitle] = useState("MILKYWAY Liptint Glow");
+  const [productTitle, setProductTitle] = useState("Altera Blurring Lip Tint");
   const [productPrice, setProductPrice] = useState("87.120");
   const [productOriginalPrice, setProductOriginalPrice] = useState("238.000");
   const [productUnit, setProductUnit] = useState("/pcs");
   const [productSold, setProductSold] = useState("1.1K sold");
   const [productRating, setProductRating] = useState("4.9");
-  
   const [showFreeShipping, setShowFreeShipping] = useState(true);
-  // NEW STATE: Warna Harga
   const [priceColor, setPriceColor] = useState<'pink' | 'black'>('pink');
-
-  // Pilihan Mata Uang
   const [currency, setCurrency] = useState<'Rp' | 'RM' | '$'>('Rp');
   const [priceFormat, setPriceFormat] = useState<'exact' | 'k-an'>('k-an');
-  
   const [showShopeeLive, setShowShopeeLive] = useState(true);
   const productPreviewRef = useRef<HTMLDivElement>(null);
 
@@ -136,10 +109,8 @@ export default function Home() {
   const TIKTOK_GRAY_TEXT = "#8a8b91";
   const TIKTOK_WHITE_TEXT = "#ffffff";
   const TIKTOK_BLACK_TEXT = "#161823";
-
   const WA_TERANG_BG = '#efeae2';
   const WA_GELAP_BG = '#0b141a'; 
-
   const WA_COLORS = ['#e53935', '#d81b60', '#8e24aa', '#5e35b1', '#3949ab', '#1e88e5', '#039be5', '#00897b', '#00838f', '#2e7d32', '#43a047', '#f57c00', '#ef6c00', '#d84315'];
 
   const [isReady, setIsReady] = useState(false);
@@ -226,7 +197,6 @@ export default function Home() {
     try {
       await document.fonts.ready;
       const bgExportColor = waTheme === 'dark' ? WA_GELAP_BG : WA_TERANG_BG;
-      
       const dataUrl = await toPng(waPreviewRef.current, { 
         cacheBust: true, 
         pixelRatio: 3, 
@@ -240,9 +210,7 @@ export default function Home() {
   };
 
   const getNum = (str: string, curr: string) => {
-    if (curr === 'Rp') {
-      return parseInt(str.replace(/[^0-9]/g, ''), 10) || 0;
-    }
+    if (curr === 'Rp') return parseInt(str.replace(/[^0-9]/g, ''), 10) || 0;
     return parseFloat(str.replace(/[^0-9.]/g, '')) || 0;
   };
 
@@ -259,7 +227,6 @@ export default function Home() {
 
   let rawPrice = productPrice.trim();
   if (rawPrice && !rawPrice.toLowerCase().startsWith(currency.toLowerCase())) rawPrice = currency + rawPrice;
-  
   let rawOrigPrice = productOriginalPrice.trim();
   if (rawOrigPrice && !rawOrigPrice.toLowerCase().startsWith(currency.toLowerCase())) rawOrigPrice = currency + rawOrigPrice;
 
@@ -277,21 +244,22 @@ export default function Home() {
   if (!isReady) return null;
 
   return (
-    <main className="min-h-screen bg-[#0F1115] flex flex-col items-center py-12 px-4 font-sans text-[#F3F4F6] relative overflow-hidden selection:bg-[#C084FC]/30 selection:text-[#F3F4F6]">
+    <main className="min-h-screen bg-[#0F1115] flex flex-col items-center py-16 px-4 font-sans text-[#F3F4F6] relative overflow-hidden selection:bg-[#C084FC]/30 selection:text-[#F3F4F6]">
       
-      {/* --- AMBIENT BACKGROUND GLOW (TIMEPHORIA DARK VIBE) --- */}
-      <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[radial-gradient(circle_at_top,rgba(168,139,250,0.12),transparent_60%)] -z-10 pointer-events-none"></div>
-      
-      {/* Subtle Grain/Noise Overlay */}
-      <div className="absolute inset-0 opacity-[0.03] mix-blend-soft-light pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGZpbHRlciBpZD0ibiI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuNyIgbnVtT2N0YXZlcz0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNuKSIvPjwvc3ZnPg==')]"></div>
+      {/* Background Ambience Layer */}
+      <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[radial-gradient(circle_at_top,rgba(168,139,250,0.1),transparent_60%)] -z-10 pointer-events-none"></div>
+      <div className="absolute inset-0 opacity-[0.02] mix-blend-soft-light pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGZpbHRlciBpZD0ibiI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuNyIgbnVtT2N0YXZlcz0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNuKSIvPjwvc3ZnPg==')]"></div>
 
-      {/* --- EDITORIAL HERO SECTION --- */}
-      <div className="max-w-3xl w-full text-center mb-14 mt-6 relative z-10">
-        <h1 className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-[#F3F4F6] to-[#A1A1AA] mb-5 tracking-tighter leading-tight">
-          TPH Editor Tools<br />
+      {/* --- REFINED TYPOGRAPHY HERO SECTION --- */}
+      <div className="max-w-3xl w-full text-center mb-10 mt-4 relative z-10">
+        <span className="inline-flex py-1 px-3.5 rounded-full bg-[#171A21] border border-white/5 text-[#A78BFA] text-[11px] font-bold tracking-widest mb-4 shadow-sm">
+          WORKSPACE UTILITIES
+        </span>
+        <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-[#F3F4F6] to-[#A1A1AA] mb-4 tracking-tight leading-tight">
+          TPH Editor Tools
         </h1>
-        <p className="text-[#A1A1AA] text-lg md:text-xl font-medium tracking-wide max-w-xl mx-auto leading-[1.6]">
-          Semoga membantu guys
+        <p className="text-[#A1A1AA] text-sm md:text-base font-medium tracking-wide max-w-lg mx-auto leading-[1.6]">
+          Asisten produksi aset marketing cepat untuk kreator dan tim media sosial Timephoria.
         </p>
       </div>
 
@@ -301,6 +269,55 @@ export default function Home() {
         <button onClick={() => setActiveTab('comment')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'comment' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>💬 FAKE COMMENT</button>
         <button onClick={() => setActiveTab('product')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'product' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>🛍️ PRODUCT CARD</button>
         <button onClick={() => setActiveTab('wa')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'wa' ? 'bg-[#008069] text-[#F3F4F6] shadow-lg shadow-[#008069]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>💬 WA CHAT</button>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* VISUAL HIERARCHY GUIDANCE CARDS (SCANNABLE IN <1 SEC) */}
+      {/* ========================================================================= */}
+      <div className="w-full max-w-4xl grid grid-cols-2 md:grid-cols-4 gap-3 mb-10 z-10">
+        <div onClick={() => setActiveTab('product')} className={`p-4 rounded-xl border transition-all duration-300 cursor-pointer flex flex-col justify-between h-24 ${activeTab === 'product' ? 'bg-[#171A21] border-[#C084FC] shadow-lg shadow-[#C084FC]/5' : 'bg-[#171A21]/40 border-[#262A35] opacity-60 hover:opacity-100 hover:bg-[#171A21]'}`}>
+          <div>
+            <div className="flex justify-between items-start">
+              <span className="text-base">🛍️</span>
+              <span className="text-[9px] bg-pink-500/10 text-pink-400 font-extrabold px-1.5 py-0.5 rounded tracking-wide uppercase">RECOMMENDED</span>
+            </div>
+            <h4 className="text-xs font-bold text-[#F3F4F6] mt-2">Product Card</h4>
+          </div>
+          <p className="text-[10px] text-[#A1A1AA] line-clamp-1">Simulasi Tiktok/Shopee SS</p>
+        </div>
+
+        <div onClick={() => setActiveTab('wa')} className={`p-4 rounded-xl border transition-all duration-300 cursor-pointer flex flex-col justify-between h-24 ${activeTab === 'wa' ? 'bg-[#171A21] border-[#008069] shadow-lg shadow-[#008069]/5' : 'bg-[#171A21]/40 border-[#262A35] opacity-60 hover:opacity-100 hover:bg-[#171A21]'}`}>
+          <div>
+            <div className="flex justify-between items-start">
+               <span className="text-base">💬</span>
+               <span className="text-[9px] bg-[#008069]/20 text-[#00a884] font-extrabold px-1.5 py-0.5 rounded tracking-wide uppercase">FAST UTILITY</span>
+            </div>
+            <h4 className="text-xs font-bold text-[#F3F4F6] mt-2">WhatsApp Chat</h4>
+          </div>
+          <p className="text-[10px] text-[#A1A1AA] line-clamp-1">Rekayasa Chat Bukti Transaksi</p>
+        </div>
+
+        <div onClick={() => setActiveTab('comment')} className={`p-4 rounded-xl border transition-all duration-300 cursor-pointer flex flex-col justify-between h-24 ${activeTab === 'comment' ? 'bg-[#171A21] border-[#C084FC] shadow-lg shadow-[#C084FC]/5' : 'bg-[#171A21]/40 border-[#262A35] opacity-60 hover:opacity-100 hover:bg-[#171A21]'}`}>
+          <div>
+            <div className="flex justify-between items-start">
+              <span className="text-base">💬</span>
+              <span className="text-[9px] bg-zinc-800 text-[#A1A1AA] font-extrabold px-1.5 py-0.5 rounded tracking-wide uppercase">LOCAL RENDERING</span>
+            </div>
+            <h4 className="text-xs font-bold text-[#F3F4F6] mt-2">Fake Comment</h4>
+          </div>
+          <p className="text-[10px] text-[#A1A1AA] line-clamp-1">Komentar Balasan Stitch</p>
+        </div>
+
+        <div onClick={() => setActiveTab('downloader')} className={`p-4 rounded-xl border transition-all duration-300 cursor-pointer flex flex-col justify-between h-24 ${activeTab === 'downloader' ? 'bg-[#171A21] border-[#C084FC] shadow-lg shadow-[#C084FC]/5' : 'bg-[#171A21]/40 border-[#262A35] opacity-60 hover:opacity-100 hover:bg-[#171A21]'}`}>
+          <div>
+            <div className="flex justify-between items-start">
+              <span className="text-base">📥</span>
+              <span className="text-[9px] bg-blue-500/10 text-blue-400 font-extrabold px-1.5 py-0.5 rounded tracking-wide uppercase">EXTERNAL API</span>
+            </div>
+            <h4 className="text-xs font-bold text-[#F3F4F6] mt-2">Video Downloader</h4>
+          </div>
+          <p className="text-[10px] text-[#A1A1AA] line-clamp-1">Tanpa Watermark HD</p>
+        </div>
       </div>
 
       {/* ========================================= */}
@@ -491,7 +508,6 @@ export default function Home() {
               <button onClick={() => { setCurrency('$'); setPriceFormat('exact'); }} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${currency === '$' ? 'bg-[#262A35] shadow-sm text-[#F3F4F6]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🇺🇸 USD ($)</button>
             </div>
 
-            {/* OPSI WARNA HARGA (Hanya untuk TikTok) */}
             {(productLayout === 'tiktok-portrait' || productLayout === 'tiktok-landscape') && (
               <div className="flex gap-2 bg-[#1D212B] p-1.5 rounded-xl border border-white/5 animate-in fade-in">
                 <button onClick={() => setPriceColor('pink')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${priceColor === 'pink' ? 'bg-[#262A35] shadow-sm text-pink-400' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>💗 HARGA PINK</button>
@@ -509,11 +525,18 @@ export default function Home() {
                 <input type="file" onChange={(e) => handleImageUpload(e, setProductImage)} className="text-sm block w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#1D212B] file:text-pink-400 hover:file:bg-[#262A35] transition-all cursor-pointer text-[#71717A]" />
               </div>
 
+              {/* INPUT NAMA PRODUK KEMBALI MANUAL (TANPA AUTOCOMPLETE) */}
               <div className="flex w-full bg-[#1D212B] border border-[#262A35] rounded-xl overflow-hidden focus-within:border-pink-400 focus-within:ring-4 focus-within:ring-pink-400/10 transition-all">
                 <span className="p-3.5 bg-[#262A35]/50 text-[#A1A1AA] font-bold text-sm flex items-center whitespace-nowrap border-r border-[#262A35]">
                   [MALL] TIMEPHORIA -
                 </span>
-                <input type="text" value={productTitle} onChange={(e) => setProductTitle(e.target.value)} placeholder="Varian Produk" className="w-full p-3.5 bg-transparent focus:outline-none text-sm font-medium text-[#F3F4F6]" />
+                <input 
+                  type="text" 
+                  value={productTitle} 
+                  onChange={(e) => setProductTitle(e.target.value)}
+                  placeholder="Ketik nama produk..." 
+                  className="w-full p-3.5 bg-transparent focus:outline-none text-sm font-medium text-[#F3F4F6]" 
+                />
               </div>
               
               <div className="grid grid-cols-3 gap-3">
@@ -548,11 +571,9 @@ export default function Home() {
                   </label>
                 )}
               </div>
-
-              <p className="text-[11px] text-[#71717A] font-medium italic mt-2">*Diskon & format mata uang otomatis dihitung.</p>
             </div>
 
-            <button onClick={exportProductImage} className={`w-full text-[#0F1115] font-bold py-4 rounded-xl shadow-lg transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98] ${productLayout === 'shopee' ? 'bg-gradient-to-r from-orange-400 to-orange-500 shadow-orange-500/10 hover:shadow-xl hover:shadow-orange-500/20' : 'bg-gradient-to-r from-pink-400 to-rose-500 shadow-pink-500/10 hover:shadow-xl hover:shadow-pink-500/20'}`}>
+            <button onClick={exportProductImage} className={`w-full text-[#0F1115] font-bold py-4 rounded-xl shadow-lg transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98] ${productLayout === 'shopee' ? 'bg-gradient-to-r from-orange-400 to-orange-500 shadow-orange-500/10 hover:shadow-xl' : 'bg-gradient-to-r from-pink-400 to-rose-500 shadow-pink-500/10 hover:shadow-xl'}`}>
               📸 Download Product Card
             </button>
           </div>
@@ -562,7 +583,6 @@ export default function Home() {
 
             <div style={{ padding: '40px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
               
-              {/* SHOPEE RENDER (Keep original colors for accurate output) */}
               {productLayout === 'shopee' && (
                  <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '4px', width: '300px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.5)', fontFamily: 'Arial, sans-serif' }}>
                     <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
@@ -597,7 +617,6 @@ export default function Home() {
                  </div>
               )}
 
-              {/* TIKTOK RENDER (Keep original colors for accurate output) */}
               {(productLayout === 'tiktok-portrait' || productLayout === 'tiktok-landscape') && (
                 <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: productLayout === 'tiktok-portrait' ? '300px' : '480px', display: 'flex', flexDirection: productLayout === 'tiktok-portrait' ? 'column' : 'row', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}>
                   <div style={{ position: 'relative', width: productLayout === 'tiktok-portrait' ? '300px' : '200px', height: productLayout === 'tiktok-portrait' ? '300px' : '220px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
@@ -648,7 +667,6 @@ export default function Home() {
                   </div>
                 </div>
               )}
-
             </div>
           </div>
         </div>
@@ -659,17 +677,14 @@ export default function Home() {
       {/* ========================================= */}
       {activeTab === 'wa' && (
         <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 z-10 animate-in fade-in zoom-in-95">
-          
           <div className="bg-[#171A21]/90 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 rounded-[2rem] p-8 border border-[#262A35] space-y-8 h-fit">
-            
             <div className="flex gap-2 bg-[#1D212B] p-1.5 rounded-xl border border-white/5">
                 <button onClick={() => setWaTheme('light')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${waTheme === 'light' ? 'bg-[#262A35] shadow-sm text-[#00a884]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>☀️ MODE TERANG</button>
                 <button onClick={() => setWaTheme('dark')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${waTheme === 'dark' ? 'bg-[#262A35] shadow-sm text-[#00a884]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🌙 MODE MALAM</button>
             </div>
-
             <div className="space-y-4">
               <h3 className="font-bold text-[#00a884] uppercase text-xs tracking-widest flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#00a884]"></span> Grup / Chat Settings
+                <span className="w-2 h-2 rounded-full bg-[#00a884]"></span> Chat Settings
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
@@ -678,225 +693,98 @@ export default function Home() {
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-[#A1A1AA] mb-2">Avatar Grup</label>
-                  <input type="file" onChange={(e) => handleImageUpload(e, setWaGroupAvatar)} className="text-sm block w-full file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#008069]/20 file:text-[#00a884] hover:file:bg-[#008069]/40 transition-all cursor-pointer text-[#71717A]" />
+                  <input type="file" onChange={(e) => handleImageUpload(e, setWaGroupAvatar)} className="text-sm block w-full file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#008069]/20 file:text-[#00a884] cursor-pointer text-[#71717A]" />
                 </div>
               </div>
             </div>
-
             <hr className="border-white/5" />
-
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                  <h3 className="font-bold text-[#00a884] uppercase text-xs tracking-widest flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-[#00a884]"></span> Daftar Chat
                  </h3>
-                 <button onClick={addWaMessage} className="text-xs bg-[#008069] hover:bg-[#00a884] text-[#F3F4F6] px-4 py-2 rounded-lg font-bold shadow-md shadow-[#008069]/20 transition-all active:scale-95">+ Tambah</button>
+                 <button onClick={addWaMessage} className="text-xs bg-[#008069] text-[#F3F4F6] px-4 py-2 rounded-lg font-bold shadow-md transition-all active:scale-95">+ Tambah</button>
               </div>
-              
               <div className="space-y-4 max-h-[400px] overflow-y-auto pr-3 custom-scrollbar">
-                {waMessages.map((msg, index) => (
+                {waMessages.map((msg) => (
                   <div key={msg.id} className="p-5 bg-[#1D212B] border border-[#262A35] rounded-2xl relative group hover:border-[#4B5563] transition-all">
-                    <button onClick={() => removeWaMessage(msg.id)} className="absolute -top-2 -right-2 text-red-400 text-xs font-bold bg-[#262A35] shadow-sm border border-[#4B5563] w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500/20 hover:text-red-300">✕</button>
+                    <button onClick={() => removeWaMessage(msg.id)} className="absolute -top-2 -right-2 text-red-400 text-xs font-bold bg-[#262A35] border border-[#4B5563] w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500/20">✕</button>
                     <div className="grid grid-cols-2 gap-3 mb-3">
-                      <select value={msg.sender} onChange={(e) => updateWaMessage(msg.id, 'sender', e.target.value)} className="p-2.5 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] rounded-xl text-sm font-medium focus:outline-none focus:border-[#00a884] focus:ring-2 focus:ring-[#00a884]/20">
+                      <select value={msg.sender} onChange={(e) => updateWaMessage(msg.id, 'sender', e.target.value)} className="p-2.5 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] rounded-xl text-sm focus:outline-none">
                         <option value="other">Orang Lain (Kiri)</option>
                         <option value="me">Saya (Kanan)</option>
                       </select>
                       {msg.sender === 'other' ? (
-                        <input type="text" value={msg.name} onChange={(e) => updateWaMessage(msg.id, 'name', e.target.value)} placeholder="Nama Pengirim" className="p-2.5 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] placeholder-[#71717A] rounded-xl text-sm font-medium focus:outline-none focus:border-[#00a884] focus:ring-2 focus:ring-[#00a884]/20" />
+                        <input type="text" value={msg.name} onChange={(e) => updateWaMessage(msg.id, 'name', e.target.value)} placeholder="Nama Pengirim" className="p-2.5 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] rounded-xl text-sm focus:outline-none" />
                       ) : (
-                         <div className="p-2.5 text-sm font-medium text-[#71717A] bg-[#111318] border border-transparent rounded-xl text-center cursor-not-allowed">Anda</div>
+                         <div className="p-2.5 text-sm font-medium text-[#71717A] bg-[#111318] rounded-xl text-center cursor-not-allowed">Anda</div>
                       )}
                     </div>
-                    <textarea value={msg.text} onChange={(e) => updateWaMessage(msg.id, 'text', e.target.value)} placeholder="Isi pesan..." className="w-full p-3 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] placeholder-[#71717A] rounded-xl text-sm min-h-[60px] mb-3 focus:outline-none focus:border-[#00a884] focus:ring-2 focus:ring-[#00a884]/20 font-medium leading-[1.6]" />
+                    <textarea value={msg.text} onChange={(e) => updateWaMessage(msg.id, 'text', e.target.value)} placeholder="Isi pesan..." className="w-full p-3 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] rounded-xl text-sm min-h-[60px] mb-3 focus:outline-none leading-[1.6]" />
                     <div className="grid grid-cols-2 gap-3 items-center">
-                      <input type="time" value={msg.time} onChange={(e) => updateWaMessage(msg.id, 'time', e.target.value)} className="p-2.5 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] rounded-xl text-sm font-medium focus:outline-none focus:border-[#00a884]" style={{ colorScheme: 'dark' }} />
-                      <input type="file" onChange={(e) => handleWaMessageImage(msg.id, e)} className="text-[10px] p-2 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:bg-[#262A35] file:text-[#A1A1AA] cursor-pointer text-[#71717A]" />
+                      <input type="time" value={msg.time} onChange={(e) => updateWaMessage(msg.id, 'time', e.target.value)} className="p-2.5 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] rounded-xl text-sm focus:outline-none" style={{ colorScheme: 'dark' }} />
+                      <input type="file" onChange={(e) => handleWaMessageImage(msg.id, e)} className="text-[10px] p-2 cursor-pointer text-[#71717A]" />
                     </div>
-                    {msg.image && (
-                      <button onClick={() => updateWaMessage(msg.id, 'image', '')} className="mt-3 text-[11px] font-bold text-red-400 hover:text-red-300 transition-colors flex items-center gap-1">✕ Hapus Gambar Terlampir</button>
-                    )}
                   </div>
                 ))}
               </div>
             </div>
-
-            <button onClick={exportWaImage} className="w-full bg-[#008069] hover:bg-[#00a884] text-[#F3F4F6] font-bold py-4 rounded-xl shadow-lg shadow-[#008069]/10 hover:shadow-xl hover:shadow-[#008069]/20 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]">
+            <button onClick={exportWaImage} className="w-full bg-[#008069] text-[#F3F4F6] font-bold py-4 rounded-xl shadow-lg transition-all duration-300 hover:-translate-y-0.5">
               📸 Download WA Chat
             </button>
           </div>
 
-          {/* PREVIEW WHATSAPP (PIXEL STRICT MODE) */}
           <div className="bg-[#0F1115] border border-[#262A35] rounded-[2rem] p-6 flex items-center justify-center min-h-[500px] overflow-hidden shadow-inner relative">
              <div className="absolute inset-0 opacity-[0.05] bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
-            
             <div style={{ padding: '20px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
-              
-              <div ref={waPreviewRef} style={{ 
-                backgroundColor: waTheme === 'dark' ? WA_GELAP_BG : WA_TERANG_BG, 
-                width: '360px', 
-                height: '640px', 
-                display: 'flex', 
-                flexDirection: 'column', 
-                fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
-                overflow: 'hidden',
-                boxShadow: '0 12px 32px rgba(0,0,0,0.5)'
-              }}>
-                
+              <div ref={waPreviewRef} style={{ backgroundColor: waTheme === 'dark' ? WA_GELAP_BG : WA_TERANG_BG, width: '360px', height: '640px', display: 'flex', flexDirection: 'column', fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif', overflow: 'hidden', boxShadow: '0 12px 32px rgba(0,0,0,0.5)' }}>
                 {/* WA Header */}
-                <div style={{ 
-                    backgroundColor: waTheme === 'dark' ? '#202c33' : '#008069', 
-                    padding: '10px 16px 10px 8px', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '8px', 
-                    zIndex: 10, 
-                    flexShrink: 0 
-                }}>
+                <div style={{ backgroundColor: waTheme === 'dark' ? '#202c33' : '#008069', padding: '10px 16px 10px 8px', display: 'flex', alignItems: 'center', gap: '8px', zIndex: 10, flexShrink: 0 }}>
                   <WaBackIcon color={waTheme === 'dark' ? '#aebac1' : '#ffffff'} />
                   <img src={waGroupAvatar} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ 
-                        color: waTheme === 'dark' ? '#e9edef' : '#ffffff', 
-                        fontSize: '16px', 
-                        fontWeight: 'bold', 
-                        whiteSpace: 'nowrap', 
-                        overflow: 'hidden', 
-                        textOverflow: 'ellipsis' 
-                    }}>KOL ASIK 💄</div>
-                    <div style={{ 
-                        color: waTheme === 'dark' ? '#8696a0' : 'rgba(255,255,255,0.8)', 
-                        fontSize: '13px', 
-                        whiteSpace: 'nowrap', 
-                        overflow: 'hidden', 
-                        textOverflow: 'ellipsis' 
-                    }}>tap here for group info</div>
+                    <div style={{ color: waTheme === 'dark' ? '#e9edef' : '#ffffff', fontSize: '16px', fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>KOL ASIK 💄</div>
+                    <div style={{ color: waTheme === 'dark' ? '#8696a0' : 'rgba(255,255,255,0.8)', fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>tap here for group info</div>
                   </div>
-                  <div style={{ display: 'flex', gap: '16px', marginLeft: '8px' }}>
-                     <WaVideoIcon color={waTheme === 'dark' ? '#aebac1' : '#ffffff'}/>
-                     <WaCallIcon color={waTheme === 'dark' ? '#aebac1' : '#ffffff'}/>
-                     <WaDotsIcon color={waTheme === 'dark' ? '#aebac1' : '#ffffff'}/>
-                  </div>
+                  <div style={{ display: 'flex', gap: '16px', marginLeft: '8px' }}><WaVideoIcon color={waTheme === 'dark' ? '#aebac1' : '#ffffff'}/><WaCallIcon color={waTheme === 'dark' ? '#aebac1' : '#ffffff'}/><WaDotsIcon color={waTheme === 'dark' ? '#aebac1' : '#ffffff'}/></div>
                 </div>
-
-                {/* WA Chat Body */}
+                {/* WA Body */}
                 <div style={{ flex: 1, padding: '16px', display: 'flex', flexDirection: 'column', gap: '4px', overflowY: 'hidden' }}>
-                   {waMessages.map((msg, index) => {
+                   {waMessages.map((msg) => {
                      const isMe = msg.sender === 'me';
                      const isDark = waTheme === 'dark';
-                     
-                     let bubbleBg = '#ffffff';
-                     if(isMe){
-                        bubbleBg = isDark ? '#005c4b' : '#d9fdd3';
-                     } else {
-                        bubbleBg = isDark ? '#202c33' : '#ffffff';
-                     }
-
+                     let bubbleBg = isMe ? (isDark ? '#005c4b' : '#d9fdd3') : (isDark ? '#202c33' : '#ffffff');
                      return (
-                        <div key={msg.id} style={{ 
-                           display: 'flex', 
-                           flexDirection: 'column', 
-                           alignSelf: isMe ? 'flex-end' : 'flex-start',
-                           maxWidth: '78%',
-                           marginBottom: '8px',
-                           position: 'relative'
-                        }}>
-                           <div style={{
-                              backgroundColor: bubbleBg,
-                              padding: '4px 8px 6px 8px',
-                              borderRadius: '8px',
-                              borderTopLeftRadius: isMe ? '8px' : '0px',
-                              borderTopRightRadius: isMe ? '0px' : '8px',
-                              boxShadow: '0 1px 1px rgba(0,0,0,0.15)',
-                              position: 'relative',
-                              border: 'none', 
-                              outline: 'none'
-                           }}>
-                              {/* Ekor Bubble */}
+                        <div key={msg.id} style={{ display: 'flex', flexDirection: 'column', alignSelf: isMe ? 'flex-end' : 'flex-start', maxWidth: '78%', marginBottom: '8px', position: 'relative' }}>
+                           <div style={{ backgroundColor: bubbleBg, padding: '4px 8px 6px 8px', borderRadius: '8px', borderTopLeftRadius: isMe ? '8px' : '0px', borderTopRightRadius: isMe ? '0px' : '8px', boxShadow: '0 1px 1px rgba(0,0,0,0.15)', position: 'relative' }}>
                               {isMe ? (
-                                <svg viewBox="0 0 8 13" width="8" height="13" style={{ position: 'absolute', top: 0, right: '-7.5px' }}>
-                                   <path d="M0 0h8v1L2.8 11.2C2 12.8.3 13 0 13V0z" fill={bubbleBg} />
-                                </svg>
+                                <svg viewBox="0 0 8 13" width="8" height="13" style={{ position: 'absolute', top: 0, right: '-7.5px' }}><path d="M0 0h8v1L2.8 11.2C2 12.8.3 13 0 13V0z" fill={bubbleBg} /></svg>
                               ) : (
-                                <svg viewBox="0 0 8 13" width="8" height="13" style={{ position: 'absolute', top: 0, left: '-7.5px' }}>
-                                   <path d="M8 0H0v1l5.2 10.2C6 12.8 7.7 13 8 13V0z" fill={bubbleBg} />
-                                </svg>
+                                <svg viewBox="0 0 8 13" width="8" height="13" style={{ position: 'absolute', top: 0, left: '-7.5px' }}><path d="M8 0H0v1l5.2 10.2C6 12.8 7.7 13 8 13V0z" fill={bubbleBg} /></svg>
                               )}
-
-                              {/* Sender Name (Other only) */}
-                              {!isMe && msg.name && (
-                                <div style={{ color: msg.color, fontSize: '13px', fontWeight: 'bold', marginBottom: '4px', lineHeight: '1.2' }}>
-                                   {msg.name}
-                                </div>
-                              )}
-
-                              {/* Uploaded Image */}
-                              {msg.image && (
-                                <img src={msg.image} style={{ width: '100%', borderRadius: '3px', marginBottom: '2px', maxHeight: '200px', objectFit: 'cover' }} />
-                              )}
-
-                              {/* Teks Pesan */}
-                              {msg.text && (
-                                <div style={{ 
-                                    color: isDark ? '#e9edef' : '#111b21', 
-                                    fontSize: '14.2px', 
-                                    lineHeight: '19px', 
-                                    whiteSpace: 'pre-wrap', 
-                                    wordWrap: 'break-word' 
-                                }}>
-                                   {msg.text}
-                                   <span style={{ display: 'inline-block', width: isMe ? '60px' : '40px' }}></span> 
-                                </div>
-                              )}
-
-                              {/* Waktu & Tick */}
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '2px', position: 'absolute', bottom: '4px', right: '8px' }}>
-                                 <span style={{ 
-                                     fontSize: '11px', 
-                                     color: isDark ? 'rgba(233,237,239,0.6)' : '#667781' 
-                                 }}>{msg.time}</span>
-                                 {isMe && <WaTickIcon isDark={isDark} />}
-                              </div>
+                              {!isMe && msg.name && <div style={{ color: msg.color, fontSize: '13px', fontWeight: 'bold', marginBottom: '4px' }}>{msg.name}</div>}
+                              {msg.image && <img src={msg.image} style={{ width: '100%', borderRadius: '3px', marginBottom: '2px', maxHeight: '200px', objectFit: 'cover' }} />}
+                              {msg.text && <div style={{ color: isDark ? '#e9edef' : '#111b21', fontSize: '14.2px', lineHeight: '19px', whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>{msg.text}<span style={{ display: 'inline-block', width: isMe ? '60px' : '40px' }}></span></div>}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '2px', position: 'absolute', bottom: '4px', right: '8px' }}><span style={{ fontSize: '11px', color: isDark ? 'rgba(233,237,239,0.6)' : '#667781' }}>{msg.time}</span>{isMe && <WaTickIcon isDark={isDark} />}</div>
                            </div>
                         </div>
                      )
                    })}
                 </div>
-
-                {/* WA Input Footer */}
-                <div style={{ padding: '8px', display: 'flex', gap: '8px', alignItems: 'flex-end', backgroundColor: 'transparent', flexShrink: 0 }}>
-                   <div style={{ 
-                       flex: 1, 
-                       backgroundColor: waTheme === 'dark' ? '#2a3942' : '#ffffff', 
-                       borderRadius: '24px', 
-                       padding: '10px 16px', 
-                       display: 'flex', 
-                       alignItems: 'center', 
-                       color: waTheme === 'dark' ? '#8696a0' : '#8696a0', 
-                       fontSize: '15px' 
-                   }}>
-                      Message
-                   </div>
-                   <div style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: '#00a884', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
-                   </div>
-                </div>
-
+                {/* WA Footer */}
+                <div style={{ padding: '8px', display: 'flex', gap: '8px', alignItems: 'flex-end', backgroundColor: 'transparent', flexShrink: 0 }}><div style={{ flex: 1, backgroundColor: waTheme === 'dark' ? '#2a3942' : '#ffffff', borderRadius: '24px', padding: '10px 16px', color: '#8696a0', fontSize: '15px' }}>Message</div><div style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: '#00a884', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg></div></div>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      <footer style={{ 
-        marginTop: '80px', paddingTop: '40px', paddingBottom: '30px', textAlign: 'center', width: '100%', maxWidth: '1152px', borderTop: '1px solid rgba(255,255,255,0.05)', zIndex: 10 
-      }}>
+      <footer style={{ marginTop: '80px', paddingTop: '40px', paddingBottom: '30px', textAlign: 'center', width: '100%', maxWidth: '1152px', borderTop: '1px solid rgba(255,255,255,0.05)', zIndex: 10 }}>
         <p style={{ color: '#71717A', fontSize: '14px', fontWeight: 500 }}>
           &copy; {new Date().getFullYear()} <span style={{ fontWeight: 'bold', color: '#A1A1AA' }}>Aditya Satria Pratama</span>. All rights reserved.
         </p>
       </footer>
 
-      {/* Global CSS for Custom Scrollbar in WA list */}
       <style dangerouslySetInnerHTML={{__html: `
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
