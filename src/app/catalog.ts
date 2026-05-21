@@ -40,7 +40,7 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
   },
   {
     name: "Lunara Frost 3D Lip Gloss Lipstick",
-    image: "/products/LIP GLOSS.jpg"
+    image: "/products/Lunara Frost 3D Lip Gloss Lipstick.jpg"
   },
   {
     name: "Two Way Cake Timeless Optima Cover",
