@@ -130,7 +130,7 @@ const handleSelectProduct = (
   // STATE: PRODUCT CARD GENERATOR
   const [productLayout, setProductLayout] = useState<'tiktok-portrait' | 'tiktok-landscape' | 'shopee'>('tiktok-landscape');
   const [productImage, setProductImage] = useState(DEFAULT_PRODUCT);
-  const [productTitle, setProductTitle] = useState("MILKYWAY Liptint Glow");
+  const [productTitle, setProductTitle] = useState("Nama Produk");
   const [productPrice, setProductPrice] = useState("87.120");
   const [productOriginalPrice, setProductOriginalPrice] = useState("238.000");
   const [productUnit, setProductUnit] = useState("/pcs");
