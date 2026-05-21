@@ -64,20 +64,4 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
   },
   
   // -- Combo Products --
-  {
-    name: "Elixir Velvet-Shine Switching Lip Cream + Glow Cushion",
-    image: "/products/Elixir Velvet-Shine Switching Lip Cream + Glow Cushion.jpg"
-  },
-  {
-    name: "Stellar Dust Lip Stain + Eternal Lip Matte",
-    image: "/products/Stellar Dust Lip Stain + Eternal Lip Matte.jpg"
-  },
-  {
-    name: "Timeless Lumina Matte Perfection Cushion + Timeless Supernova Setting Spray",
-    image: "/products/Timeless Lumina Matte Perfection Cushion + Timeless Supernova Setting Spray.webp"
-  },
-  {
-    name: "TIMEPHORIA ALTERA BLURRING + LIP TINT+LIP MATTE ",
-    image: "/products/TIMEPHORIA ALTERA BLURRING LIP TINT+LIP MATTE.jpeg"
-  },
 ];
