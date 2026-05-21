@@ -110,10 +110,9 @@ export default function Home() {
   const [productSold, setProductSold] = useState("1.1K sold");
   const [productRating, setProductRating] = useState("4.9");
   
-  // FITUR BARU: Warna Harga (TikTok)
-  const [priceColor, setPriceColor] = useState<'pink' | 'black'>('pink');
-
   const [showFreeShipping, setShowFreeShipping] = useState(true);
+  // NEW STATE: Warna Harga
+  const [priceColor, setPriceColor] = useState<'pink' | 'black'>('pink');
 
   // Pilihan Mata Uang
   const [currency, setCurrency] = useState<'Rp' | 'RM' | '$'>('Rp');
@@ -274,10 +273,6 @@ export default function Home() {
   const tiktokLsMainFontSize = priceStrLength > 11 ? '18px' : '24px';
   const tiktokPtMainFontSize = priceStrLength > 12 ? '20px' : '24px';
   const shopeeMainFontSize = priceStrLength > 12 ? '17px' : '20px';
-
-  // Penentuan Warna Tema Khusus TikTok
-  const tkColor = priceColor === 'black' ? '#161823' : '#fe2c55';
-  const tkLightBg = priceColor === 'black' ? '#f1f1f2' : '#ffeef2';
 
   if (!isReady) return null;
 
@@ -486,14 +481,6 @@ export default function Home() {
               <button onClick={() => setProductLayout('shopee')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${productLayout === 'shopee' ? 'bg-[#262A35] shadow-sm text-orange-400' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🛒 SHOPEE</button>
             </div>
 
-            {/* TOGGLE WARNA HARGA (KHUSUS TIKTOK) */}
-            {(productLayout === 'tiktok-portrait' || productLayout === 'tiktok-landscape') && (
-              <div className="flex gap-2 bg-[#1D212B] p-1.5 rounded-xl border border-white/5 animate-in fade-in">
-                <button onClick={() => setPriceColor('pink')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${priceColor === 'pink' ? 'bg-[#262A35] shadow-sm text-pink-400' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>💖 HARGA PINK</button>
-                <button onClick={() => setPriceColor('black')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${priceColor === 'black' ? 'bg-[#262A35] shadow-sm text-[#F3F4F6]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🖤 HARGA HITAM</button>
-              </div>
-            )}
-
             <div className="flex gap-2 bg-[#1D212B] p-1.5 rounded-xl border border-white/5">
               <button onClick={() => setPriceFormat('exact')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${priceFormat === 'exact' ? 'bg-[#262A35] shadow-sm text-[#F3F4F6]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🔢 HARGA EXACT</button>
               {currency === 'Rp' && (
@@ -506,6 +493,14 @@ export default function Home() {
               <button onClick={() => { setCurrency('RM'); setPriceFormat('exact'); }} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${currency === 'RM' ? 'bg-[#262A35] shadow-sm text-[#F3F4F6]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🇲🇾 MYR (RM)</button>
               <button onClick={() => { setCurrency('$'); setPriceFormat('exact'); }} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${currency === '$' ? 'bg-[#262A35] shadow-sm text-[#F3F4F6]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🇺🇸 USD ($)</button>
             </div>
+
+            {/* OPSI WARNA HARGA (Hanya untuk TikTok) */}
+            {(productLayout === 'tiktok-portrait' || productLayout === 'tiktok-landscape') && (
+              <div className="flex gap-2 bg-[#1D212B] p-1.5 rounded-xl border border-white/5 animate-in fade-in">
+                <button onClick={() => setPriceColor('pink')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${priceColor === 'pink' ? 'bg-[#262A35] shadow-sm text-pink-400' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>💗 HARGA PINK</button>
+                <button onClick={() => setPriceColor('black')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${priceColor === 'black' ? 'bg-[#262A35] shadow-sm text-[#F3F4F6]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🖤 HARGA HITAM</button>
+              </div>
+            )}
 
             <div className="space-y-5">
               <h3 className="font-bold text-pink-400 uppercase text-xs tracking-widest flex items-center gap-2">
@@ -605,7 +600,7 @@ export default function Home() {
                  </div>
               )}
 
-              {/* TIKTOK RENDER */}
+              {/* TIKTOK RENDER (Keep original colors for accurate output) */}
               {(productLayout === 'tiktok-portrait' || productLayout === 'tiktok-landscape') && (
                 <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: productLayout === 'tiktok-portrait' ? '300px' : '480px', display: 'flex', flexDirection: productLayout === 'tiktok-portrait' ? 'column' : 'row', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}>
                   <div style={{ position: 'relative', width: productLayout === 'tiktok-portrait' ? '300px' : '200px', height: productLayout === 'tiktok-portrait' ? '300px' : '220px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
@@ -628,8 +623,7 @@ export default function Home() {
 
                     {productLayout === 'tiktok-portrait' ? (
                       <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: 'auto', flexWrap: 'wrap' }}>
-                        {/* UPDATE WARNA HARGA */}
-                        <span style={{ color: tkColor, fontSize: tiktokPtMainFontSize, fontWeight: 'bold', fontFamily: 'Arial, sans-serif' }}>{displayPrice}{productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}</span>
+                        <span style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: tiktokPtMainFontSize, fontWeight: 'bold', fontFamily: 'Arial, sans-serif' }}>{displayPrice}{productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}</span>
                         {rawOrigPrice && (
                           <div style={{ color: '#999999', fontSize: '14px', fontFamily: 'Arial, sans-serif' }}>
                             <del>{rawOrigPrice}</del>{productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}
@@ -639,8 +633,7 @@ export default function Home() {
                     ) : (
                       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: '12px', gap: '12px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, minWidth: 0 }}>
-                          {/* UPDATE WARNA HARGA */}
-                          <div style={{ color: tkColor, fontSize: tiktokLsMainFontSize, fontWeight: 'bold', lineHeight: '1.2', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>
+                          <div style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: tiktokLsMainFontSize, fontWeight: 'bold', lineHeight: '1.2', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>
                             {displayPrice}{productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
                           </div>
                           {rawOrigPrice && (
@@ -650,9 +643,8 @@ export default function Home() {
                           )}
                         </div>
                         <div style={{ display: 'flex', height: '32px', flexShrink: 0 }}>
-                          {/* UPDATE WARNA TOMBOL BUY */}
-                          <div style={{ backgroundColor: tkLightBg, color: tkColor, padding: '0 10px', display: 'flex', alignItems: 'center', borderTopLeftRadius: '4px', borderBottomLeftRadius: '4px' }}><CartIcon /></div>
-                          <div style={{ backgroundColor: tkColor, color: '#ffffff', padding: '0 16px', display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '14px', borderTopRightRadius: '4px', borderBottomRightRadius: '4px' }}>Buy</div>
+                          <div style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '0 10px', display: 'flex', alignItems: 'center', borderTopLeftRadius: '4px', borderBottomLeftRadius: '4px' }}><CartIcon /></div>
+                          <div style={{ backgroundColor: '#fe2c55', color: '#ffffff', padding: '0 16px', display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '14px', borderTopRightRadius: '4px', borderBottomRightRadius: '4px' }}>Buy</div>
                         </div>
                       </div>
                     )}
