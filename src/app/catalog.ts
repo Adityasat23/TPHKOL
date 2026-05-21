@@ -66,34 +66,18 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
   // -- Combo Products --
   {
     name: "Elixir Velvet-Shine Switching Lip Cream + Glow Cushion",
-    image: "/products/GLOW CUSHION.jpg"
-  },
-  {
-    name: "Stellar Dust Lip Stain + Timeless Lumina Matte Perfection Cushion",
-    image: "/products/MATTE CUSHION.jpg"
-  },
-  {
-    name: "Spectra Ultra Stay Color Transfer Proof Lip Glaze + Stellar Dust Lip Stain",
-    image: "/products/LIP STAIN.jpg"
+    image: "/products/Elixir Velvet-Shine Switching Lip Cream + Glow Cushion.jpg"
   },
   {
     name: "Stellar Dust Lip Stain + Eternal Lip Matte",
-    image: "/products/LIP MATTE.jpg"
-  },
-  {
-    name: "Timeless Utopia Glow Perfection Cushion + Orion Cloud Matte Intense Smooth Lipstick",
-    image: "/products/ORION CLOUD MATTE LIPSTICK.jpg"
-  },
-  {
-    name: "Lunara Frost 3D Lip Gloss Lipstick + Altera Blurring Lip Tint",
-    image: "/products/BLURRING TINT.jpg"
+    image: "/products/Stellar Dust Lip Stain + Eternal Lip Matte.jpg"
   },
   {
     name: "Timeless Lumina Matte Perfection Cushion + Timeless Supernova Setting Spray",
-    image: "/products/MATTE CUSHION.jpg"
+    image: "/products/Timeless Lumina Matte Perfection Cushion + Timeless Supernova Setting Spray.webp"
   },
   {
-    name: "Timeless Utopia Glow Perfection Cushion + Timeless Supernova Setting Spray",
-    image: "/products/GLOW CUSHION.jpg"
-  }
+    name: "TIMEPHORIA ALTERA BLURRING + LIP TINT+LIP MATTE ",
+    image: "/products/TIMEPHORIA ALTERA BLURRING LIP TINT+LIP MATTE.jpeg"
+  },
 ];
