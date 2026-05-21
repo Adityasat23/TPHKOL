@@ -1,121 +1,99 @@
-export const DEFAULT_PRODUCT = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=";
-
-export interface CatalogItem {
+export type CatalogItem = {
   name: string;
   image: string;
-}
+};
+
+export const DEFAULT_PRODUCT = "/products/default.jpg";
 
 export const TIMEPHORIA_CATALOG: CatalogItem[] = [
   {
     name: "Altera Blurring Lip Tint",
-    image: "/images/altera_blurring_lip_tint.jpg"
+    image: "/products/BLURRING TINT.jpg" // Perhatikan: Kata 'public/' dihapus
   },
   {
     name: "Revela Tinted Eyebrow Mascara",
-    image: "/images/revela_tinted_eyebrow.jpg"
+    image: "/products/EYEBROW MASCARA.jpg"
   },
   {
     name: "Timeless Valora Fit Perfection Concealer",
-    image: "/images/timeless_valora_concealer.jpg"
-  },
-  {
-    name: "Exclusive Timephoria Mirror",
-    image: "/images/exclusive_timephoria_mirror.jpg"
-  },
-  {
-    name: "Exclusive Timephoria Ring",
-    image: "/images/exclusive_timephoria_ring.jpg"
-  },
-  {
-    name: "Elixir Velvet-Shine Switching Lip Cream",
-    image: "/images/elixir_velvet_shine.jpg"
+    image: "/products/CONCEALER.jpg"
   },
   {
     name: "Milkyway Melting Lip Balm",
-    image: "/images/milkyway_melting_lip.jpg"
-  },
-  {
-    name: "Heart Soft Puff",
-    image: "/images/heart_soft_puff.jpg"
+    image: "/products/MILKYWAY MELTING LIP BALM.jpg"
   },
   {
     name: "Timeless Utopia Glow Perfection Cushion",
-    image: "/images/timeless_utopia_cushion.jpg"
-  },
-  {
-    name: "Color Transfer Proof Lip Glaze",
-    image: "/images/color_transfer_proof.jpg"
+    image: "/products/GLOW CUSHION.jpg"
   },
   {
     name: "Spectra Ultra Stay Color Transfer Proof Lip Glaze",
-    image: "/images/spectra_ultra_stay.jpg"
+    image: "/products/LIP GLAZE.jpg"
   },
   {
     name: "Orion Cloud Matte Intense Smooth Lipstick",
-    image: "/images/orion_cloud_matte.jpg"
+    image: "/products/ORION CLOUD MATTE LIPSTICK.jpg"
   },
   {
     name: "Lumina Matte Perfection Cushion",
-    image: "/images/lumina_matte_perfection.jpg"
+    image: "/products/MATTE CUSHION.jpg"
   },
   {
     name: "Lunara Frost 3D Lip Gloss Lipstick",
-    image: "/images/lunara_frost_3d.jpg"
+    image: "/products/LIP GLOSS.jpg"
   },
   {
     name: "Two Way Cake Timeless Optima Cover",
-    image: "/images/two_way_cake.jpg"
+    image: "/products/TWO WAY CAKE.jpg"
   },
   {
     name: "Stellar Dust Lip Stain",
-    image: "/images/stellar_dust_lip.jpg"
+    image: "/products/LIP STAIN.jpg"
   },
   {
     name: "Eternal Lip Matte",
-    image: "/images/eternal_lip_matte.jpg"
+    image: "/products/LIP MATTE.jpg"
   },
   {
     name: "Illumina Jelly Eyeshadow Stick",
-    image: "/images/illumina_jelly_eyeshadow.jpg"
+    image: "/products/JELLY EYESHADOW STICK.jpg"
   },
   {
     name: "Orbita 3-in-1 Blurring Pot Liptint",
-    image: "/images/orbita_3_in_1.jpg"
+    image: "/products/BLURRING POT.jpg"
   },
-  {
-    name: "Lipstick Shade Eksklusif",
-    image: "/images/lipstick_shade_eksklusif.jpg"
-  },
+  
+  // -- Combo Products --
   {
     name: "Elixir Velvet-Shine Switching Lip Cream + Glow Cushion",
-    image: "/images/elixir_velvet_glow_cushion.jpg"
+    image: "/products/GLOW CUSHION.jpg"
   },
   {
     name: "Stellar Dust Lip Stain + Timeless Lumina Matte Perfection Cushion",
-    image: "/images/stellar_dust_lumina_cushion.jpg"
+    image: "/products/MATTE CUSHION.jpg"
   },
   {
     name: "Spectra Ultra Stay Color Transfer Proof Lip Glaze + Stellar Dust Lip Stain",
-    image: "/images/spectra_ultra_stellar_dust.jpg"
+    image: "/products/LIP STAIN.jpg"
   },
   {
     name: "Stellar Dust Lip Stain + Eternal Lip Matte",
-    image: "/images/stellar_dust_eternal_lip.jpg"
+    image: "/products/LIP MATTE.jpg"
   },
   {
     name: "Timeless Utopia Glow Perfection Cushion + Orion Cloud Matte Intense Smooth Lipstick",
-    image: "/images/timeless_utopia_orion_cloud.jpg"
+    image: "/products/ORION CLOUD MATTE LIPSTICK.jpg"
   },
   {
     name: "Lunara Frost 3D Lip Gloss Lipstick + Altera Blurring Lip Tint",
-    image: "/images/lunara_frost_altera_blurring.jpg"
+    image: "/products/BLURRING TINT.jpg"
   },
   {
     name: "Timeless Lumina Matte Perfection Cushion + Timeless Supernova Setting Spray",
-    image: "/images/timeless_lumina_setting_spray.jpg"
+    image: "/products/MATTE CUSHION.jpg"
   },
   {
     name: "Timeless Utopia Glow Perfection Cushion + Timeless Supernova Setting Spray",
-    image: "/images/timeless_utopia_setting_spray.jpg"
+    image: "/products/GLOW CUSHION.jpg"
   }
 ];
