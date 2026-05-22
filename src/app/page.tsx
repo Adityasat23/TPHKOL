@@ -1,14 +1,21 @@
 'use client';
 import {TIMEPHORIA_CATALOG,DEFAULT_PRODUCT} from './catalog';
 import { useState, useRef, useEffect } from 'react';
-import { toPng } from 'html-to-image';
-import { toJpeg } from 'html-to-image';
+import { toPng, toJpeg } from 'html-to-image';
 
 // Placeholder Avatar & Product
 const DEFAULT_AVATAR = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk8A8AAQsAzQ/8/GkAAAAASUVORK5CYII=";
 
 // FIXED TIMEPHORIA LOGO (Base64 SVG)
 const TIMEPHORIA_LOGO = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMjAwIDIwMCI+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSIxMDAiIGZpbGw9IiMwMDAwMDAiIC8+PHRleHQgeD0iMTAwIiB5PSIxMDgiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMCIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9ImJvbGQiIGxldHRlci1zcGFjaW5nPSIyIj5USU1FUEhPUklBPC90ZXh0Pjwvc3ZnPg==';
+
+// --- DISCLAIMERS LIST ---
+const DISCLAIMERS = [
+  "HARGA BERLAKU UTK PEMBELIAN SAAT PAYDAY SALE TGL () DI TIKTO LIVE TIME PHORIA & DAPAT BERUBAH SEWAKTU-WAKTU",
+  "HAK CIPTA DARI (@KOL) TELAH RESMI DISETUJUI UNTUK DIGUNAKAN OLEH TIME PHORIA. HARGA DAPAT BERUBAH SEWAKTU WAKTU",
+  "REAKSI DARI PENGGUNAAN MAKEUP TERGANTUNG PADA JENIS KULIT, USIA, PENGGABUNGAN DENGAN PRODUK MAKEUP LAIN, DAN FAKTOR LAINNYA",
+  "HARGA DAPAT BERUBAH SEWAKTU WAKTU"
+];
 
 // --- SVG Icons TikTok ---
 const TruckIcon = () => (
@@ -77,7 +84,8 @@ type WaMessage = {
 };
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'downloader' | 'comment' | 'product' | 'wa'>('product');
+  // --- DITAMBAHKAN TAB 'disclaimer' ---
+  const [activeTab, setActiveTab] = useState<'downloader' | 'comment' | 'product' | 'disclaimer' | 'wa'>('product');
 
   // STATE: FAKE COMMENT
   const [commentMode, setCommentMode] = useState<'sticker' | 'thread'>('sticker'); 
@@ -117,6 +125,10 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [filteredCatalog, setFilteredCatalog] = useState(TIMEPHORIA_CATALOG);
+  const searchContainerRef = useRef<HTMLDivElement>(null); 
+
+  // Disclaimer State
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   // Get unique categories for dropdown
   const categories = ["All", ...Array.from(new Set(TIMEPHORIA_CATALOG.map(item => item.category)))];
@@ -150,7 +162,22 @@ export default function Home() {
   const WA_COLORS = ['#e53935', '#d81b60', '#8e24aa', '#5e35b1', '#3949ab', '#1e88e5', '#039be5', '#00897b', '#00838f', '#2e7d32', '#43a047', '#f57c00', '#ef6c00', '#d84315'];
 
   const [isReady, setIsReady] = useState(false);
-  useEffect(() => { setIsReady(true); }, []);
+  
+  useEffect(() => { 
+    setIsReady(true); 
+
+    // Event listener untuk klik di luar dropdown produk
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // ==========================================
   // AUTOCOMPLETE & FILTER CATALOG LOGIC
@@ -159,7 +186,6 @@ export default function Home() {
     const value = e.target.value;
     setProductTitle(value);
 
-    // Filter by title AND selected category
     if (value.trim().length > 0 || selectedCategory !== "All") {
       const filtered = TIMEPHORIA_CATALOG.filter((item) => {
         const matchesSearch = item.name.toLowerCase().includes(value.toLowerCase());
@@ -177,7 +203,6 @@ export default function Home() {
     const category = e.target.value;
     setSelectedCategory(category);
 
-    // Re-filter list when category changes
     const filtered = TIMEPHORIA_CATALOG.filter((item) => {
       const matchesSearch = productTitle === "" || item.name.toLowerCase().includes(productTitle.toLowerCase());
       const matchesCategory = category === "All" || item.category === category;
@@ -196,11 +221,16 @@ export default function Home() {
   const handleSelectProduct = (product: { name: string; image: string; category?: string }) => {
     setProductTitle(product.name);
     setProductImage(product.image);
-    // Optional: auto-update category dropdown when an item is selected
     if (product.category && selectedCategory === "All") {
         setSelectedCategory(product.category);
     }
     setShowSuggestions(false);
+  };
+
+  const handleCopyDisclaimer = (text: string, index: number) => {
+    navigator.clipboard.writeText(text);
+    setCopiedIndex(index);
+    setTimeout(() => setCopiedIndex(null), 2000); 
   };
 
   // ==========================================
@@ -356,10 +386,11 @@ export default function Home() {
       </div>
 
       {/* --- NAVIGATION TABS --- */}
-      <div className="flex bg-[#171A21]/70 backdrop-blur-xl rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.2)] border border-[#262A35] p-1.5 mb-10 w-full max-w-4xl justify-center gap-1 z-10 overflow-x-auto">
+      <div className="flex bg-[#171A21]/70 backdrop-blur-xl rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.2)] border border-[#262A35] p-1.5 mb-10 w-full max-w-5xl justify-center gap-1 z-10 overflow-x-auto custom-scrollbar">
         <button onClick={() => setActiveTab('downloader')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'downloader' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>📥 DOWNLOADER</button>
         <button onClick={() => setActiveTab('comment')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'comment' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>💬 FAKE COMMENT</button>
         <button onClick={() => setActiveTab('product')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'product' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>🛍️ PRODUCT CARD</button>
+        <button onClick={() => setActiveTab('disclaimer')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'disclaimer' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>📝 DISCLAIMER</button>
         <button onClick={() => setActiveTab('wa')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'wa' ? 'bg-[#008069] text-[#F3F4F6] shadow-lg shadow-[#008069]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>💬 WA CHAT</button>
       </div>
 
@@ -476,7 +507,7 @@ export default function Home() {
                       <img key={avatar} src={avatar} style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, marginTop: '2px' }} />
                       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
                         <p style={{ color: '#757575', fontSize: '16px', fontWeight: '600', margin: '0 0 6px 0', fontFamily: 'inherit' }}>Reply to {replyTo}'s comment</p>
-                        <p style={{ color: '#000000', fontSize: '24px', fontWeight: '700', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'inherit', letterSpacing: '-0.02em' }}>{commentText}</p>
+                        <p style={{ color: '#000000', fontSize: '24px', fontWeight: '600', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'inherit', letterSpacing: '-0.02em' }}>{commentText}</p>
                       </div>
                     </div>
                     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style={{ display: 'block', alignSelf: 'flex-start', marginTop: '-1px' }} xmlns="http://www.w3.org/2000/svg">
@@ -570,7 +601,8 @@ export default function Home() {
               </div>
 
               {/* PRODUCT NAME + DROPDOWN CATEGORY */}
-              <div className="relative flex w-full bg-[#1D212B] border border-[#262A35] rounded-xl overflow-visible focus-within:border-pink-400 focus-within:ring-4 focus-within:ring-pink-400/10 transition-all">
+              {/* === REF UNTUK DETEKSI KLIK DI LUAR (searchContainerRef) === */}
+              <div ref={searchContainerRef} className="relative flex w-full bg-[#1D212B] border border-[#262A35] rounded-xl overflow-visible focus-within:border-pink-400 focus-within:ring-4 focus-within:ring-pink-400/10 transition-all">
                 
                 <span className="p-3.5 bg-[#262A35]/50 text-[#A1A1AA] font-bold text-sm items-center whitespace-nowrap border-r border-[#262A35] hidden sm:flex">
                   [MALL] TIMEPHORIA -
@@ -597,15 +629,12 @@ export default function Home() {
                       setShowSuggestions(true);
                     }
                   }}
-                  onBlur={() => {
-                    setTimeout(() => setShowSuggestions(false), 200);
-                  }}
                   placeholder="Varian Produk"
                   className="w-full p-3.5 bg-transparent focus:outline-none text-sm font-medium text-[#F3F4F6]"
                 />
 
                 {showSuggestions && filteredCatalog.length > 0 && (
-                  <ul className="absolute top-full left-0 right-0 z-50 mt-2 bg-[#1D212B] border border-[#374151] rounded-xl shadow-2xl max-h-64 overflow-y-auto">
+                  <ul className="absolute top-full left-0 right-0 z-50 mt-2 bg-[#1D212B] border border-[#374151] rounded-xl shadow-2xl max-h-64 overflow-y-auto custom-scrollbar">
                     {filteredCatalog.map((item, index) => (
                       <li
                         key={index}
@@ -667,7 +696,6 @@ export default function Home() {
                   </label>
                 )}
               </div>
-
               <p className="text-[11px] text-[#71717A] font-medium italic mt-2">*Diskon & format mata uang otomatis dihitung.</p>
             </div>
 
@@ -774,7 +802,40 @@ export default function Home() {
       )}
 
       {/* ========================================= */}
-      {/* TAB 4: FAKE WA CHAT */}
+      {/* TAB 4: DISCLAIMER (NEW TAB) */}
+      {/* ========================================= */}
+      {activeTab === 'disclaimer' && (
+        <div className="w-full max-w-4xl bg-[#171A21]/90 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 rounded-[2rem] p-10 border border-[#262A35] z-10 animate-in fade-in zoom-in-95">
+          <div className="space-y-6">
+            <div>
+              <h3 className="font-bold text-[#A78BFA] uppercase text-sm tracking-widest flex items-center gap-2 mb-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#C084FC]"></span> Template Disclaimer
+              </h3>
+              <p className="text-[#A1A1AA] font-medium text-sm">Klik pada kotak disclaimer di bawah untuk menyalin (copy) teksnya secara otomatis.</p>
+            </div>
+            
+            <div className="grid grid-cols-1 gap-4">
+              {DISCLAIMERS.map((text, idx) => (
+                <div 
+                  key={idx}
+                  onClick={() => handleCopyDisclaimer(text, idx)}
+                  className="p-5 bg-[#1D212B] border border-[#262A35] hover:border-[#C084FC]/50 hover:bg-[#262A35]/50 rounded-2xl cursor-pointer transition-all flex items-center justify-between gap-6 group shadow-sm active:scale-[0.99]"
+                >
+                  <div className="text-[15px] text-[#A1A1AA] group-hover:text-[#F3F4F6] transition-colors leading-relaxed font-medium">
+                    {text}
+                  </div>
+                  <button className={`text-xs uppercase font-bold px-5 py-2.5 rounded-xl transition-all whitespace-nowrap shadow-sm ${copiedIndex === idx ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115]' : 'bg-[#262A35] text-[#F3F4F6] group-hover:bg-[#3F3F46]'}`}>
+                    {copiedIndex === idx ? '✓ COPIED' : 'COPY'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================= */}
+      {/* TAB 5: FAKE WA CHAT */}
       {/* ========================================= */}
       {activeTab === 'wa' && (
         <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 z-10 animate-in fade-in zoom-in-95">
@@ -1015,9 +1076,9 @@ export default function Home() {
         </p>
       </footer>
 
-      {/* Global CSS for Custom Scrollbar in WA list */}
+      {/* Global CSS for Custom Scrollbar */}
       <style dangerouslySetInnerHTML={{__html: `
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #262A35; border-radius: 20px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #4B5563; }
