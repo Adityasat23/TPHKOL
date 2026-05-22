@@ -271,7 +271,7 @@ const handleSelectProduct = (
     if (!productPreviewRef.current) return;
     try {
       await document.fonts.ready;
-      const dataUrl = await toJpeg(productPreviewRef.current, { quality: 0.88,pixelRatio: 1.5,cacheBust: true,backgroundColor: '#111827' });
+      const dataUrl = await toJpeg(productPreviewRef.current, { quality: 1,pixelRatio: 2,cacheBust: true,backgroundColor: '#111827' });
       const link = document.createElement('a');
       link.download = `product-${productLayout}-${Date.now()}.png`;
       link.href = dataUrl;
