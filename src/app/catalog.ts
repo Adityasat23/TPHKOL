@@ -68,5 +68,12 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
     name: "Stellar Dust Lip Stain + Eternal Lip Matte",
     image: "/products/Stellar Dust Lip Stain-Eternal Lip Matte.jpg"
   },
-  
+  {
+    name: "2PCS Stellar Dust Lip Stain",
+    image: "/products/LIP STAIN 2PCS.jpg"
+  },
+  {
+    name: "Lumina Matte Perfection Cushion + Timeless Optima Two Way Cake",
+    image: "/products/public/products/TWC MATTE CUSHION.jpeg"
+  },
 ];
