@@ -78,35 +78,7 @@ type WaMessage = {
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'downloader' | 'comment' | 'product' | 'wa'>('product');
-  // ==========================================
-// AUTOCOMPLETE CATALOG
-// ==========================================
-const handleTitleChange = (
-  e: React.ChangeEvent<HTMLInputElement>
-) => {
-  const value = e.target.value;
 
-  setProductTitle(value);
-
-  if (value.trim().length > 0) {
-    const filtered = TIMEPHORIA_CATALOG.filter((item) =>
-      item.name.toLowerCase().includes(value.toLowerCase())
-    );
-
-    setFilteredCatalog(filtered);
-    setShowSuggestions(true);
-  } else {
-    setShowSuggestions(false);
-  }
-};
-
-const handleSelectProduct = (
-  product: { name: string; image: string }
-) => {
-  setProductTitle(product.name);
-  setProductImage(product.image);
-  setShowSuggestions(false);
-};
   // STATE: FAKE COMMENT
   const [commentMode, setCommentMode] = useState<'sticker' | 'thread'>('sticker'); 
   const [threadTheme, setThreadTheme] = useState<'dark' | 'light'>('dark');
@@ -139,8 +111,15 @@ const handleSelectProduct = (
   const [productRating, setProductRating] = useState("4.9");
   
   const [showFreeShipping, setShowFreeShipping] = useState(true);
-  // NEW STATE: Warna Harga
   const [priceColor, setPriceColor] = useState<'pink' | 'black'>('pink');
+
+  // Dropdown Product Catalog States
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [filteredCatalog, setFilteredCatalog] = useState(TIMEPHORIA_CATALOG);
+
+  // Get unique categories for dropdown
+  const categories = ["All", ...Array.from(new Set(TIMEPHORIA_CATALOG.map(item => item.category)))];
 
   // Pilihan Mata Uang
   const [currency, setCurrency] = useState<'Rp' | 'RM' | '$'>('Rp');
@@ -148,9 +127,6 @@ const handleSelectProduct = (
   
   const [showShopeeLive, setShowShopeeLive] = useState(true);
   const productPreviewRef = useRef<HTMLDivElement>(null);
-const [showSuggestions, setShowSuggestions] = useState(false);
-const [filteredCatalog, setFilteredCatalog] =
-  useState(TIMEPHORIA_CATALOG);
 
   // STATE: WA CHAT
   const [waGroupAvatar, setWaGroupAvatar] = useState(TIMEPHORIA_LOGO);
@@ -175,6 +151,59 @@ const [filteredCatalog, setFilteredCatalog] =
 
   const [isReady, setIsReady] = useState(false);
   useEffect(() => { setIsReady(true); }, []);
+
+  // ==========================================
+  // AUTOCOMPLETE & FILTER CATALOG LOGIC
+  // ==========================================
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setProductTitle(value);
+
+    // Filter by title AND selected category
+    if (value.trim().length > 0 || selectedCategory !== "All") {
+      const filtered = TIMEPHORIA_CATALOG.filter((item) => {
+        const matchesSearch = item.name.toLowerCase().includes(value.toLowerCase());
+        const matchesCategory = selectedCategory === "All" || item.category === selectedCategory;
+        return matchesSearch && matchesCategory;
+      });
+      setFilteredCatalog(filtered);
+      setShowSuggestions(true);
+    } else {
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const category = e.target.value;
+    setSelectedCategory(category);
+
+    // Re-filter list when category changes
+    const filtered = TIMEPHORIA_CATALOG.filter((item) => {
+      const matchesSearch = productTitle === "" || item.name.toLowerCase().includes(productTitle.toLowerCase());
+      const matchesCategory = category === "All" || item.category === category;
+      return matchesSearch && matchesCategory;
+    });
+    
+    setFilteredCatalog(filtered);
+    
+    if (productTitle.trim().length > 0 || category !== "All") {
+      setShowSuggestions(true);
+    } else {
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSelectProduct = (product: { name: string; image: string; category?: string }) => {
+    setProductTitle(product.name);
+    setProductImage(product.image);
+    // Optional: auto-update category dropdown when an item is selected
+    if (product.category && selectedCategory === "All") {
+        setSelectedCategory(product.category);
+    }
+    setShowSuggestions(false);
+  };
+
+  // ==========================================
 
   const handleDownload = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -202,33 +231,6 @@ const [filteredCatalog, setFilteredCatalog] =
       reader.onloadend = () => setImgFn(reader.result as string);
       reader.readAsDataURL(file);
     }
-const handleTitleChange = (
-  e: React.ChangeEvent<HTMLInputElement>
-) => {
-  const value = e.target.value;
-
-  setProductTitle(value);
-
-  if (value.trim().length > 0) {
-    const filtered = TIMEPHORIA_CATALOG.filter((item) =>
-      item.name.toLowerCase().includes(value.toLowerCase())
-    );
-
-    setFilteredCatalog(filtered);
-    setShowSuggestions(true);
-  } else {
-    setShowSuggestions(false);
-  }
-};
-
-const handleSelectProduct = (
-  product: { name: string; image: string }
-) => {
-  setProductTitle(product.name);
-  setProductImage(product.image);
-  setShowSuggestions(false);
-};
-
   };
 
   const addWaMessage = () => {
@@ -567,59 +569,71 @@ const handleSelectProduct = (
                 <input type="file" onChange={(e) => handleImageUpload(e, setProductImage)} className="text-sm block w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#1D212B] file:text-pink-400 hover:file:bg-[#262A35] transition-all cursor-pointer text-[#71717A]" />
               </div>
 
-            <div className="relative flex w-full bg-[#1D212B] border border-[#262A35] rounded-xl overflow-visible focus-within:border-pink-400 focus-within:ring-4 focus-within:ring-pink-400/10 transition-all">
-  
-  <span className="p-3.5 bg-[#262A35]/50 text-[#A1A1AA] font-bold text-sm flex items-center whitespace-nowrap border-r border-[#262A35]">
-    [MALL] TIMEPHORIA -
-  </span>
+              {/* PRODUCT NAME + DROPDOWN CATEGORY */}
+              <div className="relative flex w-full bg-[#1D212B] border border-[#262A35] rounded-xl overflow-visible focus-within:border-pink-400 focus-within:ring-4 focus-within:ring-pink-400/10 transition-all">
+                
+                <span className="p-3.5 bg-[#262A35]/50 text-[#A1A1AA] font-bold text-sm items-center whitespace-nowrap border-r border-[#262A35] hidden sm:flex">
+                  [MALL] TIMEPHORIA -
+                </span>
 
-  <input
-    type="text"
-    value={productTitle}
-    onChange={handleTitleChange}
-    onFocus={() => {
-      if (productTitle.trim().length > 0) {
-        setShowSuggestions(true);
-      }
-    }}
-    onBlur={() => {
-      setTimeout(() => setShowSuggestions(false), 200);
-    }}
-    placeholder="Varian Produk"
-    className="w-full p-3.5 bg-transparent focus:outline-none text-sm font-medium text-[#F3F4F6]"
-  />
+                <select 
+                  value={selectedCategory} 
+                  onChange={handleCategoryChange}
+                  className="p-3.5 bg-transparent border-r border-[#262A35] text-sm font-bold text-pink-400 focus:outline-none cursor-pointer appearance-none min-w-[100px] outline-none"
+                >
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat} className="bg-[#1D212B] text-white">
+                      {cat}
+                    </option>
+                  ))}
+                </select>
 
-  {showSuggestions && filteredCatalog.length > 0 && (
-    <ul className="absolute top-full left-0 right-0 z-50 mt-2 bg-[#1D212B] border border-[#374151] rounded-xl shadow-2xl max-h-64 overflow-y-auto">
-      
-      {filteredCatalog.map((item, index) => (
-        <li
-          key={index}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            handleSelectProduct(item);
-          }}
-          className="p-3 hover:bg-[#262A35] cursor-pointer flex items-center gap-3 border-b border-white/5 transition-colors"
-        >
-          <img
-            src={item.image}
-            alt={item.name}
-            className="w-10 h-10 rounded-lg object-cover"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = DEFAULT_PRODUCT;
-            }}
-          />
+                <input
+                  type="text"
+                  value={productTitle}
+                  onChange={handleTitleChange}
+                  onFocus={() => {
+                    if (productTitle.trim().length > 0 || selectedCategory !== "All") {
+                      setShowSuggestions(true);
+                    }
+                  }}
+                  onBlur={() => {
+                    setTimeout(() => setShowSuggestions(false), 200);
+                  }}
+                  placeholder="Varian Produk"
+                  className="w-full p-3.5 bg-transparent focus:outline-none text-sm font-medium text-[#F3F4F6]"
+                />
 
-          <span className="text-sm font-medium text-white">
-            {item.name}
-          </span>
-        </li>
-      ))}
-
-    </ul>
-  )}
-
-</div>
+                {showSuggestions && filteredCatalog.length > 0 && (
+                  <ul className="absolute top-full left-0 right-0 z-50 mt-2 bg-[#1D212B] border border-[#374151] rounded-xl shadow-2xl max-h-64 overflow-y-auto">
+                    {filteredCatalog.map((item, index) => (
+                      <li
+                        key={index}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          handleSelectProduct(item);
+                        }}
+                        className="p-3 hover:bg-[#262A35] cursor-pointer flex items-center gap-3 border-b border-white/5 transition-colors"
+                      >
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-10 h-10 rounded-lg object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = DEFAULT_PRODUCT;
+                          }}
+                        />
+                        <span className="text-sm font-medium text-white flex-1">
+                          {item.name}
+                        </span>
+                        <span className="text-xs font-bold text-[#A1A1AA] bg-[#262A35] px-2 py-1 rounded-md">
+                          {item.category}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
               
               <div className="grid grid-cols-3 gap-3">
                 <input type="text" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} placeholder={`Baru (${currency === 'Rp' ? '87.120' : '26.9'})`} className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl font-bold text-pink-400 focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-400/10 transition-all text-sm placeholder-[#71717A]" />
