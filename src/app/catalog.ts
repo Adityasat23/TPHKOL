@@ -74,6 +74,10 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
   },
   {
     name: "Lumina Matte Perfection Cushion + Timeless Optima Two Way Cake",
-    image: "/products/public/products/TWC MATTE CUSHION.jpeg"
+    image: "/products/TWC MATTE CUSHION.jpg"
+  },
+  {
+    name: "ALTERA BLURRING LIP TINT + LIP MATTE ",
+    image: "/products/TIMEPHORIA ALTERA BLURRING LIP TINT+LIP MATTE .jpg"
   },
 ];
