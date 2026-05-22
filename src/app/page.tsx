@@ -11,11 +11,10 @@ const TIMEPHORIA_LOGO = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3d
 
 // --- DISCLAIMERS LIST ---
 const DISCLAIMERS = [
-  "HARGA BERLAKU UTK PEMBELIAN SAAT PAYDAY SALE TGL (0-00-000) DI TIKTO LIVE TIME PHORIA & DAPAT BERUBAH SEWAKTU-WAKTU",
+  "HARGA BERLAKU UTK PEMBELIAN SAAT PAYDAY SALE TGL () DI TIKTO LIVE TIME PHORIA & DAPAT BERUBAH SEWAKTU-WAKTU",
   "HAK CIPTA DARI (@KOL) TELAH RESMI DISETUJUI UNTUK DIGUNAKAN OLEH TIME PHORIA. HARGA DAPAT BERUBAH SEWAKTU WAKTU",
   "REAKSI DARI PENGGUNAAN MAKEUP TERGANTUNG PADA JENIS KULIT, USIA, PENGGABUNGAN DENGAN PRODUK MAKEUP LAIN, DAN FAKTOR LAINNYA",
-  "HARGA DAPAT BERUBAH SEWAKTU WAKTU SESUAI AKUN DAN PERIODE PROMO",
-  "BEBERAPA BAGIAN DALAM VIDEO INI MENGANDUNG KONTEN YANG DIBUAT MENGGUNAKAN AI",
+  "HARGA DAPAT BERUBAH SEWAKTU WAKTU"
 ];
 
 // --- SVG Icons TikTok ---
@@ -85,7 +84,6 @@ type WaMessage = {
 };
 
 export default function Home() {
-  // --- DITAMBAHKAN TAB 'disclaimer' ---
   const [activeTab, setActiveTab] = useState<'downloader' | 'comment' | 'product' | 'disclaimer' | 'wa'>('product');
 
   // STATE: FAKE COMMENT
@@ -914,7 +912,11 @@ export default function Home() {
             <div style={{ padding: '20px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
               
               <div ref={waPreviewRef} style={{ 
-                backgroundColor: waTheme === 'dark' ? WA_GELAP_BG : WA_TERANG_BG, 
+                // --- DIGANTI DENGAN BACKGROUND IMAGE DARI FOLDER PUBLIC ---
+                backgroundImage: waTheme === 'dark' ? "url('/bg/wadark.jpg')" : "url('/bg/wawhite.jpg')",
+                backgroundColor: waTheme === 'dark' ? WA_GELAP_BG : WA_TERANG_BG, // Fallback warna
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
                 width: '360px', 
                 height: '640px', 
                 display: 'flex', 
