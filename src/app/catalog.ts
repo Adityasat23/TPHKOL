@@ -66,7 +66,7 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
   // -- Combo Products --
   {
     name: "Stellar Dust Lip Stain + Eternal Lip Matte",
-    image: "/products/Stellar Dust Lip Stain + Eternal Lip Matte.jpg"
+    image: "/products/Stellar Dust Lip Stain-Eternal Lip Matte.jpg"
   },
   
 ];
