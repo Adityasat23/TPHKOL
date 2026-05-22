@@ -77,7 +77,7 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
     image: "/products/TWC MATTE CUSHION.jpg"
   },
   {
-    name: "ALTERA BLURRING LIP TINT + LIP MATTE ",
-    image: "/products/TIMEPHORIA ALTERA BLURRING LIP TINT+LIP MATTE.jpg"
+    name: "ALTERA BLURRING LIP TINT + LIP MATTE",
+    image: "/products/lipmatte2pcs.jpg"
   },
 ];
