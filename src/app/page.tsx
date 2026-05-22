@@ -2,6 +2,7 @@
 import {TIMEPHORIA_CATALOG,DEFAULT_PRODUCT} from './catalog';
 import { useState, useRef, useEffect } from 'react';
 import { toPng } from 'html-to-image';
+import { toJpeg } from 'html-to-image';
 
 // Placeholder Avatar & Product
 const DEFAULT_AVATAR = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk8A8AAQsAzQ/8/GkAAAAASUVORK5CYII=";
@@ -270,7 +271,7 @@ const handleSelectProduct = (
     if (!productPreviewRef.current) return;
     try {
       await document.fonts.ready;
-      const dataUrl = await toPng(productPreviewRef.current, { cacheBust: true, pixelRatio: 3, backgroundColor: 'transparent' });
+      const dataUrl = await toJpeg(productPreviewRef.current, { quality: 0.88,pixelRatio: 1.5,cacheBust: true,backgroundColor: '#111827' });
       const link = document.createElement('a');
       link.download = `product-${productLayout}-${Date.now()}.png`;
       link.href = dataUrl;
