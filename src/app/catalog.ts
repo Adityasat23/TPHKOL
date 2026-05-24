@@ -105,7 +105,11 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
     image: "/products/GLOW CUSHION.jpg",
     category: "Face"
   },
-
+ {
+    name: "ECLIPSE SPARK 2 IN 1 FACE CONTOUR",
+    image: "/products/ECLIPSE SPARK 2 IN 1 FACE CONTOUR.jpg",
+    category: "Face"
+  },
   {
     name: "Timeless Valora Fit Perfection Concealer",
     image: "/products/CONCEALER.jpg",
