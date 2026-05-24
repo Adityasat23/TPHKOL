@@ -78,7 +78,16 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
     image: "/products/LIP GLAZE.jpg",
     category: "Lips"
   },
-
+  {
+    name: "SUPERNOVA SETTING SPRAY",
+    image: "/products/SUPERNOVA SETTING SPRAY.jpg",
+    category: "Face"
+  },
+  {
+    name: "Timephoria Aion Superstain Lip Tattoo Ink",
+    image: "/products/Timephoria Aion Superstain Lip Tattoo Ink.jpg",
+    category: "Lips"
+  },
   {
     name: "Stellar Dust Lip Stain",
     image: "/products/LIP STAIN.jpg",
