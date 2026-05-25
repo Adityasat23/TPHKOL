@@ -73,7 +73,6 @@ const WaTickIcon = ({ isDark = false }) => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill={isDark ? "#8696a0" : "#53bdeb"}><path d="M18 7l-1.41-1.41-6.34 6.34 1.41 1.41L18 7zm4.24-1.41L11.66 16.17 7.48 12l-1.41 1.41L11.66 19l12-12-1.42-1.41zM.41 13.41L6 19l1.41-1.41L1.83 12 .41 13.41z"/></svg>
 );
 
-// Tipe Data untuk WA Chat
 type WaMessage = {
   id: number;
   sender: 'me' | 'other';
@@ -99,7 +98,7 @@ export default function Home() {
     fetch(SHEET_CSV_URL)
       .then(res => res.text())
       .then(csvText => {
-        // --- CUSTOM CSV PARSER ---
+        // --- CUSTOM CSV PARSER PINTAR ---
         const rows: string[][] = [];
         let row: string[] = [];
         let currentVal = '';
@@ -132,35 +131,64 @@ export default function Home() {
           rows.push(row);
         }
 
+        // Cek Dinamis Index Kolom (jaga-jaga kalau Kolom A kosong di sheet)
+        let bCol = 0; // Kolom Banned Words (Default Col A)
+        let sCol = 1; // Kolom Saran (Default Col B)
+        
+        // Deteksi jika Kolom A kosong semua, geser ke Kolom B & C
+        const isCol0Empty = rows.slice(1, 5).every(r => !r[0] || r[0].trim() === '');
+        if (isCol0Empty) {
+          bCol = 1;
+          sCol = 2;
+        }
+
         const parsedData: {word: string, suggestion: string, regexStr: string}[] = [];
 
         rows.forEach((cols, index) => {
           if (index === 0) return; // Lewati header
           
-          if (cols.length >= 2) {
-            const bannedCell = cols[1] || '';
-            const suggestion = (cols[2] && cols[2].trim() !== '') ? cols[2].trim() : '-take out-';
+          if (cols.length > bCol) {
+            const bannedCell = cols[bCol] || '';
+            const suggestion = (cols[sCol] && cols[sCol].trim() !== '') ? cols[sCol].trim() : '-take out-';
             
-            // Pecah kata yang digabung koma (cth: "no. 1, pertama")
+            // Pecah kata yang digabung koma di dalam satu sel (cth: "no. 1, pertama")
             const wordsInCell = bannedCell.split(/[\n,]+/)
                                           .map(w => w.trim().toLowerCase())
                                           .filter(w => w.length > 1); 
             
             wordsInCell.forEach(word => {
-              // 1. Escape karakter spesial Regex
-              let escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+              // --- FLEXIBLE REGEX BUILDER ---
+              // Menghapus simbol di awal/akhir kata yang sering typo (kecuali %)
+              let cleanWord = word.replace(/^[^a-zA-Z0-9%]+|[^a-zA-Z0-9%]+$/g, '');
+              if (!cleanWord) return;
+
+              // Pisahkan antara huruf/angka dengan simbol pemisah (spasi, titik, strip)
+              const tokens = cleanWord.split(/([\W_]+)/);
+              let regexStr = "";
               
-              // 2. Ganti spasi, titik, strip, koma, garis miring, titik dua, underscore jadi bebas (fleksibel)
-              let flexibleStr = escaped.replace(/(?:\s|\\\.|\\-|\\,|\\\/|\\:|_+)+/g, '[\\W_]*');
-              
-              // 3. Tambahkan word boundary jika kata berawalan/berakhiran huruf/angka
-              const prefix = /^\w/.test(word) ? '\\b' : '';
-              const suffix = /\w$/.test(word) ? '\\b' : '';
+              for (let i = 0; i < tokens.length; i++) {
+                const token = tokens[i];
+                if (i % 2 === 0) {
+                  // Bagian huruf/angka: escape regex biar aman
+                  regexStr += token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                } else {
+                  // Bagian simbol pemisah: buat jadi fleksibel
+                  if (token.includes('%')) {
+                    regexStr += '[\\W_]*%[\\W_]*'; // Persen wajib ada
+                  } else {
+                    regexStr += '[\\W_]*'; // Spasi/simbol lain opsional (bisa gak ada, bisa diganti spasi/titik)
+                  }
+                }
+              }
+
+              // Tambahkan word boundary (\b) agar presisi
+              const prefix = /^[a-zA-Z0-9]/.test(cleanWord) ? '\\b' : '';
+              const suffix = /[a-zA-Z0-9]$/.test(cleanWord) ? '\\b' : '';
 
               parsedData.push({ 
-                word, 
+                word: cleanWord, 
                 suggestion, 
-                regexStr: `${prefix}${flexibleStr}${suffix}` 
+                regexStr: `${prefix}${regexStr}${suffix}` 
               });
             });
           }
@@ -200,13 +228,14 @@ export default function Home() {
     if (detectedItems.length === 0) return text;
 
     // Gabungkan semua pola regex yang terdeteksi
-    const regexParts = detectedItems.map(d => d.regexStr);
+    const regexParts = detectedItems.map(d => d.regexStr).filter(Boolean);
     const combinedRegex = new RegExp(`(${regexParts.join('|')})`, 'gi');
     
     const parts = text.split(combinedRegex);
     
     return parts.map((part, i) => {
-      // Cek apakah potongan kata ini adalah kata yang diban
+      if (!part) return null;
+      // Cek apakah potongan kata ini adalah kata yang diban (Exactly Match)
       const isBanned = detectedItems.some(d => new RegExp(`^${d.regexStr}$`, 'i').test(part));
       return isBanned ? (
         <span key={i} style={{ backgroundColor: '#ef4444', color: 'white', padding: '0 4px', borderRadius: '4px', display: 'inline-block' }}>
@@ -818,7 +847,6 @@ export default function Home() {
                 <input type="file" onChange={(e) => handleImageUpload(e, setProductImage)} className="text-sm block w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#1D212B] file:text-pink-400 hover:file:bg-[#262A35] transition-all cursor-pointer text-[#71717A]" />
               </div>
 
-              {/* PRODUCT NAME + DROPDOWN CATEGORY */}
               {/* === REF UNTUK DETEKSI KLIK DI LUAR (searchContainerRef) === */}
               <div ref={searchContainerRef} className="relative flex w-full bg-[#1D212B] border border-[#262A35] rounded-xl overflow-visible focus-within:border-pink-400 focus-within:ring-4 focus-within:ring-pink-400/10 transition-all">
                 
@@ -1150,9 +1178,8 @@ export default function Home() {
             <div style={{ padding: '20px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
               
               <div ref={waPreviewRef} style={{ 
-                // --- DIGANTI DENGAN BACKGROUND IMAGE DARI FOLDER PUBLIC ---
                 backgroundImage: waTheme === 'dark' ? "url('/bg/wadark.jpg')" : "url('/bg/wawhite.jpg')",
-                backgroundColor: waTheme === 'dark' ? WA_GELAP_BG : WA_TERANG_BG, // Fallback warna
+                backgroundColor: waTheme === 'dark' ? WA_GELAP_BG : WA_TERANG_BG,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 width: '360px', 
