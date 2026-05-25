@@ -1,22 +1,14 @@
 'use client';
 import {TIMEPHORIA_CATALOG,DEFAULT_PRODUCT} from './catalog';
 import { useState, useRef, useEffect } from 'react';
-import { toPng, toJpeg } from 'html-to-image';
+import { toPng } from 'html-to-image';
+import { toJpeg } from 'html-to-image';
 
 // Placeholder Avatar & Product
 const DEFAULT_AVATAR = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk8A8AAQsAzQ/8/GkAAAAASUVORK5CYII=";
 
-// FIXED TIMEPHORIA LOGO (Base64 SVG)
+// FIXED TIMEPHORIA LOGO
 const TIMEPHORIA_LOGO = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMjAwIDIwMCI+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSIxMDAiIGZpbGw9IiMwMDAwMDAiIC8+PHRleHQgeD0iMTAwIiB5PSIxMDgiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMCIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9ImJvbGQiIGxldHRlci1zcGFjaW5nPSIyIj5USU1FUEhPUklBPC90ZXh0Pjwvc3ZnPg==';
-
-// --- DISCLAIMERS LIST ---
-const DISCLAIMERS = [
-  "HARGA BERLAKU UTK PEMBELIAN SAAT PAYDAY SALE TGL (dd-mm-yyyy) DI TIKTO LIVE TIME PHORIA & DAPAT BERUBAH SEWAKTU-WAKTU",
-  "HAK CIPTA DARI (@KOL) TELAH RESMI DISETUJUI UNTUK DIGUNAKAN OLEH TIME PHORIA. HARGA DAPAT BERUBAH SEWAKTU WAKTU",
-  "REAKSI DARI PENGGUNAAN MAKEUP TERGANTUNG PADA JENIS KULIT, USIA, PENGGABUNGAN DENGAN PRODUK MAKEUP LAIN, DAN FAKTOR LAINNYA",
-  "HARGA DAPAT BERUBAH SEWAKTU WAKTU SESUAI AKUN DAN PERIODE PROMO",
-  "BEBERAPA BAGIAN DALAM VIDEO INI MENGANDUNG KONTEN YANG DIBUAT MENGGUNAKAN AI"
-];
 
 // --- SVG Icons TikTok ---
 const TruckIcon = () => (
@@ -73,7 +65,6 @@ const WaTickIcon = ({ isDark = false }) => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill={isDark ? "#8696a0" : "#53bdeb"}><path d="M18 7l-1.41-1.41-6.34 6.34 1.41 1.41L18 7zm4.24-1.41L11.66 16.17 7.48 12l-1.41 1.41L11.66 19l12-12-1.42-1.41zM.41 13.41L6 19l1.41-1.41L1.83 12 .41 13.41z"/></svg>
 );
 
-// Tipe Data untuk WA Chat
 type WaMessage = {
   id: number;
   sender: 'me' | 'other';
@@ -85,7 +76,143 @@ type WaMessage = {
 };
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'downloader' | 'comment' | 'product' | 'disclaimer' | 'wa'>('product');
+  const [activeTab, setActiveTab] = useState<'downloader' | 'comment' | 'product' | 'checker' | 'wa'>('product');
+
+  // ==========================================
+  // LOGIKA FETCH BANNED WORDS & SUGGESTIONS
+  // ==========================================
+  const [bannedData, setBannedData] = useState<{word: string, suggestion: string}[]>([]);
+  const [checkerText, setCheckerText] = useState("");
+
+  useEffect(() => {
+    const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1RUWiTF4k0JVVU4HOWmPCrECv0T5k2MHssfi7sZMn70I/export?format=csv';
+
+    fetch(SHEET_CSV_URL)
+      .then(res => res.text())
+      .then(csvText => {
+        // --- CUSTOM CSV PARSER (Menangani koma di dalam tanda kutip sel Google Sheets) ---
+        const rows: string[][] = [];
+        let row: string[] = [];
+        let currentVal = '';
+        let insideQuotes = false;
+
+        for (let i = 0; i < csvText.length; i++) {
+          const char = csvText[i];
+          const nextChar = csvText[i + 1];
+
+          if (char === '"' && insideQuotes && nextChar === '"') {
+            currentVal += '"';
+            i++; 
+          } else if (char === '"') {
+            insideQuotes = !insideQuotes;
+          } else if (char === ',' && !insideQuotes) {
+            row.push(currentVal);
+            currentVal = '';
+          } else if ((char === '\n' || char === '\r') && !insideQuotes) {
+            if (char === '\r' && nextChar === '\n') i++;
+            row.push(currentVal);
+            rows.push(row);
+            row = [];
+            currentVal = '';
+          } else {
+            currentVal += char;
+          }
+        }
+        if (currentVal || row.length > 0) {
+          row.push(currentVal);
+          rows.push(row);
+        }
+        // -----------------------------------------------------------------
+
+        const parsedData: {word: string, suggestion: string}[] = [];
+
+        rows.forEach((cols, index) => {
+          // Lewati baris pertama (Header "New List Banned Words")
+          if (index === 0) return;
+          
+          if (cols.length >= 2) {
+            // Kolom B ada di index 1, Kolom C ada di index 2
+            const bannedCell = cols[1] || '';
+            const suggestion = (cols[2] && cols[2].trim() !== '') ? cols[2].trim() : '-take out-';
+            
+            // Kolom B bisa berisi banyak kata yang dipisah koma (contoh: "Best, Best Seller, Paling")
+            // Kita pecah dulu berdasarkan koma (atau enter) biar jadi Array kata tunggal
+            const wordsInCell = bannedCell.split(/[\n,]+/)
+                                          .map(w => w.trim().toLowerCase())
+                                          .filter(w => w.length > 1); // Hindari mendeteksi spasi kosong/huruf tunggal
+            
+            wordsInCell.forEach(word => {
+              parsedData.push({ word, suggestion });
+            });
+          }
+        });
+
+        // Urutkan dari yang KARAKTERNYA PALING PANJANG ke yang pendek. 
+        // Supaya frasa panjang kayak "Skin Barrier Rusak" ke-detect duluan daripada "Skin".
+        const sortedData = parsedData.sort((a, b) => b.word.length - a.word.length);
+        
+        setBannedData(sortedData);
+      })
+      .catch(err => console.error("Gagal load banned words:", err));
+  }, []);
+
+  // FUNGSI DETEKSI DENGAN BOUNDARY (Menghindari "aman" terdeteksi di "zaman")
+  const getDetectedBannedWords = (text: string) => {
+    if (!text) return [];
+    const lowerText = text.toLowerCase();
+    const detected: {word: string, suggestion: string}[] = [];
+    
+    bannedData.forEach(item => {
+      const escapedWord = item.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      // Kasih boundary (\b) kalau karakter awal/akhirnya alfanumerik. 
+      // Kalau karakter kayak '%' (misal "100%"), suffix boundary dimatikan biar tetep kedetect.
+      const prefix = /^\w/.test(item.word) ? '\\b' : '';
+      const suffix = /\w$/.test(item.word) ? '\\b' : '';
+      
+      const regex = new RegExp(`${prefix}${escapedWord}${suffix}`, 'i');
+      
+      // Kalau ketemu di text dan belum masuk ke list detected
+      if (regex.test(lowerText) && !detected.some(d => d.word === item.word)) {
+        detected.push(item);
+      }
+    });
+    
+    return detected;
+  };
+
+  // FUNGSI HIGHLIGHT TEXT DI RENDER PREVIEW (Gambar)
+  const renderWithHighlights = (text: string) => {
+    if (!bannedData.length || !text) return text;
+    
+    const detectedItems = getDetectedBannedWords(text);
+    if (detectedItems.length === 0) return text;
+
+    // Ambil kata aja buat dibikin regex gabungan
+    const wordsToHighlight = detectedItems.map(d => d.word);
+    
+    const regexParts = wordsToHighlight.map(w => {
+      const escaped = w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const prefix = /^\w/.test(w) ? '\\b' : '';
+      const suffix = /\w$/.test(w) ? '\\b' : '';
+      return `${prefix}${escaped}${suffix}`;
+    });
+
+    const regex = new RegExp(`(${regexParts.join('|')})`, 'gi');
+    
+    const parts = text.split(regex);
+    return parts.map((part, i) => {
+      const lowerPart = part.toLowerCase();
+      const isBanned = wordsToHighlight.includes(lowerPart);
+      return isBanned ? (
+        <span key={i} style={{ backgroundColor: '#ef4444', color: 'white', padding: '0 4px', borderRadius: '4px', display: 'inline-block' }}>
+          {part}
+        </span>
+      ) : (
+        part
+      );
+    });
+  };
+  // ==========================================
 
   // STATE: FAKE COMMENT
   const [commentMode, setCommentMode] = useState<'sticker' | 'thread'>('sticker'); 
@@ -125,12 +252,6 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [filteredCatalog, setFilteredCatalog] = useState(TIMEPHORIA_CATALOG);
-  const searchContainerRef = useRef<HTMLDivElement>(null); 
-
-  // Disclaimer State
-  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
-
-  // Get unique categories for dropdown
   const categories = ["All", ...Array.from(new Set(TIMEPHORIA_CATALOG.map(item => item.category)))];
 
   // Pilihan Mata Uang
@@ -162,30 +283,11 @@ export default function Home() {
   const WA_COLORS = ['#e53935', '#d81b60', '#8e24aa', '#5e35b1', '#3949ab', '#1e88e5', '#039be5', '#00897b', '#00838f', '#2e7d32', '#43a047', '#f57c00', '#ef6c00', '#d84315'];
 
   const [isReady, setIsReady] = useState(false);
-  
-  useEffect(() => { 
-    setIsReady(true); 
+  useEffect(() => { setIsReady(true); }, []);
 
-    // Event listener untuk klik di luar dropdown produk
-    const handleClickOutside = (event: MouseEvent) => {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
-        setShowSuggestions(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  // ==========================================
-  // AUTOCOMPLETE & FILTER CATALOG LOGIC
-  // ==========================================
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setProductTitle(value);
-
     if (value.trim().length > 0 || selectedCategory !== "All") {
       const filtered = TIMEPHORIA_CATALOG.filter((item) => {
         const matchesSearch = item.name.toLowerCase().includes(value.toLowerCase());
@@ -202,15 +304,12 @@ export default function Home() {
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const category = e.target.value;
     setSelectedCategory(category);
-
     const filtered = TIMEPHORIA_CATALOG.filter((item) => {
       const matchesSearch = productTitle === "" || item.name.toLowerCase().includes(productTitle.toLowerCase());
       const matchesCategory = category === "All" || item.category === category;
       return matchesSearch && matchesCategory;
     });
-    
     setFilteredCatalog(filtered);
-    
     if (productTitle.trim().length > 0 || category !== "All") {
       setShowSuggestions(true);
     } else {
@@ -226,14 +325,6 @@ export default function Home() {
     }
     setShowSuggestions(false);
   };
-
-  const handleCopyDisclaimer = (text: string, index: number) => {
-    navigator.clipboard.writeText(text);
-    setCopiedIndex(index);
-    setTimeout(() => setCopiedIndex(null), 2000); 
-  };
-
-  // ==========================================
 
   const handleDownload = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -349,7 +440,6 @@ export default function Home() {
 
   let rawPrice = productPrice.trim();
   if (rawPrice && !rawPrice.toLowerCase().startsWith(currency.toLowerCase())) rawPrice = currency + rawPrice;
-  
   let rawOrigPrice = productOriginalPrice.trim();
   if (rawOrigPrice && !rawOrigPrice.toLowerCase().startsWith(currency.toLowerCase())) rawOrigPrice = currency + rawOrigPrice;
 
@@ -369,13 +459,11 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#0F1115] flex flex-col items-center py-12 px-4 font-sans text-[#F3F4F6] relative overflow-hidden selection:bg-[#C084FC]/30 selection:text-[#F3F4F6]">
       
-      {/* --- AMBIENT BACKGROUND GLOW (TIMEPHORIA DARK VIBE) --- */}
+      {/* AMBIENT BACKGROUND GLOW */}
       <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[radial-gradient(circle_at_top,rgba(168,139,250,0.12),transparent_60%)] -z-10 pointer-events-none"></div>
-      
-      {/* Subtle Grain/Noise Overlay */}
       <div className="absolute inset-0 opacity-[0.03] mix-blend-soft-light pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGZpbHRlciBpZD0ibiI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuNyIgbnVtT2N0YXZlcz0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNuKSIvPjwvc3ZnPg==')]"></div>
 
-      {/* --- EDITORIAL HERO SECTION --- */}
+      {/* HERO SECTION */}
       <div className="max-w-3xl w-full text-center mb-14 mt-6 relative z-10">
         <h1 className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-[#F3F4F6] to-[#A1A1AA] mb-5 tracking-tighter leading-tight">
           TPH Editor Tools<br />
@@ -386,16 +474,67 @@ export default function Home() {
       </div>
 
       {/* --- NAVIGATION TABS --- */}
-      <div className="flex bg-[#171A21]/70 backdrop-blur-xl rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.2)] border border-[#262A35] p-1.5 mb-10 w-full max-w-5xl justify-center gap-1 z-10 overflow-x-auto custom-scrollbar">
+      <div className="flex bg-[#171A21]/70 backdrop-blur-xl rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.2)] border border-[#262A35] p-1.5 mb-10 w-full max-w-4xl justify-center gap-1 z-10 overflow-x-auto">
         <button onClick={() => setActiveTab('downloader')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'downloader' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>📥 DOWNLOADER</button>
         <button onClick={() => setActiveTab('comment')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'comment' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>💬 FAKE COMMENT</button>
         <button onClick={() => setActiveTab('product')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'product' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>🛍️ PRODUCT CARD</button>
-        <button onClick={() => setActiveTab('disclaimer')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'disclaimer' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>📝 DISCLAIMER</button>
+        
+        {/* TAB: WORD CHECKER */}
+        <button onClick={() => setActiveTab('checker')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'checker' ? 'bg-gradient-to-r from-red-400 to-red-500 text-white shadow-lg shadow-red-500/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>🚨 WORD CHECKER</button>
+        
         <button onClick={() => setActiveTab('wa')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'wa' ? 'bg-[#008069] text-[#F3F4F6] shadow-lg shadow-[#008069]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>💬 WA CHAT</button>
       </div>
 
       {/* ========================================= */}
-      {/* TAB 1: DOWNLOADER */}
+      {/* TAB: BANNED WORD CHECKER (NEW) */}
+      {/* ========================================= */}
+      {activeTab === 'checker' && (
+        <div className="w-full max-w-3xl bg-[#171A21]/90 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 rounded-[2rem] p-8 border border-[#262A35] z-10 animate-in fade-in zoom-in-95">
+          <div className="space-y-4">
+             <h3 className="text-xl font-bold text-[#F3F4F6] mb-2 flex items-center gap-2">
+                <span className="text-red-400">🚨</span> Cek Banned Words
+             </h3>
+             <p className="text-[#A1A1AA] text-sm">Paste text script. Data ditarik *live* dari Google Sheets.</p>
+             
+             <textarea 
+               value={checkerText} 
+               onChange={(e) => setCheckerText(e.target.value)} 
+               placeholder="Paste atau ketik teks di sini..." 
+               className="w-full p-5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-red-400 focus:ring-4 focus:ring-red-400/10 transition-all text-sm font-medium min-h-[250px] resize-y text-[#F3F4F6] placeholder-[#71717A] leading-[1.6]" 
+             />
+
+             {getDetectedBannedWords(checkerText).length > 0 ? (
+               <div className="mt-4 p-5 bg-red-500/10 border border-red-500/30 rounded-xl space-y-3 animate-in fade-in slide-in-from-bottom-2">
+                 <p className="text-sm text-red-400 font-bold flex gap-2 items-center">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"></path></svg>
+                    Peringatan: Ditemukan {getDetectedBannedWords(checkerText).length} pelanggaran!
+                 </p>
+                 <ul className="text-sm list-disc pl-5 space-y-3">
+                   {getDetectedBannedWords(checkerText).map((d, i) => (
+                     <li key={i} className="text-[#F3F4F6]">
+                       <div className="inline-block mb-1">
+                          Hapus kata: <span className="font-bold text-white bg-red-500/50 px-2 py-0.5 rounded ml-1">{d.word}</span> 
+                       </div>
+                       <br/>
+                       <span className="text-[#A1A1AA]">➔ Saran:</span> <span className="font-semibold text-green-400 ml-1">{d.suggestion}</span>
+                     </li>
+                   ))}
+                 </ul>
+               </div>
+             ) : (
+                checkerText.length > 0 && (
+                   <div className="mt-4 p-4 bg-green-500/10 border border-green-500/30 rounded-xl flex items-center gap-3">
+                      <svg width="20" height="20" fill="#4ade80" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"></path></svg>
+                      <p className="text-sm text-green-400 font-bold">Aman! Tidak ada kata yang dibanned.</p>
+                   </div>
+                )
+             )}
+          </div>
+        </div>
+      )}
+
+      {/* ========================================= */}
+      {/* TAB: DOWNLOADER */}
       {/* ========================================= */}
       {activeTab === 'downloader' && (
         <div className="w-full max-w-2xl bg-[#171A21]/90 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 rounded-[2rem] p-8 border border-[#262A35] z-10 animate-in fade-in zoom-in-95">
@@ -422,7 +561,7 @@ export default function Home() {
       )}
 
       {/* ========================================= */}
-      {/* TAB 2: FAKE COMMENT */}
+      {/* TAB: FAKE COMMENT */}
       {/* ========================================= */}
       {activeTab === 'comment' && (
         <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 z-10 animate-in fade-in zoom-in-95">
@@ -462,7 +601,25 @@ export default function Home() {
                   <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium text-[#A1A1AA]" style={{ colorScheme: 'dark' }} />
                 </div>
               )}
-              <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} className="w-full p-4 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium min-h-[120px] resize-y text-[#F3F4F6] placeholder-[#71717A] leading-[1.6]" placeholder="Isi komentar..." />
+
+              {/* TEXTAREA KOMENTAR UTAMA + WARNING */}
+              <div className="relative">
+                <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} className="w-full p-4 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium min-h-[120px] resize-y text-[#F3F4F6] placeholder-[#71717A] leading-[1.6]" placeholder="Isi komentar..." />
+                
+                {getDetectedBannedWords(commentText).length > 0 && (
+                  <div className="mt-3 p-3 bg-red-500/10 border border-red-500/30 rounded-xl space-y-1.5">
+                    <p className="text-[12px] text-red-400 font-bold flex gap-1 items-center">⚠️ Mengandung Banned Word:</p>
+                    <ul className="text-xs text-[#A1A1AA] list-disc pl-4 space-y-2">
+                      {getDetectedBannedWords(commentText).map((d, i) => (
+                        <li key={i}>
+                          Hapus: <span className="font-bold text-white bg-red-500/40 px-1 rounded">{d.word}</span> <br/>
+                          Saran: <span className="italic text-green-400">{d.suggestion}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
             </div>
 
             {commentMode === 'thread' && (
@@ -483,7 +640,25 @@ export default function Home() {
                       <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="Likes Balasan" className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium text-[#F3F4F6] placeholder-[#71717A]" />
                       <input type="date" value={replyDate} onChange={(e) => setReplyDate(e.target.value)} className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium text-[#A1A1AA]" style={{ colorScheme: 'dark' }} />
                     </div>
-                    <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full p-4 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium min-h-[80px] text-[#F3F4F6] placeholder-[#71717A] leading-[1.6]" placeholder="Teks balasan admin..." />
+
+                    {/* TEXTAREA BALASAN BRAND + WARNING */}
+                    <div className="relative">
+                      <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full p-4 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium min-h-[80px] text-[#F3F4F6] placeholder-[#71717A] leading-[1.6]" placeholder="Teks balasan admin..." />
+                      
+                      {getDetectedBannedWords(replyText).length > 0 && (
+                        <div className="mt-3 p-3 bg-red-500/10 border border-red-500/30 rounded-xl space-y-1.5">
+                          <p className="text-[12px] text-red-400 font-bold flex gap-1 items-center">⚠️ Mengandung Banned Word:</p>
+                          <ul className="text-xs text-[#A1A1AA] list-disc pl-4 space-y-2">
+                            {getDetectedBannedWords(replyText).map((d, i) => (
+                              <li key={i}>
+                                Hapus: <span className="font-bold text-white bg-red-500/40 px-1 rounded">{d.word}</span> <br/>
+                                Saran: <span className="italic text-green-400">{d.suggestion}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -507,7 +682,8 @@ export default function Home() {
                       <img key={avatar} src={avatar} style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, marginTop: '2px' }} />
                       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
                         <p style={{ color: '#757575', fontSize: '16px', fontWeight: '600', margin: '0 0 6px 0', fontFamily: 'inherit' }}>Reply to {replyTo}'s comment</p>
-                        <p style={{ color: '#000000', fontSize: '24px', fontWeight: '600', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'inherit', letterSpacing: '-0.02em' }}>{commentText}</p>
+                        {/* RENDER WITH HIGHLIGHTS */}
+                        <p style={{ color: '#000000', fontSize: '24px', fontWeight: '800', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'inherit', letterSpacing: '-0.02em' }}>{renderWithHighlights(commentText)}</p>
                       </div>
                     </div>
                     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style={{ display: 'block', alignSelf: 'flex-start', marginTop: '-1px' }} xmlns="http://www.w3.org/2000/svg">
@@ -522,7 +698,8 @@ export default function Home() {
                       <img key={avatar} src={avatar} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                       <div style={{ flex: 1 }}>
                         <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'inherit' }}>{username}</p>
-                        <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '4px 0', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'inherit' }}>{commentText}</p>
+                        {/* RENDER WITH HIGHLIGHTS */}
+                        <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '4px 0', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'inherit' }}>{renderWithHighlights(commentText)}</p>
                         <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 500, marginTop: '8px', fontFamily: 'inherit' }}>
                           <span>{date}</span><span>Reply</span>
                         </div>
@@ -537,7 +714,8 @@ export default function Home() {
                         <img src={TIMEPHORIA_LOGO} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                         <div style={{ flex: 1 }}>
                           <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'inherit' }}>Timephoria</p>
-                          <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '4px 0', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'inherit' }}>{replyText}</p>
+                          {/* RENDER WITH HIGHLIGHTS */}
+                          <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '4px 0', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'inherit' }}>{renderWithHighlights(replyText)}</p>
                           <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 500, marginTop: '8px', fontFamily: 'inherit' }}>
                             <span>{replyDate}</span><span>Reply</span>
                           </div>
@@ -600,9 +778,7 @@ export default function Home() {
                 <input type="file" onChange={(e) => handleImageUpload(e, setProductImage)} className="text-sm block w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#1D212B] file:text-pink-400 hover:file:bg-[#262A35] transition-all cursor-pointer text-[#71717A]" />
               </div>
 
-              {/* PRODUCT NAME + DROPDOWN CATEGORY */}
-              {/* === REF UNTUK DETEKSI KLIK DI LUAR (searchContainerRef) === */}
-              <div ref={searchContainerRef} className="relative flex w-full bg-[#1D212B] border border-[#262A35] rounded-xl overflow-visible focus-within:border-pink-400 focus-within:ring-4 focus-within:ring-pink-400/10 transition-all">
+              <div className="relative flex w-full bg-[#1D212B] border border-[#262A35] rounded-xl overflow-visible focus-within:border-pink-400 focus-within:ring-4 focus-within:ring-pink-400/10 transition-all">
                 
                 <span className="p-3.5 bg-[#262A35]/50 text-[#A1A1AA] font-bold text-sm items-center whitespace-nowrap border-r border-[#262A35] hidden sm:flex">
                   [MALL] TIMEPHORIA -
@@ -629,12 +805,15 @@ export default function Home() {
                       setShowSuggestions(true);
                     }
                   }}
+                  onBlur={() => {
+                    setTimeout(() => setShowSuggestions(false), 200);
+                  }}
                   placeholder="Varian Produk"
                   className="w-full p-3.5 bg-transparent focus:outline-none text-sm font-medium text-[#F3F4F6]"
                 />
 
                 {showSuggestions && filteredCatalog.length > 0 && (
-                  <ul className="absolute top-full left-0 right-0 z-50 mt-2 bg-[#1D212B] border border-[#374151] rounded-xl shadow-2xl max-h-64 overflow-y-auto custom-scrollbar">
+                  <ul className="absolute top-full left-0 right-0 z-50 mt-2 bg-[#1D212B] border border-[#374151] rounded-xl shadow-2xl max-h-64 overflow-y-auto">
                     {filteredCatalog.map((item, index) => (
                       <li
                         key={index}
@@ -696,6 +875,7 @@ export default function Home() {
                   </label>
                 )}
               </div>
+
               <p className="text-[11px] text-[#71717A] font-medium italic mt-2">*Diskon & format mata uang otomatis dihitung.</p>
             </div>
 
@@ -709,7 +889,7 @@ export default function Home() {
 
             <div style={{ padding: '40px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
               
-              {/* SHOPEE RENDER (Keep original colors for accurate output) */}
+              {/* SHOPEE RENDER */}
               {productLayout === 'shopee' && (
                  <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '4px', width: '300px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.5)', fontFamily: 'Arial, sans-serif' }}>
                     <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
@@ -744,7 +924,7 @@ export default function Home() {
                  </div>
               )}
 
-              {/* TIKTOK RENDER (Keep original colors for accurate output) */}
+              {/* TIKTOK RENDER */}
               {(productLayout === 'tiktok-portrait' || productLayout === 'tiktok-landscape') && (
                 <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: productLayout === 'tiktok-portrait' ? '300px' : '480px', display: 'flex', flexDirection: productLayout === 'tiktok-portrait' ? 'column' : 'row', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}>
                   <div style={{ position: 'relative', width: productLayout === 'tiktok-portrait' ? '300px' : '200px', height: productLayout === 'tiktok-portrait' ? '300px' : '220px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
@@ -802,40 +982,7 @@ export default function Home() {
       )}
 
       {/* ========================================= */}
-      {/* TAB 4: DISCLAIMER (NEW TAB) */}
-      {/* ========================================= */}
-      {activeTab === 'disclaimer' && (
-        <div className="w-full max-w-4xl bg-[#171A21]/90 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 rounded-[2rem] p-10 border border-[#262A35] z-10 animate-in fade-in zoom-in-95">
-          <div className="space-y-6">
-            <div>
-              <h3 className="font-bold text-[#A78BFA] uppercase text-sm tracking-widest flex items-center gap-2 mb-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#C084FC]"></span> Template Disclaimer
-              </h3>
-              <p className="text-[#A1A1AA] font-medium text-sm">Klik pada kotak disclaimer di bawah untuk menyalin (copy) teksnya secara otomatis.</p>
-            </div>
-            
-            <div className="grid grid-cols-1 gap-4">
-              {DISCLAIMERS.map((text, idx) => (
-                <div 
-                  key={idx}
-                  onClick={() => handleCopyDisclaimer(text, idx)}
-                  className="p-5 bg-[#1D212B] border border-[#262A35] hover:border-[#C084FC]/50 hover:bg-[#262A35]/50 rounded-2xl cursor-pointer transition-all flex items-center justify-between gap-6 group shadow-sm active:scale-[0.99]"
-                >
-                  <div className="text-[15px] text-[#A1A1AA] group-hover:text-[#F3F4F6] transition-colors leading-relaxed font-medium">
-                    {text}
-                  </div>
-                  <button className={`text-xs uppercase font-bold px-5 py-2.5 rounded-xl transition-all whitespace-nowrap shadow-sm ${copiedIndex === idx ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115]' : 'bg-[#262A35] text-[#F3F4F6] group-hover:bg-[#3F3F46]'}`}>
-                    {copiedIndex === idx ? '✓ COPIED' : 'COPY'}
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================= */}
-      {/* TAB 5: FAKE WA CHAT */}
+      {/* TAB 4: FAKE WA CHAT */}
       {/* ========================================= */}
       {activeTab === 'wa' && (
         <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 z-10 animate-in fade-in zoom-in-95">
@@ -888,7 +1035,26 @@ export default function Home() {
                          <div className="p-2.5 text-sm font-medium text-[#71717A] bg-[#111318] border border-transparent rounded-xl text-center cursor-not-allowed">Anda</div>
                       )}
                     </div>
-                    <textarea value={msg.text} onChange={(e) => updateWaMessage(msg.id, 'text', e.target.value)} placeholder="Isi pesan..." className="w-full p-3 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] placeholder-[#71717A] rounded-xl text-sm min-h-[60px] mb-3 focus:outline-none focus:border-[#00a884] focus:ring-2 focus:ring-[#00a884]/20 font-medium leading-[1.6]" />
+
+                    {/* TEXTAREA WA CHAT + WARNING */}
+                    <div className="relative mb-3">
+                      <textarea value={msg.text} onChange={(e) => updateWaMessage(msg.id, 'text', e.target.value)} placeholder="Isi pesan..." className="w-full p-3 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] placeholder-[#71717A] rounded-xl text-sm min-h-[60px] focus:outline-none focus:border-[#00a884] focus:ring-2 focus:ring-[#00a884]/20 font-medium leading-[1.6]" />
+                      
+                      {getDetectedBannedWords(msg.text).length > 0 && (
+                        <div className="mt-2 p-2 bg-red-500/10 border border-red-500/30 rounded-lg space-y-1">
+                          <p className="text-[11px] text-red-400 font-bold flex gap-1 items-center">⚠️ Mengandung Banned Word:</p>
+                          <ul className="text-[11px] text-[#A1A1AA] list-disc pl-4 space-y-2">
+                            {getDetectedBannedWords(msg.text).map((d, i) => (
+                              <li key={i}>
+                                Hapus: <span className="font-bold text-white bg-red-500/40 px-1 rounded">{d.word}</span> <br/>
+                                Saran: <span className="italic text-green-400">{d.suggestion}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                    
                     <div className="grid grid-cols-2 gap-3 items-center">
                       <input type="time" value={msg.time} onChange={(e) => updateWaMessage(msg.id, 'time', e.target.value)} className="p-2.5 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] rounded-xl text-sm font-medium focus:outline-none focus:border-[#00a884]" style={{ colorScheme: 'dark' }} />
                       <input type="file" onChange={(e) => handleWaMessageImage(msg.id, e)} className="text-[10px] p-2 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:bg-[#262A35] file:text-[#A1A1AA] cursor-pointer text-[#71717A]" />
@@ -913,11 +1079,7 @@ export default function Home() {
             <div style={{ padding: '20px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
               
               <div ref={waPreviewRef} style={{ 
-                // --- DIGANTI DENGAN BACKGROUND IMAGE DARI FOLDER PUBLIC ---
-                backgroundImage: waTheme === 'dark' ? "url('/bg/wadark.jpg')" : "url('/bg/wawhite.jpg')",
-                backgroundColor: waTheme === 'dark' ? WA_GELAP_BG : WA_TERANG_BG, // Fallback warna
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
+                backgroundColor: waTheme === 'dark' ? WA_GELAP_BG : WA_TERANG_BG, 
                 width: '360px', 
                 height: '640px', 
                 display: 'flex', 
@@ -1019,7 +1181,7 @@ export default function Home() {
                                 <img src={msg.image} style={{ width: '100%', borderRadius: '3px', marginBottom: '2px', maxHeight: '200px', objectFit: 'cover' }} />
                               )}
 
-                              {/* Teks Pesan */}
+                              {/* Teks Pesan WITH HIGHLIGHTS */}
                               {msg.text && (
                                 <div style={{ 
                                     color: isDark ? '#e9edef' : '#111b21', 
@@ -1028,7 +1190,7 @@ export default function Home() {
                                     whiteSpace: 'pre-wrap', 
                                     wordWrap: 'break-word' 
                                 }}>
-                                   {msg.text}
+                                   {renderWithHighlights(msg.text)}
                                    <span style={{ display: 'inline-block', width: isMe ? '60px' : '40px' }}></span> 
                                 </div>
                               )}
@@ -1080,9 +1242,9 @@ export default function Home() {
         </p>
       </footer>
 
-      {/* Global CSS for Custom Scrollbar */}
+      {/* Global CSS for Custom Scrollbar in WA list */}
       <style dangerouslySetInnerHTML={{__html: `
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #262A35; border-radius: 20px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #4B5563; }
