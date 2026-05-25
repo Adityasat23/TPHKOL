@@ -85,13 +85,12 @@ type WaMessage = {
 };
 
 export default function Home() {
-  // Tambah 'checker' ke dalam type dan initial state
   const [activeTab, setActiveTab] = useState<'downloader' | 'comment' | 'product' | 'disclaimer' | 'checker' | 'wa'>('product');
 
   // ==========================================
   // LOGIKA FETCH BANNED WORDS & SUGGESTIONS
   // ==========================================
-  const [bannedData, setBannedData] = useState<{word: string, suggestion: string}[]>([]);
+  const [bannedData, setBannedData] = useState<{word: string, suggestion: string, regexStr: string}[]>([]);
   const [checkerText, setCheckerText] = useState("");
 
   useEffect(() => {
@@ -100,7 +99,7 @@ export default function Home() {
     fetch(SHEET_CSV_URL)
       .then(res => res.text())
       .then(csvText => {
-        // --- CUSTOM CSV PARSER (Menangani koma di dalam tanda kutip sel Google Sheets) ---
+        // --- CUSTOM CSV PARSER ---
         const rows: string[][] = [];
         let row: string[] = [];
         let currentVal = '';
@@ -132,80 +131,83 @@ export default function Home() {
           row.push(currentVal);
           rows.push(row);
         }
-        // -----------------------------------------------------------------
 
-        const parsedData: {word: string, suggestion: string}[] = [];
+        const parsedData: {word: string, suggestion: string, regexStr: string}[] = [];
 
         rows.forEach((cols, index) => {
-          // Lewati baris pertama (Header)
-          if (index === 0) return;
+          if (index === 0) return; // Lewati header
           
           if (cols.length >= 2) {
-            // Kolom B ada di index 1, Kolom C ada di index 2
             const bannedCell = cols[1] || '';
             const suggestion = (cols[2] && cols[2].trim() !== '') ? cols[2].trim() : '-take out-';
             
-            // Kolom B bisa berisi banyak kata yang dipisah koma (contoh: "Best, Best Seller, Paling")
+            // Pecah kata yang digabung koma (cth: "no. 1, pertama")
             const wordsInCell = bannedCell.split(/[\n,]+/)
                                           .map(w => w.trim().toLowerCase())
                                           .filter(w => w.length > 1); 
             
             wordsInCell.forEach(word => {
-              parsedData.push({ word, suggestion });
+              // 1. Escape karakter spesial Regex
+              let escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+              
+              // 2. Ganti spasi, titik, strip, koma, garis miring, titik dua, underscore jadi bebas (fleksibel)
+              let flexibleStr = escaped.replace(/(?:\s|\\\.|\\-|\\,|\\\/|\\:|_+)+/g, '[\\W_]*');
+              
+              // 3. Tambahkan word boundary jika kata berawalan/berakhiran huruf/angka
+              const prefix = /^\w/.test(word) ? '\\b' : '';
+              const suffix = /\w$/.test(word) ? '\\b' : '';
+
+              parsedData.push({ 
+                word, 
+                suggestion, 
+                regexStr: `${prefix}${flexibleStr}${suffix}` 
+              });
             });
           }
         });
 
-        // Urutkan dari karakter paling panjang ke pendek
+        // Urutkan kata dari yang terpanjang ke terpendek untuk mencegah overlapping regex
         const sortedData = parsedData.sort((a, b) => b.word.length - a.word.length);
         setBannedData(sortedData);
       })
       .catch(err => console.error("Gagal load banned words:", err));
   }, []);
 
-  // FUNGSI DETEKSI DENGAN BOUNDARY
+  // FUNGSI DETEKSI BANNED WORD PINTAR
   const getDetectedBannedWords = (text: string) => {
     if (!text) return [];
-    const lowerText = text.toLowerCase();
-    const detected: {word: string, suggestion: string}[] = [];
+    const detected: typeof bannedData = [];
     
     bannedData.forEach(item => {
-      const escapedWord = item.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const prefix = /^\w/.test(item.word) ? '\\b' : '';
-      const suffix = /\w$/.test(item.word) ? '\\b' : '';
-      
-      const regex = new RegExp(`${prefix}${escapedWord}${suffix}`, 'i');
-      
-      if (regex.test(lowerText) && !detected.some(d => d.word === item.word)) {
-        detected.push(item);
+      try {
+        const regex = new RegExp(item.regexStr, 'i');
+        if (regex.test(text) && !detected.some(d => d.word === item.word)) {
+          detected.push(item);
+        }
+      } catch (e) {
+        console.error("Regex Invalid:", item.regexStr);
       }
     });
     
     return detected;
   };
 
-  // FUNGSI HIGHLIGHT TEXT
+  // FUNGSI HIGHLIGHT TEKS OTOMATIS
   const renderWithHighlights = (text: string) => {
     if (!bannedData.length || !text) return text;
     
     const detectedItems = getDetectedBannedWords(text);
     if (detectedItems.length === 0) return text;
 
-    const wordsToHighlight = detectedItems.map(d => d.word);
+    // Gabungkan semua pola regex yang terdeteksi
+    const regexParts = detectedItems.map(d => d.regexStr);
+    const combinedRegex = new RegExp(`(${regexParts.join('|')})`, 'gi');
     
-    const regexParts = wordsToHighlight.map(w => {
-      const escaped = w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const prefix = /^\w/.test(w) ? '\\b' : '';
-      const suffix = /\w$/.test(w) ? '\\b' : '';
-      return `${prefix}${escaped}${suffix}`;
-    });
-
-    const regex = new RegExp(`(${regexParts.join('|')})`, 'gi');
+    const parts = text.split(combinedRegex);
     
-    const parts = text.split(regex);
     return parts.map((part, i) => {
-      const lowerPart = part.toLowerCase();
-      const isBanned = wordsToHighlight.includes(lowerPart);
+      // Cek apakah potongan kata ini adalah kata yang diban
+      const isBanned = detectedItems.some(d => new RegExp(`^${d.regexStr}$`, 'i').test(part));
       return isBanned ? (
         <span key={i} style={{ backgroundColor: '#ef4444', color: 'white', padding: '0 4px', borderRadius: '4px', display: 'inline-block' }}>
           {part}
@@ -517,7 +519,7 @@ export default function Home() {
         <button onClick={() => setActiveTab('product')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'product' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>🛍️ PRODUCT CARD</button>
         <button onClick={() => setActiveTab('disclaimer')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'disclaimer' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>📝 DISCLAIMER</button>
         
-        {/* NEW TAB: WORD CHECKER */}
+        {/* TAB: WORD CHECKER */}
         <button onClick={() => setActiveTab('checker')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'checker' ? 'bg-gradient-to-r from-red-400 to-red-500 text-white shadow-lg shadow-red-500/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>🚨 WORD CHECKER</button>
         
         <button onClick={() => setActiveTab('wa')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'wa' ? 'bg-[#008069] text-[#F3F4F6] shadow-lg shadow-[#008069]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>💬 WA CHAT</button>
@@ -816,6 +818,7 @@ export default function Home() {
                 <input type="file" onChange={(e) => handleImageUpload(e, setProductImage)} className="text-sm block w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#1D212B] file:text-pink-400 hover:file:bg-[#262A35] transition-all cursor-pointer text-[#71717A]" />
               </div>
 
+              {/* PRODUCT NAME + DROPDOWN CATEGORY */}
               {/* === REF UNTUK DETEKSI KLIK DI LUAR (searchContainerRef) === */}
               <div ref={searchContainerRef} className="relative flex w-full bg-[#1D212B] border border-[#262A35] rounded-xl overflow-visible focus-within:border-pink-400 focus-within:ring-4 focus-within:ring-pink-400/10 transition-all">
                 
