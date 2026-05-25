@@ -1,22 +1,14 @@
 'use client';
 import {TIMEPHORIA_CATALOG,DEFAULT_PRODUCT} from './catalog';
 import { useState, useRef, useEffect } from 'react';
-import { toPng, toJpeg } from 'html-to-image';
+import { toPng } from 'html-to-image';
+import { toJpeg } from 'html-to-image';
 
 // Placeholder Avatar & Product
 const DEFAULT_AVATAR = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk8A8AAQsAzQ/8/GkAAAAASUVORK5CYII=";
 
 // FIXED TIMEPHORIA LOGO (Base64 SVG)
 const TIMEPHORIA_LOGO = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMjAwIDIwMCI+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSIxMDAiIGZpbGw9IiMwMDAwMDAiIC8+PHRleHQgeD0iMTAwIiB5PSIxMDgiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMCIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9ImJvbGQiIGxldHRlci1zcGFjaW5nPSIyIj5USU1FUEhPUklBPC90ZXh0Pjwvc3ZnPg==';
-
-// --- DISCLAIMERS LIST ---
-const DISCLAIMERS = [
-  "HARGA BERLAKU UTK PEMBELIAN SAAT PAYDAY SALE TGL (dd-mm-yyyy) DI TIKTO LIVE TIME PHORIA & DAPAT BERUBAH SEWAKTU-WAKTU",
-  "HAK CIPTA DARI (@KOL) TELAH RESMI DISETUJUI UNTUK DIGUNAKAN OLEH TIME PHORIA. HARGA DAPAT BERUBAH SEWAKTU WAKTU",
-  "REAKSI DARI PENGGUNAAN MAKEUP TERGANTUNG PADA JENIS KULIT, USIA, PENGGABUNGAN DENGAN PRODUK MAKEUP LAIN, DAN FAKTOR LAINNYA",
-  "HARGA DAPAT BERUBAH SEWAKTU WAKTU SESUAI AKUN DAN PERIODE PROMO",
-  "BEBERAPA BAGIAN DALAM VIDEO INI MENGANDUNG KONTEN YANG DIBUAT MENGGUNAKAN AI"
-];
 
 // --- SVG Icons TikTok ---
 const TruckIcon = () => (
@@ -85,7 +77,56 @@ type WaMessage = {
 };
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'downloader' | 'comment' | 'product' | 'disclaimer' | 'wa'>('product');
+  const [activeTab, setActiveTab] = useState<'downloader' | 'comment' | 'product' | 'wa'>('product');
+
+  // ==========================================
+  // LOGIKA FETCH BANNED WORDS DARI GOOGLE SHEETS
+  // ==========================================
+  const [bannedWords, setBannedWords] = useState<string[]>([]);
+
+  useEffect(() => {
+    // Export link CSV dari Google Sheet kamu
+    const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1RUWiTF4k0JVVU4HOWmPCrECv0T5k2MHssfi7sZMn70I/export?format=csv';
+
+    fetch(SHEET_CSV_URL)
+      .then(res => res.text())
+      .then(csvText => {
+        // Parse CSV: pecah per baris/koma, hapus spasi/kutipan kosong
+        const words = csvText.split(/[\n,]/)
+          .map(w => w.replace(/['"\r]/g, '').trim().toLowerCase())
+          .filter(w => w.length > 0);
+        setBannedWords(words);
+      })
+      .catch(err => console.error("Gagal load banned words:", err));
+  }, []);
+
+  // Mengecek list kata yang dilarang dari input text
+  const getDetectedBannedWords = (text: string) => {
+    if (!text) return [];
+    const lowerText = text.toLowerCase();
+    return bannedWords.filter(word => lowerText.includes(word));
+  };
+
+  // Render teks dan memberikan highlight pada Banned Word untuk ditampikan di preview HTML
+  const renderWithHighlights = (text: string) => {
+    if (!bannedWords.length || !text) return text;
+    
+    // Escape regex agar tidak error
+    const escapedWords = bannedWords.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const regex = new RegExp(`(${escapedWords.join('|')})`, 'gi');
+    
+    const parts = text.split(regex);
+    return parts.map((part, i) =>
+      bannedWords.includes(part.toLowerCase()) ? (
+        <span key={i} style={{ backgroundColor: '#ef4444', color: 'white', padding: '0 4px', borderRadius: '4px', display: 'inline-block' }}>
+          {part}
+        </span>
+      ) : (
+        part
+      )
+    );
+  };
+  // ==========================================
 
   // STATE: FAKE COMMENT
   const [commentMode, setCommentMode] = useState<'sticker' | 'thread'>('sticker'); 
@@ -125,10 +166,6 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [filteredCatalog, setFilteredCatalog] = useState(TIMEPHORIA_CATALOG);
-  const searchContainerRef = useRef<HTMLDivElement>(null); 
-
-  // Disclaimer State
-  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   // Get unique categories for dropdown
   const categories = ["All", ...Array.from(new Set(TIMEPHORIA_CATALOG.map(item => item.category)))];
@@ -162,22 +199,7 @@ export default function Home() {
   const WA_COLORS = ['#e53935', '#d81b60', '#8e24aa', '#5e35b1', '#3949ab', '#1e88e5', '#039be5', '#00897b', '#00838f', '#2e7d32', '#43a047', '#f57c00', '#ef6c00', '#d84315'];
 
   const [isReady, setIsReady] = useState(false);
-  
-  useEffect(() => { 
-    setIsReady(true); 
-
-    // Event listener untuk klik di luar dropdown produk
-    const handleClickOutside = (event: MouseEvent) => {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
-        setShowSuggestions(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  useEffect(() => { setIsReady(true); }, []);
 
   // ==========================================
   // AUTOCOMPLETE & FILTER CATALOG LOGIC
@@ -186,6 +208,7 @@ export default function Home() {
     const value = e.target.value;
     setProductTitle(value);
 
+    // Filter by title AND selected category
     if (value.trim().length > 0 || selectedCategory !== "All") {
       const filtered = TIMEPHORIA_CATALOG.filter((item) => {
         const matchesSearch = item.name.toLowerCase().includes(value.toLowerCase());
@@ -203,6 +226,7 @@ export default function Home() {
     const category = e.target.value;
     setSelectedCategory(category);
 
+    // Re-filter list when category changes
     const filtered = TIMEPHORIA_CATALOG.filter((item) => {
       const matchesSearch = productTitle === "" || item.name.toLowerCase().includes(productTitle.toLowerCase());
       const matchesCategory = category === "All" || item.category === category;
@@ -225,12 +249,6 @@ export default function Home() {
         setSelectedCategory(product.category);
     }
     setShowSuggestions(false);
-  };
-
-  const handleCopyDisclaimer = (text: string, index: number) => {
-    navigator.clipboard.writeText(text);
-    setCopiedIndex(index);
-    setTimeout(() => setCopiedIndex(null), 2000); 
   };
 
   // ==========================================
@@ -386,11 +404,10 @@ export default function Home() {
       </div>
 
       {/* --- NAVIGATION TABS --- */}
-      <div className="flex bg-[#171A21]/70 backdrop-blur-xl rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.2)] border border-[#262A35] p-1.5 mb-10 w-full max-w-5xl justify-center gap-1 z-10 overflow-x-auto custom-scrollbar">
+      <div className="flex bg-[#171A21]/70 backdrop-blur-xl rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.2)] border border-[#262A35] p-1.5 mb-10 w-full max-w-4xl justify-center gap-1 z-10 overflow-x-auto">
         <button onClick={() => setActiveTab('downloader')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'downloader' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>📥 DOWNLOADER</button>
         <button onClick={() => setActiveTab('comment')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'comment' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>💬 FAKE COMMENT</button>
         <button onClick={() => setActiveTab('product')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'product' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>🛍️ PRODUCT CARD</button>
-        <button onClick={() => setActiveTab('disclaimer')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'disclaimer' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>📝 DISCLAIMER</button>
         <button onClick={() => setActiveTab('wa')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'wa' ? 'bg-[#008069] text-[#F3F4F6] shadow-lg shadow-[#008069]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>💬 WA CHAT</button>
       </div>
 
@@ -462,7 +479,16 @@ export default function Home() {
                   <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium text-[#A1A1AA]" style={{ colorScheme: 'dark' }} />
                 </div>
               )}
-              <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} className="w-full p-4 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium min-h-[120px] resize-y text-[#F3F4F6] placeholder-[#71717A] leading-[1.6]" placeholder="Isi komentar..." />
+
+              {/* TEXTAREA KOMENTAR UTAMA + WARNING */}
+              <div className="relative">
+                <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} className="w-full p-4 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium min-h-[120px] resize-y text-[#F3F4F6] placeholder-[#71717A] leading-[1.6]" placeholder="Isi komentar..." />
+                {getDetectedBannedWords(commentText).length > 0 && (
+                  <p className="text-[12px] text-red-400 mt-2 font-bold flex gap-1 items-center">
+                    ⚠️ Mengandung Banned Word: <span className="bg-red-500/20 px-2 py-0.5 rounded-md border border-red-500/30">{getDetectedBannedWords(commentText).join(', ')}</span>
+                  </p>
+                )}
+              </div>
             </div>
 
             {commentMode === 'thread' && (
@@ -483,7 +509,16 @@ export default function Home() {
                       <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="Likes Balasan" className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium text-[#F3F4F6] placeholder-[#71717A]" />
                       <input type="date" value={replyDate} onChange={(e) => setReplyDate(e.target.value)} className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium text-[#A1A1AA]" style={{ colorScheme: 'dark' }} />
                     </div>
-                    <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full p-4 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium min-h-[80px] text-[#F3F4F6] placeholder-[#71717A] leading-[1.6]" placeholder="Teks balasan admin..." />
+
+                    {/* TEXTAREA BALASAN BRAND + WARNING */}
+                    <div className="relative">
+                      <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full p-4 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium min-h-[80px] text-[#F3F4F6] placeholder-[#71717A] leading-[1.6]" placeholder="Teks balasan admin..." />
+                      {getDetectedBannedWords(replyText).length > 0 && (
+                        <p className="text-[12px] text-red-400 mt-2 font-bold flex gap-1 items-center">
+                          ⚠️ Mengandung Banned Word: <span className="bg-red-500/20 px-2 py-0.5 rounded-md border border-red-500/30">{getDetectedBannedWords(replyText).join(', ')}</span>
+                        </p>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -507,7 +542,8 @@ export default function Home() {
                       <img key={avatar} src={avatar} style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, marginTop: '2px' }} />
                       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
                         <p style={{ color: '#757575', fontSize: '16px', fontWeight: '600', margin: '0 0 6px 0', fontFamily: 'inherit' }}>Reply to {replyTo}'s comment</p>
-                        <p style={{ color: '#000000', fontSize: '24px', fontWeight: '600', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'inherit', letterSpacing: '-0.02em' }}>{commentText}</p>
+                        {/* RENDER WITH HIGHLIGHTS */}
+                        <p style={{ color: '#000000', fontSize: '24px', fontWeight: '800', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'inherit', letterSpacing: '-0.02em' }}>{renderWithHighlights(commentText)}</p>
                       </div>
                     </div>
                     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style={{ display: 'block', alignSelf: 'flex-start', marginTop: '-1px' }} xmlns="http://www.w3.org/2000/svg">
@@ -522,7 +558,8 @@ export default function Home() {
                       <img key={avatar} src={avatar} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                       <div style={{ flex: 1 }}>
                         <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'inherit' }}>{username}</p>
-                        <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '4px 0', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'inherit' }}>{commentText}</p>
+                        {/* RENDER WITH HIGHLIGHTS */}
+                        <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '4px 0', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'inherit' }}>{renderWithHighlights(commentText)}</p>
                         <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 500, marginTop: '8px', fontFamily: 'inherit' }}>
                           <span>{date}</span><span>Reply</span>
                         </div>
@@ -537,7 +574,8 @@ export default function Home() {
                         <img src={TIMEPHORIA_LOGO} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                         <div style={{ flex: 1 }}>
                           <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'inherit' }}>Timephoria</p>
-                          <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '4px 0', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'inherit' }}>{replyText}</p>
+                          {/* RENDER WITH HIGHLIGHTS */}
+                          <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '4px 0', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'inherit' }}>{renderWithHighlights(replyText)}</p>
                           <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 500, marginTop: '8px', fontFamily: 'inherit' }}>
                             <span>{replyDate}</span><span>Reply</span>
                           </div>
@@ -601,8 +639,7 @@ export default function Home() {
               </div>
 
               {/* PRODUCT NAME + DROPDOWN CATEGORY */}
-              {/* === REF UNTUK DETEKSI KLIK DI LUAR (searchContainerRef) === */}
-              <div ref={searchContainerRef} className="relative flex w-full bg-[#1D212B] border border-[#262A35] rounded-xl overflow-visible focus-within:border-pink-400 focus-within:ring-4 focus-within:ring-pink-400/10 transition-all">
+              <div className="relative flex w-full bg-[#1D212B] border border-[#262A35] rounded-xl overflow-visible focus-within:border-pink-400 focus-within:ring-4 focus-within:ring-pink-400/10 transition-all">
                 
                 <span className="p-3.5 bg-[#262A35]/50 text-[#A1A1AA] font-bold text-sm items-center whitespace-nowrap border-r border-[#262A35] hidden sm:flex">
                   [MALL] TIMEPHORIA -
@@ -629,12 +666,15 @@ export default function Home() {
                       setShowSuggestions(true);
                     }
                   }}
+                  onBlur={() => {
+                    setTimeout(() => setShowSuggestions(false), 200);
+                  }}
                   placeholder="Varian Produk"
                   className="w-full p-3.5 bg-transparent focus:outline-none text-sm font-medium text-[#F3F4F6]"
                 />
 
                 {showSuggestions && filteredCatalog.length > 0 && (
-                  <ul className="absolute top-full left-0 right-0 z-50 mt-2 bg-[#1D212B] border border-[#374151] rounded-xl shadow-2xl max-h-64 overflow-y-auto custom-scrollbar">
+                  <ul className="absolute top-full left-0 right-0 z-50 mt-2 bg-[#1D212B] border border-[#374151] rounded-xl shadow-2xl max-h-64 overflow-y-auto">
                     {filteredCatalog.map((item, index) => (
                       <li
                         key={index}
@@ -696,6 +736,7 @@ export default function Home() {
                   </label>
                 )}
               </div>
+
               <p className="text-[11px] text-[#71717A] font-medium italic mt-2">*Diskon & format mata uang otomatis dihitung.</p>
             </div>
 
@@ -802,40 +843,7 @@ export default function Home() {
       )}
 
       {/* ========================================= */}
-      {/* TAB 4: DISCLAIMER (NEW TAB) */}
-      {/* ========================================= */}
-      {activeTab === 'disclaimer' && (
-        <div className="w-full max-w-4xl bg-[#171A21]/90 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 rounded-[2rem] p-10 border border-[#262A35] z-10 animate-in fade-in zoom-in-95">
-          <div className="space-y-6">
-            <div>
-              <h3 className="font-bold text-[#A78BFA] uppercase text-sm tracking-widest flex items-center gap-2 mb-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#C084FC]"></span> Template Disclaimer
-              </h3>
-              <p className="text-[#A1A1AA] font-medium text-sm">Klik pada kotak disclaimer di bawah untuk menyalin (copy) teksnya secara otomatis.</p>
-            </div>
-            
-            <div className="grid grid-cols-1 gap-4">
-              {DISCLAIMERS.map((text, idx) => (
-                <div 
-                  key={idx}
-                  onClick={() => handleCopyDisclaimer(text, idx)}
-                  className="p-5 bg-[#1D212B] border border-[#262A35] hover:border-[#C084FC]/50 hover:bg-[#262A35]/50 rounded-2xl cursor-pointer transition-all flex items-center justify-between gap-6 group shadow-sm active:scale-[0.99]"
-                >
-                  <div className="text-[15px] text-[#A1A1AA] group-hover:text-[#F3F4F6] transition-colors leading-relaxed font-medium">
-                    {text}
-                  </div>
-                  <button className={`text-xs uppercase font-bold px-5 py-2.5 rounded-xl transition-all whitespace-nowrap shadow-sm ${copiedIndex === idx ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115]' : 'bg-[#262A35] text-[#F3F4F6] group-hover:bg-[#3F3F46]'}`}>
-                    {copiedIndex === idx ? '✓ COPIED' : 'COPY'}
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================= */}
-      {/* TAB 5: FAKE WA CHAT */}
+      {/* TAB 4: FAKE WA CHAT */}
       {/* ========================================= */}
       {activeTab === 'wa' && (
         <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 z-10 animate-in fade-in zoom-in-95">
@@ -888,7 +896,17 @@ export default function Home() {
                          <div className="p-2.5 text-sm font-medium text-[#71717A] bg-[#111318] border border-transparent rounded-xl text-center cursor-not-allowed">Anda</div>
                       )}
                     </div>
-                    <textarea value={msg.text} onChange={(e) => updateWaMessage(msg.id, 'text', e.target.value)} placeholder="Isi pesan..." className="w-full p-3 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] placeholder-[#71717A] rounded-xl text-sm min-h-[60px] mb-3 focus:outline-none focus:border-[#00a884] focus:ring-2 focus:ring-[#00a884]/20 font-medium leading-[1.6]" />
+
+                    {/* TEXTAREA WA CHAT + WARNING */}
+                    <div className="relative mb-3">
+                      <textarea value={msg.text} onChange={(e) => updateWaMessage(msg.id, 'text', e.target.value)} placeholder="Isi pesan..." className="w-full p-3 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] placeholder-[#71717A] rounded-xl text-sm min-h-[60px] focus:outline-none focus:border-[#00a884] focus:ring-2 focus:ring-[#00a884]/20 font-medium leading-[1.6]" />
+                      {getDetectedBannedWords(msg.text).length > 0 && (
+                        <p className="text-[12px] text-red-400 mt-2 font-bold flex gap-1 items-center">
+                          ⚠️ Mengandung Banned Word: <span className="bg-red-500/20 px-2 py-0.5 rounded-md border border-red-500/30">{getDetectedBannedWords(msg.text).join(', ')}</span>
+                        </p>
+                      )}
+                    </div>
+                    
                     <div className="grid grid-cols-2 gap-3 items-center">
                       <input type="time" value={msg.time} onChange={(e) => updateWaMessage(msg.id, 'time', e.target.value)} className="p-2.5 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] rounded-xl text-sm font-medium focus:outline-none focus:border-[#00a884]" style={{ colorScheme: 'dark' }} />
                       <input type="file" onChange={(e) => handleWaMessageImage(msg.id, e)} className="text-[10px] p-2 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:bg-[#262A35] file:text-[#A1A1AA] cursor-pointer text-[#71717A]" />
@@ -913,11 +931,7 @@ export default function Home() {
             <div style={{ padding: '20px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
               
               <div ref={waPreviewRef} style={{ 
-                // --- DIGANTI DENGAN BACKGROUND IMAGE DARI FOLDER PUBLIC ---
-                backgroundImage: waTheme === 'dark' ? "url('/bg/wadark.jpg')" : "url('/bg/wawhite.jpg')",
-                backgroundColor: waTheme === 'dark' ? WA_GELAP_BG : WA_TERANG_BG, // Fallback warna
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
+                backgroundColor: waTheme === 'dark' ? WA_GELAP_BG : WA_TERANG_BG, 
                 width: '360px', 
                 height: '640px', 
                 display: 'flex', 
@@ -1019,7 +1033,7 @@ export default function Home() {
                                 <img src={msg.image} style={{ width: '100%', borderRadius: '3px', marginBottom: '2px', maxHeight: '200px', objectFit: 'cover' }} />
                               )}
 
-                              {/* Teks Pesan */}
+                              {/* Teks Pesan WITH HIGHLIGHTS */}
                               {msg.text && (
                                 <div style={{ 
                                     color: isDark ? '#e9edef' : '#111b21', 
@@ -1028,7 +1042,7 @@ export default function Home() {
                                     whiteSpace: 'pre-wrap', 
                                     wordWrap: 'break-word' 
                                 }}>
-                                   {msg.text}
+                                   {renderWithHighlights(msg.text)}
                                    <span style={{ display: 'inline-block', width: isMe ? '60px' : '40px' }}></span> 
                                 </div>
                               )}
@@ -1080,9 +1094,9 @@ export default function Home() {
         </p>
       </footer>
 
-      {/* Global CSS for Custom Scrollbar */}
+      {/* Global CSS for Custom Scrollbar in WA list */}
       <style dangerouslySetInnerHTML={{__html: `
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #262A35; border-radius: 20px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #4B5563; }
