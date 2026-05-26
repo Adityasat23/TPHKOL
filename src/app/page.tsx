@@ -459,9 +459,16 @@ export default function Home() {
     if (!productPreviewRef.current) return;
     try {
       await document.fonts.ready;
-      const dataUrl = await toJpeg(productPreviewRef.current, { quality: 1,pixelRatio: 3.5,cacheBust: true,backgroundColor: '#111827' });
+      
+      // Ubah toJpeg menjadi toPng dan set background ke transparent
+      const dataUrl = await toPng(productPreviewRef.current, { 
+        cacheBust: true,
+        pixelRatio: 3.5,
+        backgroundColor: 'transparent' 
+      });
+      
       const link = document.createElement('a');
-      link.download = `product-${productLayout}-${Date.now()}.png`;
+      link.download = `product-${productLayout}-${Date.now()}.png`; // File jadi .png
       link.href = dataUrl;
       link.click();
     } catch (err) { alert("Export Product Card gagal."); }
