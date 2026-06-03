@@ -520,13 +520,13 @@ export default function Home() {
         </p>
       </div>
 
-      {/* --- NAVIGATION TABS (Apple Glassmorphism Style) --- */}
-      <div className="flex bg-white/40 backdrop-blur-2xl rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-white/60 p-1.5 mb-10 w-full max-w-5xl justify-center gap-2 z-10 overflow-x-auto custom-scrollbar">
+{/* --- NAVIGATION TABS (Apple Glassmorphism Style) --- */}
+      <div className="flex bg-white/50 backdrop-blur-3xl rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.1)] border-[1.5px] border-white p-1.5 mb-10 w-full max-w-5xl justify-center gap-2 z-10 overflow-x-auto custom-scrollbar">
         <button onClick={() => setActiveTab('downloader')} className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap ${activeTab === 'downloader' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}>Downloader</button>
         <button onClick={() => setActiveTab('comment')} className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap ${activeTab === 'comment' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}>Fake Comment</button>
         <button onClick={() => setActiveTab('product')} className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap ${activeTab === 'product' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}>Product Card</button>
         <button onClick={() => setActiveTab('disclaimer')} className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap ${activeTab === 'disclaimer' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}>Disclaimer</button>
-        <button onClick={() => setActiveTab('checker')} className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap ${activeTab === 'checker' ? 'bg-[#FF3B30] text-white shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}>Word Checker</button>
+        <button onClick={() => setActiveTab('checker')} className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap ${activeTab === 'checker' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}>Word Checker</button>
         <button onClick={() => setActiveTab('wa')} className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap ${activeTab === 'wa' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}>WA Chat</button>
       </div>
 
@@ -774,57 +774,58 @@ export default function Home() {
         </div>
       )}
 
-      {/* ========================================= */}
+{/* ========================================= */}
       {/* TAB 3: PRODUCT CARD GENERATOR */}
       {/* ========================================= */}
       {activeTab === 'product' && (
         <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 z-10 animate-in fade-in zoom-in-95">
-          <div className="bg-white/70 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-500 rounded-[2rem] p-8 border border-white/60 space-y-8 h-fit">
+          {/* GLASSMORPHISM DIPERTEGAS: bg-white/60 dan border-white tebal */}
+          <div className="bg-white/60 backdrop-blur-3xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-500 rounded-[2rem] p-8 border-[1.5px] border-white space-y-8 h-fit">
             
-            <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200/50">
-              <button onClick={() => setProductLayout('tiktok-portrait')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${productLayout === 'tiktok-portrait' ? 'bg-white shadow text-pink-500' : 'text-gray-500 hover:text-gray-700'}`}>📱 TK PORTRAIT</button>
-              <button onClick={() => setProductLayout('tiktok-landscape')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${productLayout === 'tiktok-landscape' ? 'bg-white shadow text-pink-500' : 'text-gray-500 hover:text-gray-700'}`}>🖥️ TK LANDSCAPE</button>
-              <button onClick={() => setProductLayout('shopee')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${productLayout === 'shopee' ? 'bg-white shadow text-orange-500' : 'text-gray-500 hover:text-gray-700'}`}>🛒 SHOPEE</button>
+            <div className="flex bg-white/60 p-1.5 rounded-xl border border-white shadow-sm">
+              <button onClick={() => setProductLayout('tiktok-portrait')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${productLayout === 'tiktok-portrait' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>TK Portrait</button>
+              <button onClick={() => setProductLayout('tiktok-landscape')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${productLayout === 'tiktok-landscape' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>TK Landscape</button>
+              <button onClick={() => setProductLayout('shopee')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${productLayout === 'shopee' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>Shopee</button>
             </div>
 
-            <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200/50">
-              <button onClick={() => setPriceFormat('exact')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${priceFormat === 'exact' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>🔢 HARGA EXACT</button>
+            <div className="flex bg-white/60 p-1.5 rounded-xl border border-white shadow-sm">
+              <button onClick={() => setPriceFormat('exact')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${priceFormat === 'exact' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>Harga Exact</button>
               {currency === 'Rp' && (
-                <button onClick={() => setPriceFormat('k-an')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${priceFormat === 'k-an' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>🔥 HARGA K-AN</button>
+                <button onClick={() => setPriceFormat('k-an')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${priceFormat === 'k-an' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>Harga K-an</button>
               )}
             </div>
 
-            <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200/50">
-              <button onClick={() => setCurrency('Rp')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${currency === 'Rp' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>🇮🇩 IDR (Rp)</button>
-              <button onClick={() => { setCurrency('RM'); setPriceFormat('exact'); }} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${currency === 'RM' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>🇲🇾 MYR (RM)</button>
-              <button onClick={() => { setCurrency('$'); setPriceFormat('exact'); }} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${currency === '$' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>🇺🇸 USD ($)</button>
+            <div className="flex bg-white/60 p-1.5 rounded-xl border border-white shadow-sm">
+              <button onClick={() => setCurrency('Rp')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${currency === 'Rp' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>IDR (Rp)</button>
+              <button onClick={() => { setCurrency('RM'); setPriceFormat('exact'); }} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${currency === 'RM' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>MYR (RM)</button>
+              <button onClick={() => { setCurrency('$'); setPriceFormat('exact'); }} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${currency === '$' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>USD ($)</button>
             </div>
 
             {(productLayout === 'tiktok-portrait' || productLayout === 'tiktok-landscape') && (
-              <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200/50 animate-in fade-in">
-                <button onClick={() => setPriceColor('pink')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${priceColor === 'pink' ? 'bg-white shadow text-pink-500' : 'text-gray-500 hover:text-gray-700'}`}>💗 HARGA PINK</button>
-                <button onClick={() => setPriceColor('black')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${priceColor === 'black' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>🖤 HARGA HITAM</button>
+              <div className="flex bg-white/60 p-1.5 rounded-xl border border-white shadow-sm animate-in fade-in">
+                <button onClick={() => setPriceColor('pink')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${priceColor === 'pink' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>Harga Pink</button>
+                <button onClick={() => setPriceColor('black')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${priceColor === 'black' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>Harga Hitam</button>
               </div>
             )}
 
             <div className="space-y-5">
-              <h3 className="font-bold text-gray-900 uppercase text-xs tracking-widest flex items-center gap-2">
+              <h3 className="font-semibold text-gray-900 text-sm tracking-wide flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#0071E3]"></span> Detail Produk
               </h3>
               
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-2">Foto Produk</label>
-                <input type="file" onChange={(e) => handleImageUpload(e, setProductImage)} className="text-sm block w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-[#0071E3] hover:file:bg-blue-100 transition-all cursor-pointer text-gray-500" />
+                <input type="file" onChange={(e) => handleImageUpload(e, setProductImage)} className="text-sm block w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-medium file:bg-blue-50/50 file:text-[#0071E3] hover:file:bg-blue-100 transition-all cursor-pointer text-gray-500" />
               </div>
 
-              <div ref={searchContainerRef} className="relative flex w-full bg-white border border-gray-200 rounded-xl overflow-visible focus-within:border-[#0071E3] focus-within:ring-4 focus-within:ring-[#0071E3]/10 transition-all">
-                <span className="p-3.5 bg-gray-50 text-gray-500 font-bold text-sm items-center whitespace-nowrap border-r border-gray-200 rounded-l-xl hidden sm:flex">
+              <div ref={searchContainerRef} className="relative flex w-full bg-white/80 border border-white rounded-xl overflow-visible focus-within:border-[#0071E3] focus-within:ring-4 focus-within:ring-[#0071E3]/10 transition-all shadow-sm">
+                <span className="p-3.5 bg-gray-50/50 text-gray-500 font-semibold text-sm items-center whitespace-nowrap border-r border-gray-200/60 rounded-l-xl hidden sm:flex">
                   [MALL] TIMEPHORIA -
                 </span>
                 <select 
                   value={selectedCategory} 
                   onChange={handleCategoryChange}
-                  className="p-3.5 bg-transparent border-r border-gray-200 text-sm font-bold text-gray-900 focus:outline-none cursor-pointer appearance-none min-w-[100px]"
+                  className="p-3.5 bg-transparent border-r border-gray-200/60 text-sm font-semibold text-gray-900 focus:outline-none cursor-pointer appearance-none min-w-[100px]"
                 >
                   {categories.map((cat) => (
                     <option key={cat} value={cat}>
@@ -844,16 +845,16 @@ export default function Home() {
                 />
 
                 {showSuggestions && filteredCatalog.length > 0 && (
-                  <ul className="absolute top-full left-0 right-0 z-50 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl max-h-64 overflow-y-auto custom-scrollbar">
+                  <ul className="absolute top-full left-0 right-0 z-50 mt-2 bg-white/95 backdrop-blur-xl border border-white rounded-xl shadow-xl max-h-64 overflow-y-auto custom-scrollbar">
                     {filteredCatalog.map((item, index) => (
                       <li
                         key={index}
                         onMouseDown={(e) => { e.preventDefault(); handleSelectProduct(item); }}
-                        className="p-3 hover:bg-gray-50 cursor-pointer flex items-center gap-3 border-b border-gray-100 transition-colors"
+                        className="p-3 hover:bg-gray-100 cursor-pointer flex items-center gap-3 border-b border-gray-100/50 transition-colors"
                       >
                         <img src={item.image} alt={item.name} className="w-10 h-10 rounded-lg object-cover border border-gray-200" onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_PRODUCT; }} />
                         <span className="text-sm font-medium text-gray-900 flex-1">{item.name}</span>
-                        <span className="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-md">{item.category}</span>
+                        <span className="text-xs font-semibold text-gray-500 bg-white shadow-sm px-2 py-1 rounded-md">{item.category}</span>
                       </li>
                     ))}
                   </ul>
@@ -861,41 +862,34 @@ export default function Home() {
               </div>
               
               <div className="grid grid-cols-3 gap-3">
-                <input type="text" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} placeholder={`Baru (${currency === 'Rp' ? '87.120' : '26.9'})`} className="w-full p-3.5 bg-white border border-gray-200 rounded-xl font-bold text-gray-900 focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm placeholder-gray-400" />
-                <input type="text" value={productOriginalPrice} onChange={(e) => setProductOriginalPrice(e.target.value)} placeholder={`Coret (${currency === 'Rp' ? '238.000' : '29'})`} className="w-full p-3.5 bg-white border border-gray-200 rounded-xl text-gray-500 focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium placeholder-gray-400" />
-                <input type="text" value={productUnit} onChange={(e) => setProductUnit(e.target.value)} placeholder="Unit (/pcs)" className="w-full p-3.5 bg-white border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-bold placeholder-gray-400" />
+                <input type="text" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} placeholder={`Baru (${currency === 'Rp' ? '87.120' : '26.9'})`} className="w-full p-3.5 bg-white/80 border border-white shadow-sm rounded-xl font-semibold text-gray-900 focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm placeholder-gray-400" />
+                <input type="text" value={productOriginalPrice} onChange={(e) => setProductOriginalPrice(e.target.value)} placeholder={`Coret (${currency === 'Rp' ? '238.000' : '29'})`} className="w-full p-3.5 bg-white/80 border border-white shadow-sm rounded-xl text-gray-500 focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium placeholder-gray-400" />
+                <input type="text" value={productUnit} onChange={(e) => setProductUnit(e.target.value)} placeholder="Unit (/pcs)" className="w-full p-3.5 bg-white/80 border border-white shadow-sm rounded-xl text-gray-700 focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-semibold placeholder-gray-400" />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <input type="text" value={productRating} onChange={(e) => setProductRating(e.target.value)} placeholder="Rating (4.9)" className="w-full p-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-900 placeholder-gray-400" />
-                <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="Terjual (1.1K)" className="w-full p-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-900 placeholder-gray-400" />
+                <input type="text" value={productRating} onChange={(e) => setProductRating(e.target.value)} placeholder="Rating (4.9)" className="w-full p-3.5 bg-white/80 border border-white shadow-sm rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-900 placeholder-gray-400" />
+                <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="Terjual (1.1K)" className="w-full p-3.5 bg-white/80 border border-white shadow-sm rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-900 placeholder-gray-400" />
               </div>
 
-              <div className="flex flex-col gap-3 mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <label className="flex items-center gap-3 cursor-pointer group">
-                  <div className="relative flex items-center justify-center">
-                    <input type="checkbox" checked={showFreeShipping} onChange={e => setShowFreeShipping(e.target.checked)} className="peer sr-only" />
-                    <div className="w-5 h-5 border-2 border-gray-300 bg-white rounded peer-checked:bg-[#0071E3] peer-checked:border-[#0071E3] transition-all"></div>
-                    <svg className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
-                  </div>
-                  <span className="text-sm font-semibold text-gray-600 group-hover:text-gray-900 transition-colors">Tampilkan Label Free Shipping</span>
-                </label>
-                
-                {productLayout === 'shopee' && (
-                  <label className="flex items-center gap-3 cursor-pointer group">
-                    <div className="relative flex items-center justify-center">
-                      <input type="checkbox" checked={showShopeeLive} onChange={e => setShowShopeeLive(e.target.checked)} className="peer sr-only" />
-                      <div className="w-5 h-5 border-2 border-gray-300 bg-white rounded peer-checked:bg-[#0071E3] peer-checked:border-[#0071E3] transition-all"></div>
-                      <svg className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
-                    </div>
-                    <span className="text-sm font-semibold text-gray-600 group-hover:text-gray-900 transition-colors">Tampilkan Label [LIVE]</span>
-                  </label>
-                )}
-              </div>
+              {/* FREE SHIPPING CHECKBOX DIHAPUS TOTAL, HANYA SISA SHOPEE LIVE */}
+              {productLayout === 'shopee' && (
+                <div className="flex flex-col gap-3 mt-4 p-4 bg-white/60 rounded-xl border border-white shadow-sm">
+                    <label className="flex items-center gap-3 cursor-pointer group">
+                      <div className="relative flex items-center justify-center">
+                        <input type="checkbox" checked={showShopeeLive} onChange={e => setShowShopeeLive(e.target.checked)} className="peer sr-only" />
+                        <div className="w-5 h-5 border-[1.5px] border-gray-300 bg-white/80 rounded peer-checked:bg-[#0071E3] peer-checked:border-[#0071E3] transition-all"></div>
+                        <svg className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
+                      </div>
+                      <span className="text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">Tampilkan Label [LIVE]</span>
+                    </label>
+                </div>
+              )}
+              
               <p className="text-[11px] text-gray-500 font-medium italic mt-2">*Diskon & format mata uang otomatis dihitung.</p>
             </div>
 
-            <button onClick={exportProductImage} className="w-full bg-[#0071E3] hover:bg-[#0077ED] text-white font-semibold py-4 rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]">
+            <button onClick={exportProductImage} className="w-full bg-[#1D1D1F] hover:bg-black text-white font-medium py-4 rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]">
               Download Product Card
             </button>
           </div>
@@ -1130,13 +1124,18 @@ export default function Home() {
             
             <div style={{ padding: '20px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
               
-              <div ref={waPreviewRef} style={{ 
-                backgroundColor: waTheme === 'dark' ? WA_GELAP_BG : WA_TERANG_BG,
+<div ref={waPreviewRef} style={{ 
+                backgroundColor: waTheme === 'dark' ? '#0b141a' : '#efeae2',
+                
+                /* OPACITY GRADIENT DIKURANGI AGAR WALLPAPER TEMBUS */
                 backgroundImage: waTheme === 'dark' 
-                  ? 'linear-gradient(rgba(11, 20, 26, 0.9), rgba(11, 20, 26, 0.9)), url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png")'
-                  : 'linear-gradient(rgba(239, 234, 226, 0.85), rgba(239, 234, 226, 0.85)), url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png")',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
+                  ? 'linear-gradient(rgba(11, 20, 26, 0.75), rgba(11, 20, 26, 0.75)), url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png")'
+                  : 'linear-gradient(rgba(239, 234, 226, 0.6), rgba(239, 234, 226, 0.6)), url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png")',
+                
+                /* SETTING REPEAT AGAR POLA MENYAMBUNG SEPERTI WA ASLI */
+                backgroundSize: '300px', 
+                backgroundRepeat: 'repeat',
+                
                 width: '360px', 
                 height: '640px', 
                 display: 'flex', 
