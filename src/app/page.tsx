@@ -508,26 +508,26 @@ export default function Home() {
   if (!isReady) return null;
 
   return (
-    <main className="min-h-screen bg-[#F5F5F7] flex flex-col items-center py-12 px-4 font-sans text-[#1D1D1F] relative overflow-hidden selection:bg-[#0071E3]/20 selection:text-[#1D1D1F]">
+<main className="min-h-screen bg-[#F5F5F7] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-50 via-[#F5F5F7] to-gray-200 flex flex-col items-center py-12 px-4 font-sans text-[#1D1D1F] relative overflow-hidden selection:bg-gray-300/50 selection:text-[#1D1D1F]">
       
       {/* --- EDITORIAL HERO SECTION --- */}
       <div className="max-w-3xl w-full text-center mb-10 mt-6 relative z-10">
-        <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-gray-900 to-gray-600 mb-4 tracking-tight leading-tight">
-          TPH Editor Tools
+        <h1 className="text-4xl md:text-5xl font-semibold text-transparent bg-clip-text bg-gradient-to-b from-black to-gray-600 mb-3 tracking-tight leading-tight">
+          Editor Tools
         </h1>
-        <p className="text-gray-500 text-lg font-medium tracking-wide max-w-xl mx-auto">
-          Semoga membantu guys
+        <p className="text-gray-500 text-base font-medium tracking-wide max-w-xl mx-auto">
+          Workspace
         </p>
       </div>
 
-      {/* --- NAVIGATION TABS (Segmented Control Apple Style) --- */}
-      <div className="flex bg-white/60 backdrop-blur-xl rounded-full shadow-sm border border-gray-200/80 p-1.5 mb-10 w-full max-w-5xl justify-center gap-1 z-10 overflow-x-auto custom-scrollbar">
-        <button onClick={() => setActiveTab('downloader')} className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 whitespace-nowrap ${activeTab === 'downloader' ? 'bg-[#0071E3] text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}>📥 Downloader</button>
-        <button onClick={() => setActiveTab('comment')} className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 whitespace-nowrap ${activeTab === 'comment' ? 'bg-[#0071E3] text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}>💬 Fake Comment</button>
-        <button onClick={() => setActiveTab('product')} className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 whitespace-nowrap ${activeTab === 'product' ? 'bg-[#0071E3] text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}>🛍️ Product Card</button>
-        <button onClick={() => setActiveTab('disclaimer')} className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 whitespace-nowrap ${activeTab === 'disclaimer' ? 'bg-[#0071E3] text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}>📝 Disclaimer</button>
-        <button onClick={() => setActiveTab('checker')} className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 whitespace-nowrap ${activeTab === 'checker' ? 'bg-[#FF3B30] text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}>🚨 Word Checker</button>
-        <button onClick={() => setActiveTab('wa')} className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 whitespace-nowrap ${activeTab === 'wa' ? 'bg-[#008069] text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}>💬 WA Chat</button>
+      {/* --- NAVIGATION TABS (Apple Glassmorphism Style) --- */}
+      <div className="flex bg-white/40 backdrop-blur-2xl rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-white/60 p-1.5 mb-10 w-full max-w-5xl justify-center gap-2 z-10 overflow-x-auto custom-scrollbar">
+        <button onClick={() => setActiveTab('downloader')} className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap ${activeTab === 'downloader' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}>Downloader</button>
+        <button onClick={() => setActiveTab('comment')} className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap ${activeTab === 'comment' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}>Fake Comment</button>
+        <button onClick={() => setActiveTab('product')} className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap ${activeTab === 'product' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}>Product Card</button>
+        <button onClick={() => setActiveTab('disclaimer')} className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap ${activeTab === 'disclaimer' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}>Disclaimer</button>
+        <button onClick={() => setActiveTab('checker')} className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap ${activeTab === 'checker' ? 'bg-[#FF3B30] text-white shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}>Word Checker</button>
+        <button onClick={() => setActiveTab('wa')} className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap ${activeTab === 'wa' ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}>WA Chat</button>
       </div>
 
       {/* ========================================= */}
@@ -605,58 +605,58 @@ export default function Home() {
         </div>
       )}
 
-      {/* ========================================= */}
+{/* ========================================= */}
       {/* TAB 2: FAKE COMMENT */}
       {/* ========================================= */}
       {activeTab === 'comment' && (
         <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 z-10 animate-in fade-in zoom-in-95">
-          <div className="bg-white/70 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-500 rounded-[2rem] p-8 border border-white/60 space-y-8 h-fit">
+          <div className="bg-white/40 backdrop-blur-2xl shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-500 rounded-[2rem] p-8 border border-white/80 space-y-8 h-fit">
             
-            <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200/50">
-              <button onClick={() => setCommentMode('sticker')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${commentMode === 'sticker' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>STICKER BUBBLE</button>
-              <button onClick={() => setCommentMode('thread')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${commentMode === 'thread' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>THREAD COMMENT</button>
+            <div className="flex bg-white/50 p-1.5 rounded-xl border border-white/60 shadow-sm">
+              <button onClick={() => setCommentMode('sticker')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${commentMode === 'sticker' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>Sticker Bubble</button>
+              <button onClick={() => setCommentMode('thread')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${commentMode === 'thread' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>Thread Comment</button>
             </div>
 
             {commentMode === 'thread' && (
-              <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200/50">
-                <button onClick={() => setThreadTheme('dark')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${threadTheme === 'dark' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>🌙 DARK PREVIEW</button>
-                <button onClick={() => setThreadTheme('light')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${threadTheme === 'light' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>☀️ LIGHT PREVIEW</button>
+              <div className="flex bg-white/50 p-1.5 rounded-xl border border-white/60 shadow-sm">
+                <button onClick={() => setThreadTheme('dark')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${threadTheme === 'dark' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>Dark Preview</button>
+                <button onClick={() => setThreadTheme('light')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${threadTheme === 'light' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>Light Preview</button>
               </div>
             )}
             
             <div className="space-y-5">
-              <h3 className="font-bold text-gray-900 uppercase text-xs tracking-widest flex items-center gap-2">
+              <h3 className="font-semibold text-gray-900 text-sm tracking-wide flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#0071E3]"></span> Komentar Utama
               </h3>
               
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-2">Avatar Profil</label>
-                <input type="file" onChange={(e) => handleImageUpload(e, setAvatar)} className="text-sm block w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-[#0071E3] hover:file:bg-blue-100 transition-all cursor-pointer text-gray-500" />
+                <input type="file" onChange={(e) => handleImageUpload(e, setAvatar)} className="text-sm block w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-medium file:bg-blue-50/50 file:text-[#0071E3] hover:file:bg-blue-100 transition-all cursor-pointer text-gray-500" />
               </div>
 
               {commentMode === 'thread' && (
-                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" className="w-full p-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-900 placeholder-gray-400" />
+                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" className="w-full p-3.5 bg-white/60 border border-gray-200/60 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-900 placeholder-gray-400" />
               )}
               
               {commentMode === 'sticker' ? (
-                 <input type="text" value={replyTo} onChange={(e) => setReplyTo(e.target.value)} placeholder="Reply to username..." className="w-full p-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-900 placeholder-gray-400" />
+                 <input type="text" value={replyTo} onChange={(e) => setReplyTo(e.target.value)} placeholder="Reply to username..." className="w-full p-3.5 bg-white/60 border border-gray-200/60 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-900 placeholder-gray-400" />
               ) : (
                 <div className="grid grid-cols-2 gap-3">
-                  <input type="text" value={likes} onChange={(e) => setLikes(e.target.value)} placeholder="Jumlah Likes" className="w-full p-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-900 placeholder-gray-400" />
-                  <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full p-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-700" />
+                  <input type="text" value={likes} onChange={(e) => setLikes(e.target.value)} placeholder="Jumlah Likes" className="w-full p-3.5 bg-white/60 border border-gray-200/60 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-900 placeholder-gray-400" />
+                  <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full p-3.5 bg-white/60 border border-gray-200/60 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-700" />
                 </div>
               )}
 
               <div className="relative">
-                <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} className="w-full p-4 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium min-h-[120px] resize-y text-gray-900 placeholder-gray-400 leading-[1.6]" placeholder="Isi komentar..." />
+                <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} className="w-full p-4 bg-white/60 border border-gray-200/60 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium min-h-[120px] resize-y text-gray-900 placeholder-gray-400 leading-[1.6]" placeholder="Isi komentar..." />
                 
                 {getDetectedBannedWords(commentText).length > 0 && (
                   <div className="mt-3 p-3 bg-[#FF3B30]/10 border border-[#FF3B30]/20 rounded-xl space-y-1.5">
-                    <p className="text-[12px] text-[#FF3B30] font-bold flex gap-1 items-center">⚠️ Mengandung Banned Word:</p>
+                    <p className="text-[12px] text-[#FF3B30] font-semibold flex gap-1 items-center">Peringatan Banned Word:</p>
                     <ul className="text-xs text-gray-700 list-disc pl-4 space-y-1">
                       {getDetectedBannedWords(commentText).map((d, i) => (
                         <li key={i}>
-                          <span className="font-bold text-white bg-[#FF3B30] px-1 rounded">{d.word}</span> 
+                          <span className="font-semibold text-white bg-[#FF3B30] px-1 rounded">{d.word}</span> 
                           {' '}➔ Saran: <span className="italic text-green-600">{d.suggestion}</span>
                         </li>
                       ))}
@@ -667,34 +667,34 @@ export default function Home() {
             </div>
 
             {commentMode === 'thread' && (
-              <div className="space-y-5 pt-6 border-t border-gray-200">
+              <div className="space-y-5 pt-6 border-t border-gray-200/60">
                 <div className="flex justify-between items-center">
-                  <h3 className="font-bold text-gray-900 uppercase text-xs tracking-widest flex items-center gap-2">
+                  <h3 className="font-semibold text-gray-900 text-sm tracking-wide flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-[#0071E3]"></span> Balasan Brand
                   </h3>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" checked={showReply} onChange={() => setShowReply(!showReply)} className="sr-only peer" />
-                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#34C759]"></div>
+                    <div className="w-9 h-5 bg-gray-200/80 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#34C759]"></div>
                   </label>
                 </div>
                 {showReply && (
                   <div className="animate-in fade-in slide-in-from-top-2 duration-300 space-y-3">
                     <p className="text-[11px] text-gray-500 font-medium">Avatar & Nama diset otomatis ke Timephoria.</p>
                     <div className="grid grid-cols-2 gap-3">
-                      <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="Likes Balasan" className="w-full p-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-900 placeholder-gray-400" />
-                      <input type="date" value={replyDate} onChange={(e) => setReplyDate(e.target.value)} className="w-full p-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-700" />
+                      <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="Likes Balasan" className="w-full p-3.5 bg-white/60 border border-gray-200/60 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-900 placeholder-gray-400" />
+                      <input type="date" value={replyDate} onChange={(e) => setReplyDate(e.target.value)} className="w-full p-3.5 bg-white/60 border border-gray-200/60 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-700" />
                     </div>
 
                     <div className="relative">
-                      <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full p-4 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium min-h-[80px] text-gray-900 placeholder-gray-400 leading-[1.6]" placeholder="Teks balasan admin..." />
+                      <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full p-4 bg-white/60 border border-gray-200/60 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium min-h-[80px] text-gray-900 placeholder-gray-400 leading-[1.6]" placeholder="Teks balasan admin..." />
                       
                       {getDetectedBannedWords(replyText).length > 0 && (
                         <div className="mt-3 p-3 bg-[#FF3B30]/10 border border-[#FF3B30]/20 rounded-xl space-y-1.5">
-                          <p className="text-[12px] text-[#FF3B30] font-bold flex gap-1 items-center">⚠️ Mengandung Banned Word:</p>
+                          <p className="text-[12px] text-[#FF3B30] font-semibold flex gap-1 items-center">Peringatan Banned Word:</p>
                           <ul className="text-xs text-gray-700 list-disc pl-4 space-y-1">
                             {getDetectedBannedWords(replyText).map((d, i) => (
                               <li key={i}>
-                                <span className="font-bold text-white bg-[#FF3B30] px-1 rounded">{d.word}</span> 
+                                <span className="font-semibold text-white bg-[#FF3B30] px-1 rounded">{d.word}</span> 
                                 {' '}➔ Saran: <span className="italic text-green-600">{d.suggestion}</span>
                               </li>
                             ))}
@@ -707,8 +707,8 @@ export default function Home() {
               </div>
             )}
             
-            <button onClick={exportCommentImage} className="w-full bg-[#0071E3] hover:bg-[#0077ED] text-white font-semibold py-4 rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]">
-              📸 Download Image
+            <button onClick={exportCommentImage} className="w-full bg-[#1D1D1F] hover:bg-black text-white font-medium py-4 rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]">
+              Download Image
             </button>
           </div>
 
@@ -896,7 +896,7 @@ export default function Home() {
             </div>
 
             <button onClick={exportProductImage} className="w-full bg-[#0071E3] hover:bg-[#0077ED] text-white font-semibold py-4 rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]">
-              📸 Download Product Card
+              Download Product Card
             </button>
           </div>
 
@@ -957,8 +957,7 @@ export default function Home() {
                   <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#ffffff', boxSizing: 'border-box', minWidth: 0 }}>
                     <div style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#222', lineHeight: '20px', maxHeight: '40px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', wordWrap: 'break-word', whiteSpace: 'normal' }}>[MALL] TIMEPHORIA - {productTitle}</div>
                     <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                      {showFreeShipping && ( <span style={{ display: 'flex', alignItems: 'center', backgroundColor: '#e2f7f4', color: '#00b09b', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}><TruckIcon /> Free shipping</span> )}
-                      {autoDiscountTagText && ( <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>{autoDiscountTagText}</span> )}
+                     {autoDiscountTagText && ( <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>{autoDiscountTagText}</span> )}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#888', marginBottom: productLayout === 'tiktok-portrait' ? '12px' : 'auto' }}>
                       {productLayout === 'tiktok-landscape' ? ( <span style={{ display: 'flex', alignItems: 'center' }}><StarBlack/><StarBlack/><StarBlack/><StarBlack/><StarBlack/></span> ) : ( <StarYellow /> )}
@@ -1055,7 +1054,7 @@ export default function Home() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-2">Nama Grup (Fixed)</label>
-                  <input type="text" value="KOL ASIK 💄" disabled className="w-full p-3.5 bg-gray-50 text-gray-500 border border-gray-200 rounded-xl font-bold cursor-not-allowed text-sm" />
+                  <input type="text" value="KOL ASIK" disabled className="w-full p-3.5 bg-gray-50 text-gray-500 border border-gray-200 rounded-xl font-bold cursor-not-allowed text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-2">Avatar Grup</label>
@@ -1121,7 +1120,7 @@ export default function Home() {
             </div>
 
             <button onClick={exportWaImage} className="w-full bg-[#008069] hover:bg-[#006e5a] text-white font-semibold py-4 rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]">
-              📸 Download WA Chat
+              Download WA Chat
             </button>
           </div>
 
@@ -1133,13 +1132,18 @@ export default function Home() {
               
               <div ref={waPreviewRef} style={{ 
                 backgroundColor: waTheme === 'dark' ? WA_GELAP_BG : WA_TERANG_BG,
+                backgroundImage: waTheme === 'dark' 
+                  ? 'linear-gradient(rgba(11, 20, 26, 0.9), rgba(11, 20, 26, 0.9)), url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png")'
+                  : 'linear-gradient(rgba(239, 234, 226, 0.85), rgba(239, 234, 226, 0.85)), url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png")',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
                 width: '360px', 
                 height: '640px', 
                 display: 'flex', 
                 flexDirection: 'column', 
                 fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
                 overflow: 'hidden',
-                boxShadow: '0 12px 32px rgba(0,0,0,0.1)'
+                boxShadow: '0 20px 40px rgba(0,0,0,0.15)'
               }}>
                 
                 {/* WA Header */}
@@ -1162,7 +1166,7 @@ export default function Home() {
                         whiteSpace: 'nowrap', 
                         overflow: 'hidden', 
                         textOverflow: 'ellipsis' 
-                    }}>KOL ASIK 💄</div>
+                    }}>KOL ASIK</div>
                     <div style={{ 
                         color: waTheme === 'dark' ? '#8696a0' : 'rgba(255,255,255,0.8)', 
                         fontSize: '13px', 
