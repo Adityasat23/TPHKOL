@@ -151,9 +151,13 @@ fetch(SHEET_CSV_URL, { cache: 'no-store' })
             const suggestion = (cols[sCol] && cols[sCol].trim() !== '') ? cols[sCol].trim() : '-take out-';
             
             // Pecah kata yang digabung koma di dalam satu sel (cth: "no. 1, pertama")
-            const wordsInCell = bannedCell.split(/[\n,]+/)
+// 1. Hapus catatan di dalam kurung (cth: "no more ( no aja boleh )" -> "no more ")
+            const cleanCell = bannedCell.replace(/\([^)]*\)/g, '');
+
+            // 2. Pecah kata berdasarkan Koma, Enter, ATAU Garis Miring (/)
+            const wordsInCell = cleanCell.split(/[\n,\/]+/)
                                           .map(w => w.trim().toLowerCase())
-                                          .filter(w => w.length > 1); 
+                                          .filter(w => w.length > 1);
             
             wordsInCell.forEach(word => {
               // --- FLEXIBLE REGEX BUILDER ---
