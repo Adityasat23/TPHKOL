@@ -1,7 +1,7 @@
 'use client';
 import {TIMEPHORIA_CATALOG,DEFAULT_PRODUCT} from './catalog';
 import { useState, useRef, useEffect } from 'react';
-import { toPng } from 'html-to-image';
+import { toPng, toJpeg } from 'html-to-image';
 
 // Placeholder Avatar & Product
 const DEFAULT_AVATAR = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk8A8AAQsAzQ/8/GkAAAAASUVORK5CYII=";
@@ -93,12 +93,15 @@ export default function Home() {
   const [checkerText, setCheckerText] = useState("");
 
   useEffect(() => {
-    // Parameter waktu agar URL selalu unik
-    const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/1RUWiTF4k0JVVU4HOWmPCrECv0T5k2MHssfi7sZMn70I/export?format=csv&gid=520891865&t=${new Date().getTime()}`;
+   // Tambahkan parameter waktu (t) agar URL selalu unik setiap di-refresh
+// Tambahkan parameter gid agar mengarah ke tab yang tepat
+const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/1RUWiTF4k0JVVU4HOWmPCrECv0T5k2MHssfi7sZMn70I/export?format=csv&gid=520891865&t=${new Date().getTime()}`;
 
-    fetch(SHEET_CSV_URL, { cache: 'no-store' })
-      .then(res => res.text())
+// Tambahkan opsi { cache: 'no-store' } untuk memastikan browser tidak menyimpan cache
+fetch(SHEET_CSV_URL, { cache: 'no-store' })
+  .then(res => res.text())
       .then(csvText => {
+        // --- CUSTOM CSV PARSER PINTAR ---
         const rows: string[][] = [];
         let row: string[] = [];
         let currentVal = '';
@@ -131,7 +134,10 @@ export default function Home() {
           rows.push(row);
         }
 
-        // Kolom A = 0 (Nomor), Kolom B = 1 (Banned Words), Kolom C = 2 (Suggestions)
+// FIX: Kunci langsung ke index kolom yang sesuai dengan Sheet.
+        // Kolom A = 0 (Nomor)
+        // Kolom B = 1 (Banned Words)
+        // Kolom C = 2 (Suggestions)
         let bCol = 1; 
         let sCol = 2;
 
@@ -144,34 +150,41 @@ export default function Home() {
             const bannedCell = cols[bCol] || '';
             const suggestion = (cols[sCol] && cols[sCol].trim() !== '') ? cols[sCol].trim() : '-take out-';
             
-            // Hapus catatan di dalam kurung
+            // Pecah kata yang digabung koma di dalam satu sel (cth: "no. 1, pertama")
+// 1. Hapus catatan di dalam kurung (cth: "no more ( no aja boleh )" -> "no more ")
             const cleanCell = bannedCell.replace(/\([^)]*\)/g, '');
 
-            // Pecah kata berdasarkan Koma, Enter, ATAU Garis Miring (/)
+            // 2. Pecah kata berdasarkan Koma, Enter, ATAU Garis Miring (/)
             const wordsInCell = cleanCell.split(/[\n,\/]+/)
                                           .map(w => w.trim().toLowerCase())
                                           .filter(w => w.length > 1);
             
             wordsInCell.forEach(word => {
+              // --- FLEXIBLE REGEX BUILDER ---
+              // Menghapus simbol di awal/akhir kata yang sering typo (kecuali %)
               let cleanWord = word.replace(/^[^a-zA-Z0-9%]+|[^a-zA-Z0-9%]+$/g, '');
               if (!cleanWord) return;
 
+              // Pisahkan antara huruf/angka dengan simbol pemisah (spasi, titik, strip)
               const tokens = cleanWord.split(/([\W_]+)/);
               let regexStr = "";
               
               for (let i = 0; i < tokens.length; i++) {
                 const token = tokens[i];
                 if (i % 2 === 0) {
+                  // Bagian huruf/angka: escape regex biar aman
                   regexStr += token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 } else {
+                  // Bagian simbol pemisah: buat jadi fleksibel
                   if (token.includes('%')) {
-                    regexStr += '[\\W_]*%[\\W_]*'; 
+                    regexStr += '[\\W_]*%[\\W_]*'; // Persen wajib ada
                   } else {
-                    regexStr += '[\\W_]*'; 
+                    regexStr += '[\\W_]*'; // Spasi/simbol lain opsional (bisa gak ada, bisa diganti spasi/titik)
                   }
                 }
               }
 
+              // Tambahkan word boundary (\b) agar presisi
               const prefix = /^[a-zA-Z0-9]/.test(cleanWord) ? '\\b' : '';
               const suffix = /[a-zA-Z0-9]$/.test(cleanWord) ? '\\b' : '';
 
@@ -184,12 +197,14 @@ export default function Home() {
           }
         });
 
+        // Urutkan kata dari yang terpanjang ke terpendek untuk mencegah overlapping regex
         const sortedData = parsedData.sort((a, b) => b.word.length - a.word.length);
         setBannedData(sortedData);
       })
       .catch(err => console.error("Gagal load banned words:", err));
   }, []);
 
+  // FUNGSI DETEKSI BANNED WORD PINTAR
   const getDetectedBannedWords = (text: string) => {
     if (!text) return [];
     const detected: typeof bannedData = [];
@@ -208,12 +223,14 @@ export default function Home() {
     return detected;
   };
 
+  // FUNGSI HIGHLIGHT TEKS OTOMATIS
   const renderWithHighlights = (text: string) => {
     if (!bannedData.length || !text) return text;
     
     const detectedItems = getDetectedBannedWords(text);
     if (detectedItems.length === 0) return text;
 
+    // Gabungkan semua pola regex yang terdeteksi
     const regexParts = detectedItems.map(d => d.regexStr).filter(Boolean);
     const combinedRegex = new RegExp(`(${regexParts.join('|')})`, 'gi');
     
@@ -221,9 +238,10 @@ export default function Home() {
     
     return parts.map((part, i) => {
       if (!part) return null;
+      // Cek apakah potongan kata ini adalah kata yang diban (Exactly Match)
       const isBanned = detectedItems.some(d => new RegExp(`^${d.regexStr}$`, 'i').test(part));
       return isBanned ? (
-        <span key={i} style={{ backgroundColor: '#FF3B30', color: 'white', padding: '0 4px', borderRadius: '4px', display: 'inline-block' }}>
+        <span key={i} style={{ backgroundColor: '#ef4444', color: 'white', padding: '0 4px', borderRadius: '4px', display: 'inline-block' }}>
           {part}
         </span>
       ) : (
@@ -231,6 +249,7 @@ export default function Home() {
       );
     });
   };
+  // ==========================================
 
   // STATE: FAKE COMMENT
   const [commentMode, setCommentMode] = useState<'sticker' | 'thread'>('sticker'); 
@@ -275,8 +294,10 @@ export default function Home() {
   // Disclaimer State
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
+  // Get unique categories for dropdown
   const categories = ["All", ...Array.from(new Set(TIMEPHORIA_CATALOG.map(item => item.category)))];
 
+  // Pilihan Mata Uang
   const [currency, setCurrency] = useState<'Rp' | 'RM' | '$'>('Rp');
   const [priceFormat, setPriceFormat] = useState<'exact' | 'k-an'>('k-an');
   
@@ -309,6 +330,7 @@ export default function Home() {
   useEffect(() => { 
     setIsReady(true); 
 
+    // Event listener untuk klik di luar dropdown produk
     const handleClickOutside = (event: MouseEvent) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
         setShowSuggestions(false);
@@ -440,13 +462,16 @@ export default function Home() {
     if (!productPreviewRef.current) return;
     try {
       await document.fonts.ready;
+      
+      // Ubah toJpeg menjadi toPng dan set background ke transparent
       const dataUrl = await toPng(productPreviewRef.current, { 
         cacheBust: true,
         pixelRatio: 3.5,
         backgroundColor: 'transparent' 
       });
+      
       const link = document.createElement('a');
-      link.download = `product-${productLayout}-${Date.now()}.png`;
+      link.download = `product-${productLayout}-${Date.now()}.png`; // File jadi .png
       link.href = dataUrl;
       link.click();
     } catch (err) { alert("Export Product Card gagal."); }
@@ -508,69 +533,78 @@ export default function Home() {
   if (!isReady) return null;
 
   return (
-    <main className="min-h-screen bg-[#F5F5F7] flex flex-col items-center py-12 px-4 font-sans text-[#1D1D1F] relative overflow-hidden selection:bg-[#0071E3]/20 selection:text-[#1D1D1F]">
+    <main className="min-h-screen bg-[#0F1115] flex flex-col items-center py-12 px-4 font-sans text-[#F3F4F6] relative overflow-hidden selection:bg-[#C084FC]/30 selection:text-[#F3F4F6]">
       
+      {/* --- AMBIENT BACKGROUND GLOW (TIMEPHORIA DARK VIBE) --- */}
+      <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[radial-gradient(circle_at_top,rgba(168,139,250,0.12),transparent_60%)] -z-10 pointer-events-none"></div>
+      
+      {/* Subtle Grain/Noise Overlay */}
+      <div className="absolute inset-0 opacity-[0.03] mix-blend-soft-light pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGZpbHRlciBpZD0ibiI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuNyIgbnVtT2N0YXZlcz0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNuKSIvPjwvc3ZnPg==')]"></div>
+
       {/* --- EDITORIAL HERO SECTION --- */}
-      <div className="max-w-3xl w-full text-center mb-10 mt-6 relative z-10">
-        <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-gray-900 to-gray-600 mb-4 tracking-tight leading-tight">
-          TPH Editor Tools
+      <div className="max-w-3xl w-full text-center mb-14 mt-6 relative z-10">
+        <h1 className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-[#F3F4F6] to-[#A1A1AA] mb-5 tracking-tighter leading-tight">
+          TPH Editor Tools<br />
         </h1>
-        <p className="text-gray-500 text-lg font-medium tracking-wide max-w-xl mx-auto">
+        <p className="text-[#A1A1AA] text-lg md:text-xl font-medium tracking-wide max-w-xl mx-auto leading-[1.6]">
           Semoga membantu guys
         </p>
       </div>
 
-      {/* --- NAVIGATION TABS (Segmented Control Apple Style) --- */}
-      <div className="flex bg-white/60 backdrop-blur-xl rounded-full shadow-sm border border-gray-200/80 p-1.5 mb-10 w-full max-w-5xl justify-center gap-1 z-10 overflow-x-auto custom-scrollbar">
-        <button onClick={() => setActiveTab('downloader')} className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 whitespace-nowrap ${activeTab === 'downloader' ? 'bg-[#0071E3] text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}>📥 Downloader</button>
-        <button onClick={() => setActiveTab('comment')} className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 whitespace-nowrap ${activeTab === 'comment' ? 'bg-[#0071E3] text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}>💬 Fake Comment</button>
-        <button onClick={() => setActiveTab('product')} className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 whitespace-nowrap ${activeTab === 'product' ? 'bg-[#0071E3] text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}>🛍️ Product Card</button>
-        <button onClick={() => setActiveTab('disclaimer')} className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 whitespace-nowrap ${activeTab === 'disclaimer' ? 'bg-[#0071E3] text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}>📝 Disclaimer</button>
-        <button onClick={() => setActiveTab('checker')} className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 whitespace-nowrap ${activeTab === 'checker' ? 'bg-[#FF3B30] text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}>🚨 Word Checker</button>
-        <button onClick={() => setActiveTab('wa')} className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 whitespace-nowrap ${activeTab === 'wa' ? 'bg-[#008069] text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}>💬 WA Chat</button>
+      {/* --- NAVIGATION TABS --- */}
+      <div className="flex bg-[#171A21]/70 backdrop-blur-xl rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.2)] border border-[#262A35] p-1.5 mb-10 w-full max-w-5xl justify-center gap-1 z-10 overflow-x-auto custom-scrollbar">
+        <button onClick={() => setActiveTab('downloader')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'downloader' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>📥 DOWNLOADER</button>
+        <button onClick={() => setActiveTab('comment')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'comment' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>💬 FAKE COMMENT</button>
+        <button onClick={() => setActiveTab('product')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'product' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>🛍️ PRODUCT CARD</button>
+        <button onClick={() => setActiveTab('disclaimer')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'disclaimer' ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] shadow-lg shadow-[#A78BFA]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>📝 DISCLAIMER</button>
+        
+        {/* TAB: WORD CHECKER */}
+        <button onClick={() => setActiveTab('checker')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'checker' ? 'bg-gradient-to-r from-red-400 to-red-500 text-white shadow-lg shadow-red-500/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>🚨 WORD CHECKER</button>
+        
+        <button onClick={() => setActiveTab('wa')} className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${activeTab === 'wa' ? 'bg-[#008069] text-[#F3F4F6] shadow-lg shadow-[#008069]/20' : 'text-[#A1A1AA] hover:bg-[#1D212B] hover:text-[#F3F4F6]'}`}>💬 WA CHAT</button>
       </div>
 
       {/* ========================================= */}
-      {/* TAB: BANNED WORD CHECKER */}
+      {/* TAB: BANNED WORD CHECKER (NEW) */}
       {/* ========================================= */}
       {activeTab === 'checker' && (
-        <div className="w-full max-w-3xl bg-white/70 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-500 rounded-[2rem] p-8 border border-white/60 z-10 animate-in fade-in zoom-in-95">
+        <div className="w-full max-w-3xl bg-[#171A21]/90 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 rounded-[2rem] p-8 border border-[#262A35] z-10 animate-in fade-in zoom-in-95">
           <div className="space-y-4">
-             <h3 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
-                <span className="text-[#FF3B30]">🚨</span> Alat Cek Banned Words
+             <h3 className="text-xl font-bold text-[#F3F4F6] mb-2 flex items-center gap-2">
+                <span className="text-red-400">🚨</span> Alat Cek Banned Words
              </h3>
-             <p className="text-gray-500 text-sm">Paste caption, text script, atau apapun di sini buat ngecek apakah ada kata yang beresiko. Data ditarik live dari Google Sheets.</p>
+             <p className="text-[#A1A1AA] text-sm">Paste caption, text script, atau apapun di sini buat ngecek apakah ada kata yang beresiko. Data ditarik *live* dari Google Sheets.</p>
              
              <textarea 
                value={checkerText} 
                onChange={(e) => setCheckerText(e.target.value)} 
                placeholder="Paste atau ketik teks di sini..." 
-               className="w-full p-5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium min-h-[250px] resize-y text-gray-900 placeholder-gray-400 leading-[1.6] shadow-sm" 
+               className="w-full p-5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-red-400 focus:ring-4 focus:ring-red-400/10 transition-all text-sm font-medium min-h-[250px] resize-y text-[#F3F4F6] placeholder-[#71717A] leading-[1.6]" 
              />
 
              {getDetectedBannedWords(checkerText).length > 0 ? (
-               <div className="mt-4 p-5 bg-[#FF3B30]/10 border border-[#FF3B30]/20 rounded-xl space-y-3 animate-in fade-in slide-in-from-bottom-2">
-                 <p className="text-sm text-[#FF3B30] font-bold flex gap-2 items-center">
+               <div className="mt-4 p-5 bg-red-500/10 border border-red-500/30 rounded-xl space-y-3 animate-in fade-in slide-in-from-bottom-2">
+                 <p className="text-sm text-red-400 font-bold flex gap-2 items-center">
                     <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"></path></svg>
                     Peringatan: Ditemukan {getDetectedBannedWords(checkerText).length} pelanggaran!
                  </p>
                  <ul className="text-sm list-disc pl-5 space-y-3">
                    {getDetectedBannedWords(checkerText).map((d, i) => (
-                     <li key={i} className="text-gray-800 font-medium">
+                     <li key={i} className="text-[#F3F4F6]">
                        <div className="inline-block mb-1">
-                          Hapus kata: <span className="font-bold text-white bg-[#FF3B30] px-2 py-0.5 rounded ml-1">{d.word}</span> 
+                          Hapus kata: <span className="font-bold text-white bg-red-500/50 px-2 py-0.5 rounded ml-1">{d.word}</span> 
                        </div>
                        <br/>
-                       <span className="text-gray-500">➔ Saran:</span> <span className="font-semibold text-green-600 ml-1">{d.suggestion}</span>
+                       <span className="text-[#A1A1AA]">➔ Saran:</span> <span className="font-semibold text-green-400 ml-1">{d.suggestion}</span>
                      </li>
                    ))}
                  </ul>
                </div>
              ) : (
                 checkerText.length > 0 && (
-                   <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
-                      <svg width="20" height="20" fill="#34C759" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"></path></svg>
-                      <p className="text-sm text-green-700 font-bold">Aman! Tidak ada kata yang dibanned.</p>
+                   <div className="mt-4 p-4 bg-green-500/10 border border-green-500/30 rounded-xl flex items-center gap-3">
+                      <svg width="20" height="20" fill="#4ade80" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"></path></svg>
+                      <p className="text-sm text-green-400 font-bold">Aman! Tidak ada kata yang dibanned.</p>
                    </div>
                 )
              )}
@@ -582,22 +616,22 @@ export default function Home() {
       {/* TAB 1: DOWNLOADER */}
       {/* ========================================= */}
       {activeTab === 'downloader' && (
-        <div className="w-full max-w-2xl bg-white/70 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-500 rounded-[2rem] p-8 border border-white/60 z-10 animate-in fade-in zoom-in-95">
+        <div className="w-full max-w-2xl bg-[#171A21]/90 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 rounded-[2rem] p-8 border border-[#262A35] z-10 animate-in fade-in zoom-in-95">
           <form onSubmit={handleDownload} className="space-y-4">
             <div className="relative group">
-              <input type="text" placeholder="Paste link TikTok di sini..." className="w-full pl-6 pr-40 py-5 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 text-gray-900 transition-all placeholder-gray-400 font-medium shadow-sm" value={url} onChange={(e) => setUrl(e.target.value)} required />
-              <button type="submit" disabled={loading} className="absolute right-2 top-2 bottom-2 bg-[#0071E3] hover:bg-[#0077ED] text-white font-semibold px-8 rounded-xl disabled:opacity-50 transition-all shadow-sm active:scale-95">{loading ? 'Processing...' : 'Download'}</button>
+              <input type="text" placeholder="Paste link TikTok di sini..." className="w-full pl-6 pr-40 py-5 bg-[#1D212B] border border-[#262A35] rounded-2xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 text-[#F3F4F6] transition-all placeholder:text-[#71717A] font-medium" value={url} onChange={(e) => setUrl(e.target.value)} required />
+              <button type="submit" disabled={loading} className="absolute right-2 top-2 bottom-2 bg-[#F3F4F6] hover:bg-white text-[#0F1115] font-bold px-8 rounded-xl disabled:opacity-50 transition-all shadow-md active:scale-95">{loading ? 'Processing...' : 'Download'}</button>
             </div>
           </form>
-          {error && <div className="mt-6 p-4 bg-[#FF3B30]/10 border border-[#FF3B30]/20 text-[#FF3B30] rounded-xl text-sm font-medium">{error}</div>}
+          {error && <div className="mt-6 p-4 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-sm font-medium">{error}</div>}
           {result && (
-            <div className="mt-8 flex flex-col md:flex-row gap-8 items-center bg-gray-50/50 p-6 rounded-2xl border border-gray-200">
-              {result.cover && <img src={result.cover} alt="thumbnail" className="w-32 h-32 object-cover rounded-2xl shadow-sm border border-gray-200" />}
+            <div className="mt-8 flex flex-col md:flex-row gap-8 items-center bg-[#1D212B] p-6 rounded-2xl border border-white/5">
+              {result.cover && <img src={result.cover} alt="thumbnail" className="w-32 h-32 object-cover rounded-2xl shadow-md border-2 border-[#262A35]" />}
               <div className="flex-1 text-center md:text-left w-full">
-                <h3 className="font-bold text-gray-900 text-lg mb-4 line-clamp-2 leading-snug">{result.title}</h3>
+                <h3 className="font-bold text-[#F3F4F6] text-lg mb-4 line-clamp-2 leading-snug">{result.title}</h3>
                 <div className="flex flex-col sm:flex-row gap-3">
-                  {result.play && <a href={result.play} target="_blank" rel="noreferrer" className="flex-1 bg-[#0071E3] hover:bg-[#0077ED] text-white font-semibold py-3 rounded-xl text-center shadow-sm transition-all active:scale-95">Unduh Video</a>}
-                  {result.music && <a href={result.music} target="_blank" rel="noreferrer" className="flex-1 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold py-3 rounded-xl text-center shadow-sm transition-all active:scale-95">Unduh MP3</a>}
+                  {result.play && <a href={result.play} target="_blank" rel="noreferrer" className="flex-1 bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] font-bold py-3 rounded-xl text-center shadow-lg hover:shadow-xl transition-all active:scale-95">Unduh Video</a>}
+                  {result.music && <a href={result.music} target="_blank" rel="noreferrer" className="flex-1 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] hover:bg-[#262A35] font-bold py-3 rounded-xl text-center shadow-sm transition-all active:scale-95">Unduh MP3</a>}
                 </div>
               </div>
             </div>
@@ -610,54 +644,55 @@ export default function Home() {
       {/* ========================================= */}
       {activeTab === 'comment' && (
         <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 z-10 animate-in fade-in zoom-in-95">
-          <div className="bg-white/70 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-500 rounded-[2rem] p-8 border border-white/60 space-y-8 h-fit">
+          <div className="bg-[#171A21]/90 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 rounded-[2rem] p-8 border border-[#262A35] space-y-8 h-fit">
             
-            <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200/50">
-              <button onClick={() => setCommentMode('sticker')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${commentMode === 'sticker' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>STICKER BUBBLE</button>
-              <button onClick={() => setCommentMode('thread')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${commentMode === 'thread' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>THREAD COMMENT</button>
+            <div className="flex gap-2 bg-[#1D212B] p-1.5 rounded-xl border border-white/5">
+              <button onClick={() => setCommentMode('sticker')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${commentMode === 'sticker' ? 'bg-[#262A35] shadow-sm text-[#F3F4F6]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>STICKER BUBBLE</button>
+              <button onClick={() => setCommentMode('thread')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${commentMode === 'thread' ? 'bg-[#262A35] shadow-sm text-[#F3F4F6]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>THREAD COMMENT</button>
             </div>
 
             {commentMode === 'thread' && (
-              <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200/50">
-                <button onClick={() => setThreadTheme('dark')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${threadTheme === 'dark' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>🌙 DARK PREVIEW</button>
-                <button onClick={() => setThreadTheme('light')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${threadTheme === 'light' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>☀️ LIGHT PREVIEW</button>
+              <div className="flex gap-2 bg-[#1D212B] p-1.5 rounded-xl border border-white/5">
+                <button onClick={() => setThreadTheme('dark')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${threadTheme === 'dark' ? 'bg-[#262A35] text-[#F3F4F6] shadow-sm' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🌙 DARK MODE</button>
+                <button onClick={() => setThreadTheme('light')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${threadTheme === 'light' ? 'bg-white text-slate-900 shadow-sm' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>☀️ LIGHT MODE</button>
               </div>
             )}
             
             <div className="space-y-5">
-              <h3 className="font-bold text-gray-900 uppercase text-xs tracking-widest flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#0071E3]"></span> Komentar Utama
+              <h3 className="font-bold text-[#A78BFA] uppercase text-xs tracking-widest flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#C084FC]"></span> Komentar Utama
               </h3>
               
               <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-2">Avatar Profil</label>
-                <input type="file" onChange={(e) => handleImageUpload(e, setAvatar)} className="text-sm block w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-[#0071E3] hover:file:bg-blue-100 transition-all cursor-pointer text-gray-500" />
+                <label className="block text-xs font-bold text-[#A1A1AA] mb-2">Avatar Profil</label>
+                <input type="file" onChange={(e) => handleImageUpload(e, setAvatar)} className="text-sm block w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#1D212B] file:text-[#A78BFA] hover:file:bg-[#262A35] transition-all cursor-pointer text-[#71717A]" />
               </div>
 
               {commentMode === 'thread' && (
-                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" className="w-full p-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-900 placeholder-gray-400" />
+                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium text-[#F3F4F6] placeholder-[#71717A]" />
               )}
               
               {commentMode === 'sticker' ? (
-                 <input type="text" value={replyTo} onChange={(e) => setReplyTo(e.target.value)} placeholder="Reply to username..." className="w-full p-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-900 placeholder-gray-400" />
+                 <input type="text" value={replyTo} onChange={(e) => setReplyTo(e.target.value)} placeholder="Reply to username..." className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium text-[#F3F4F6] placeholder-[#71717A]" />
               ) : (
                 <div className="grid grid-cols-2 gap-3">
-                  <input type="text" value={likes} onChange={(e) => setLikes(e.target.value)} placeholder="Jumlah Likes" className="w-full p-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-900 placeholder-gray-400" />
-                  <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full p-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-700" />
+                  <input type="text" value={likes} onChange={(e) => setLikes(e.target.value)} placeholder="Jumlah Likes" className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium text-[#F3F4F6] placeholder-[#71717A]" />
+                  <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium text-[#A1A1AA]" style={{ colorScheme: 'dark' }} />
                 </div>
               )}
 
+              {/* TEXTAREA KOMENTAR UTAMA + WARNING */}
               <div className="relative">
-                <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} className="w-full p-4 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium min-h-[120px] resize-y text-gray-900 placeholder-gray-400 leading-[1.6]" placeholder="Isi komentar..." />
+                <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} className="w-full p-4 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium min-h-[120px] resize-y text-[#F3F4F6] placeholder-[#71717A] leading-[1.6]" placeholder="Isi komentar..." />
                 
                 {getDetectedBannedWords(commentText).length > 0 && (
-                  <div className="mt-3 p-3 bg-[#FF3B30]/10 border border-[#FF3B30]/20 rounded-xl space-y-1.5">
-                    <p className="text-[12px] text-[#FF3B30] font-bold flex gap-1 items-center">⚠️ Mengandung Banned Word:</p>
-                    <ul className="text-xs text-gray-700 list-disc pl-4 space-y-1">
+                  <div className="mt-3 p-3 bg-red-500/10 border border-red-500/30 rounded-xl space-y-1.5">
+                    <p className="text-[12px] text-red-400 font-bold flex gap-1 items-center">⚠️ Mengandung Banned Word:</p>
+                    <ul className="text-xs text-[#A1A1AA] list-disc pl-4 space-y-1">
                       {getDetectedBannedWords(commentText).map((d, i) => (
                         <li key={i}>
-                          <span className="font-bold text-white bg-[#FF3B30] px-1 rounded">{d.word}</span> 
-                          {' '}➔ Saran: <span className="italic text-green-600">{d.suggestion}</span>
+                          <span className="font-bold text-white bg-red-500/40 px-1 rounded">{d.word}</span> 
+                          {' '}➔ Saran: <span className="italic text-green-400">{d.suggestion}</span>
                         </li>
                       ))}
                     </ul>
@@ -667,35 +702,36 @@ export default function Home() {
             </div>
 
             {commentMode === 'thread' && (
-              <div className="space-y-5 pt-6 border-t border-gray-200">
+              <div className="space-y-5 pt-6 border-t border-white/5">
                 <div className="flex justify-between items-center">
-                  <h3 className="font-bold text-gray-900 uppercase text-xs tracking-widest flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#0071E3]"></span> Balasan Brand
+                  <h3 className="font-bold text-[#A78BFA] uppercase text-xs tracking-widest flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#C084FC]"></span> Balasan Brand
                   </h3>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" checked={showReply} onChange={() => setShowReply(!showReply)} className="sr-only peer" />
-                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#34C759]"></div>
+                    <div className="w-9 h-5 bg-[#262A35] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#C084FC]"></div>
                   </label>
                 </div>
                 {showReply && (
                   <div className="animate-in fade-in slide-in-from-top-2 duration-300 space-y-3">
-                    <p className="text-[11px] text-gray-500 font-medium">Avatar & Nama diset otomatis ke Timephoria.</p>
+                    <p className="text-[11px] text-[#71717A] font-medium">Avatar & Nama diset otomatis ke Timephoria.</p>
                     <div className="grid grid-cols-2 gap-3">
-                      <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="Likes Balasan" className="w-full p-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-900 placeholder-gray-400" />
-                      <input type="date" value={replyDate} onChange={(e) => setReplyDate(e.target.value)} className="w-full p-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-700" />
+                      <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="Likes Balasan" className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium text-[#F3F4F6] placeholder-[#71717A]" />
+                      <input type="date" value={replyDate} onChange={(e) => setReplyDate(e.target.value)} className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium text-[#A1A1AA]" style={{ colorScheme: 'dark' }} />
                     </div>
 
+                    {/* TEXTAREA BALASAN BRAND + WARNING */}
                     <div className="relative">
-                      <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full p-4 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium min-h-[80px] text-gray-900 placeholder-gray-400 leading-[1.6]" placeholder="Teks balasan admin..." />
+                      <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full p-4 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 transition-all text-sm font-medium min-h-[80px] text-[#F3F4F6] placeholder-[#71717A] leading-[1.6]" placeholder="Teks balasan admin..." />
                       
                       {getDetectedBannedWords(replyText).length > 0 && (
-                        <div className="mt-3 p-3 bg-[#FF3B30]/10 border border-[#FF3B30]/20 rounded-xl space-y-1.5">
-                          <p className="text-[12px] text-[#FF3B30] font-bold flex gap-1 items-center">⚠️ Mengandung Banned Word:</p>
-                          <ul className="text-xs text-gray-700 list-disc pl-4 space-y-1">
+                        <div className="mt-3 p-3 bg-red-500/10 border border-red-500/30 rounded-xl space-y-1.5">
+                          <p className="text-[12px] text-red-400 font-bold flex gap-1 items-center">⚠️ Mengandung Banned Word:</p>
+                          <ul className="text-xs text-[#A1A1AA] list-disc pl-4 space-y-1">
                             {getDetectedBannedWords(replyText).map((d, i) => (
                               <li key={i}>
-                                <span className="font-bold text-white bg-[#FF3B30] px-1 rounded">{d.word}</span> 
-                                {' '}➔ Saran: <span className="italic text-green-600">{d.suggestion}</span>
+                                <span className="font-bold text-white bg-red-500/40 px-1 rounded">{d.word}</span> 
+                                {' '}➔ Saran: <span className="italic text-green-400">{d.suggestion}</span>
                               </li>
                             ))}
                           </ul>
@@ -707,14 +743,14 @@ export default function Home() {
               </div>
             )}
             
-            <button onClick={exportCommentImage} className="w-full bg-[#0071E3] hover:bg-[#0077ED] text-white font-semibold py-4 rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]">
+            <button onClick={exportCommentImage} className="w-full bg-gradient-to-r from-[#A78BFA] to-[#C084FC] hover:from-[#B79BFB] hover:to-[#D09DFD] text-[#0F1115] font-bold py-4 rounded-xl shadow-lg shadow-[#A78BFA]/10 hover:shadow-xl hover:shadow-[#A78BFA]/20 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]">
               📸 Download Image
             </button>
           </div>
 
           {/* PREVIEW CONTAINER */}
-          <div className="bg-[#E5E5EA] border border-gray-200 rounded-[2rem] p-10 flex items-center justify-center min-h-[500px] overflow-hidden shadow-inner relative">
-            <div className="absolute inset-0 opacity-40 bg-[radial-gradient(#C7C7CC_1px,transparent_1px)] [background-size:16px_16px]"></div>
+          <div className="bg-[#0F1115] border border-[#262A35] rounded-[2rem] p-10 flex items-center justify-center min-h-[500px] overflow-hidden shadow-inner relative">
+            <div className="absolute inset-0 opacity-[0.05] bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
             
             <div style={{ padding: '30px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
               <div ref={previewRef} style={{ display: 'inline-flex', flexDirection: 'column', fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
@@ -725,6 +761,7 @@ export default function Home() {
                       <img key={avatar} src={avatar} style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, marginTop: '2px' }} />
                       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
                         <p style={{ color: '#757575', fontSize: '16px', fontWeight: '600', margin: '0 0 6px 0', fontFamily: 'inherit' }}>Reply to {replyTo}'s comment</p>
+                        {/* RENDER WITH HIGHLIGHTS */}
                         <p style={{ color: '#000000', fontSize: '24px', fontWeight: '800', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'inherit', letterSpacing: '-0.02em' }}>{renderWithHighlights(commentText)}</p>
                       </div>
                     </div>
@@ -740,6 +777,7 @@ export default function Home() {
                       <img key={avatar} src={avatar} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                       <div style={{ flex: 1 }}>
                         <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'inherit' }}>{username}</p>
+                        {/* RENDER WITH HIGHLIGHTS */}
                         <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '4px 0', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'inherit' }}>{renderWithHighlights(commentText)}</p>
                         <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 500, marginTop: '8px', fontFamily: 'inherit' }}>
                           <span>{date}</span><span>Reply</span>
@@ -755,6 +793,7 @@ export default function Home() {
                         <img src={TIMEPHORIA_LOGO} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                         <div style={{ flex: 1 }}>
                           <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'inherit' }}>Timephoria</p>
+                          {/* RENDER WITH HIGHLIGHTS */}
                           <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '4px 0', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'inherit' }}>{renderWithHighlights(replyText)}</p>
                           <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 500, marginTop: '8px', fontFamily: 'inherit' }}>
                             <span>{replyDate}</span><span>Reply</span>
@@ -779,81 +818,102 @@ export default function Home() {
       {/* ========================================= */}
       {activeTab === 'product' && (
         <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 z-10 animate-in fade-in zoom-in-95">
-          <div className="bg-white/70 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-500 rounded-[2rem] p-8 border border-white/60 space-y-8 h-fit">
+          <div className="bg-[#171A21]/90 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 rounded-[2rem] p-8 border border-[#262A35] space-y-8 h-fit">
             
-            <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200/50">
-              <button onClick={() => setProductLayout('tiktok-portrait')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${productLayout === 'tiktok-portrait' ? 'bg-white shadow text-pink-500' : 'text-gray-500 hover:text-gray-700'}`}>📱 TK PORTRAIT</button>
-              <button onClick={() => setProductLayout('tiktok-landscape')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${productLayout === 'tiktok-landscape' ? 'bg-white shadow text-pink-500' : 'text-gray-500 hover:text-gray-700'}`}>🖥️ TK LANDSCAPE</button>
-              <button onClick={() => setProductLayout('shopee')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${productLayout === 'shopee' ? 'bg-white shadow text-orange-500' : 'text-gray-500 hover:text-gray-700'}`}>🛒 SHOPEE</button>
+            <div className="flex gap-2 bg-[#1D212B] p-1.5 rounded-xl border border-white/5">
+              <button onClick={() => setProductLayout('tiktok-portrait')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${productLayout === 'tiktok-portrait' ? 'bg-[#262A35] shadow-sm text-pink-400' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>📱 TK PORTRAIT</button>
+              <button onClick={() => setProductLayout('tiktok-landscape')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${productLayout === 'tiktok-landscape' ? 'bg-[#262A35] shadow-sm text-pink-400' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🖥️ TK LANDSCAPE</button>
+              <button onClick={() => setProductLayout('shopee')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${productLayout === 'shopee' ? 'bg-[#262A35] shadow-sm text-orange-400' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🛒 SHOPEE</button>
             </div>
 
-            <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200/50">
-              <button onClick={() => setPriceFormat('exact')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${priceFormat === 'exact' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>🔢 HARGA EXACT</button>
+            <div className="flex gap-2 bg-[#1D212B] p-1.5 rounded-xl border border-white/5">
+              <button onClick={() => setPriceFormat('exact')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${priceFormat === 'exact' ? 'bg-[#262A35] shadow-sm text-[#F3F4F6]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🔢 HARGA EXACT</button>
               {currency === 'Rp' && (
-                <button onClick={() => setPriceFormat('k-an')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${priceFormat === 'k-an' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>🔥 HARGA K-AN</button>
+                <button onClick={() => setPriceFormat('k-an')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${priceFormat === 'k-an' ? 'bg-[#262A35] shadow-sm text-[#F3F4F6]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🔥 HARGA K-AN</button>
               )}
             </div>
 
-            <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200/50">
-              <button onClick={() => setCurrency('Rp')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${currency === 'Rp' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>🇮🇩 IDR (Rp)</button>
-              <button onClick={() => { setCurrency('RM'); setPriceFormat('exact'); }} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${currency === 'RM' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>🇲🇾 MYR (RM)</button>
-              <button onClick={() => { setCurrency('$'); setPriceFormat('exact'); }} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${currency === '$' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>🇺🇸 USD ($)</button>
+            <div className="flex gap-2 bg-[#1D212B] p-1.5 rounded-xl border border-white/5">
+              <button onClick={() => setCurrency('Rp')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${currency === 'Rp' ? 'bg-[#262A35] shadow-sm text-[#F3F4F6]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🇮🇩 IDR (Rp)</button>
+              <button onClick={() => { setCurrency('RM'); setPriceFormat('exact'); }} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${currency === 'RM' ? 'bg-[#262A35] shadow-sm text-[#F3F4F6]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🇲🇾 MYR (RM)</button>
+              <button onClick={() => { setCurrency('$'); setPriceFormat('exact'); }} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${currency === '$' ? 'bg-[#262A35] shadow-sm text-[#F3F4F6]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🇺🇸 USD ($)</button>
             </div>
 
+            {/* OPSI WARNA HARGA (Hanya untuk TikTok) */}
             {(productLayout === 'tiktok-portrait' || productLayout === 'tiktok-landscape') && (
-              <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200/50 animate-in fade-in">
-                <button onClick={() => setPriceColor('pink')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${priceColor === 'pink' ? 'bg-white shadow text-pink-500' : 'text-gray-500 hover:text-gray-700'}`}>💗 HARGA PINK</button>
-                <button onClick={() => setPriceColor('black')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${priceColor === 'black' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>🖤 HARGA HITAM</button>
+              <div className="flex gap-2 bg-[#1D212B] p-1.5 rounded-xl border border-white/5 animate-in fade-in">
+                <button onClick={() => setPriceColor('pink')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${priceColor === 'pink' ? 'bg-[#262A35] shadow-sm text-pink-400' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>💗 HARGA PINK</button>
+                <button onClick={() => setPriceColor('black')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${priceColor === 'black' ? 'bg-[#262A35] shadow-sm text-[#F3F4F6]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🖤 HARGA HITAM</button>
               </div>
             )}
 
             <div className="space-y-5">
-              <h3 className="font-bold text-gray-900 uppercase text-xs tracking-widest flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#0071E3]"></span> Detail Produk
+              <h3 className="font-bold text-pink-400 uppercase text-xs tracking-widest flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-pink-400"></span> Detail Produk
               </h3>
               
               <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-2">Foto Produk</label>
-                <input type="file" onChange={(e) => handleImageUpload(e, setProductImage)} className="text-sm block w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-[#0071E3] hover:file:bg-blue-100 transition-all cursor-pointer text-gray-500" />
+                <label className="block text-xs font-bold text-[#A1A1AA] mb-2">Foto Produk</label>
+                <input type="file" onChange={(e) => handleImageUpload(e, setProductImage)} className="text-sm block w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#1D212B] file:text-pink-400 hover:file:bg-[#262A35] transition-all cursor-pointer text-[#71717A]" />
               </div>
 
-              <div ref={searchContainerRef} className="relative flex w-full bg-white border border-gray-200 rounded-xl overflow-visible focus-within:border-[#0071E3] focus-within:ring-4 focus-within:ring-[#0071E3]/10 transition-all">
-                <span className="p-3.5 bg-gray-50 text-gray-500 font-bold text-sm items-center whitespace-nowrap border-r border-gray-200 rounded-l-xl hidden sm:flex">
+              {/* === REF UNTUK DETEKSI KLIK DI LUAR (searchContainerRef) === */}
+              <div ref={searchContainerRef} className="relative flex w-full bg-[#1D212B] border border-[#262A35] rounded-xl overflow-visible focus-within:border-pink-400 focus-within:ring-4 focus-within:ring-pink-400/10 transition-all">
+                
+                <span className="p-3.5 bg-[#262A35]/50 text-[#A1A1AA] font-bold text-sm items-center whitespace-nowrap border-r border-[#262A35] hidden sm:flex">
                   [MALL] TIMEPHORIA -
                 </span>
+
                 <select 
                   value={selectedCategory} 
                   onChange={handleCategoryChange}
-                  className="p-3.5 bg-transparent border-r border-gray-200 text-sm font-bold text-gray-900 focus:outline-none cursor-pointer appearance-none min-w-[100px]"
+                  className="p-3.5 bg-transparent border-r border-[#262A35] text-sm font-bold text-pink-400 focus:outline-none cursor-pointer appearance-none min-w-[100px] outline-none"
                 >
                   {categories.map((cat) => (
-                    <option key={cat} value={cat}>
+                    <option key={cat} value={cat} className="bg-[#1D212B] text-white">
                       {cat}
                     </option>
                   ))}
                 </select>
+
                 <input
                   type="text"
                   value={productTitle}
                   onChange={handleTitleChange}
                   onFocus={() => {
-                    if (productTitle.trim().length > 0 || selectedCategory !== "All") setShowSuggestions(true);
+                    if (productTitle.trim().length > 0 || selectedCategory !== "All") {
+                      setShowSuggestions(true);
+                    }
                   }}
                   placeholder="Varian Produk"
-                  className="w-full p-3.5 bg-transparent focus:outline-none text-sm font-medium text-gray-900 rounded-r-xl"
+                  className="w-full p-3.5 bg-transparent focus:outline-none text-sm font-medium text-[#F3F4F6]"
                 />
 
                 {showSuggestions && filteredCatalog.length > 0 && (
-                  <ul className="absolute top-full left-0 right-0 z-50 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl max-h-64 overflow-y-auto custom-scrollbar">
+                  <ul className="absolute top-full left-0 right-0 z-50 mt-2 bg-[#1D212B] border border-[#374151] rounded-xl shadow-2xl max-h-64 overflow-y-auto custom-scrollbar">
                     {filteredCatalog.map((item, index) => (
                       <li
                         key={index}
-                        onMouseDown={(e) => { e.preventDefault(); handleSelectProduct(item); }}
-                        className="p-3 hover:bg-gray-50 cursor-pointer flex items-center gap-3 border-b border-gray-100 transition-colors"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          handleSelectProduct(item);
+                        }}
+                        className="p-3 hover:bg-[#262A35] cursor-pointer flex items-center gap-3 border-b border-white/5 transition-colors"
                       >
-                        <img src={item.image} alt={item.name} className="w-10 h-10 rounded-lg object-cover border border-gray-200" onError={(e) => { (e.target as HTMLImageElement).src = DEFAULT_PRODUCT; }} />
-                        <span className="text-sm font-medium text-gray-900 flex-1">{item.name}</span>
-                        <span className="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-md">{item.category}</span>
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-10 h-10 rounded-lg object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = DEFAULT_PRODUCT;
+                          }}
+                        />
+                        <span className="text-sm font-medium text-white flex-1">
+                          {item.name}
+                        </span>
+                        <span className="text-xs font-bold text-[#A1A1AA] bg-[#262A35] px-2 py-1 rounded-md">
+                          {item.category}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -861,53 +921,53 @@ export default function Home() {
               </div>
               
               <div className="grid grid-cols-3 gap-3">
-                <input type="text" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} placeholder={`Baru (${currency === 'Rp' ? '87.120' : '26.9'})`} className="w-full p-3.5 bg-white border border-gray-200 rounded-xl font-bold text-gray-900 focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm placeholder-gray-400" />
-                <input type="text" value={productOriginalPrice} onChange={(e) => setProductOriginalPrice(e.target.value)} placeholder={`Coret (${currency === 'Rp' ? '238.000' : '29'})`} className="w-full p-3.5 bg-white border border-gray-200 rounded-xl text-gray-500 focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium placeholder-gray-400" />
-                <input type="text" value={productUnit} onChange={(e) => setProductUnit(e.target.value)} placeholder="Unit (/pcs)" className="w-full p-3.5 bg-white border border-gray-200 rounded-xl text-gray-700 focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-bold placeholder-gray-400" />
+                <input type="text" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} placeholder={`Baru (${currency === 'Rp' ? '87.120' : '26.9'})`} className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl font-bold text-pink-400 focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-400/10 transition-all text-sm placeholder-[#71717A]" />
+                <input type="text" value={productOriginalPrice} onChange={(e) => setProductOriginalPrice(e.target.value)} placeholder={`Coret (${currency === 'Rp' ? '238.000' : '29'})`} className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl text-[#A1A1AA] focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-400/10 transition-all text-sm font-medium placeholder-[#71717A]" />
+                <input type="text" value={productUnit} onChange={(e) => setProductUnit(e.target.value)} placeholder="Unit (/pcs)" className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl text-[#A1A1AA] focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-400/10 transition-all text-sm font-bold placeholder-[#71717A]" />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <input type="text" value={productRating} onChange={(e) => setProductRating(e.target.value)} placeholder="Rating (4.9)" className="w-full p-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-900 placeholder-gray-400" />
-                <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="Terjual (1.1K)" className="w-full p-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-900 placeholder-gray-400" />
+                <input type="text" value={productRating} onChange={(e) => setProductRating(e.target.value)} placeholder="Rating (4.9)" className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-400/10 transition-all text-sm font-medium text-[#F3F4F6] placeholder-[#71717A]" />
+                <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="Terjual (1.1K)" className="w-full p-3.5 bg-[#1D212B] border border-[#262A35] rounded-xl focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-400/10 transition-all text-sm font-medium text-[#F3F4F6] placeholder-[#71717A]" />
               </div>
 
-              <div className="flex flex-col gap-3 mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+              <div className="flex flex-col gap-3 mt-4 p-4 bg-[#1D212B] rounded-xl border border-white/5">
                 <label className="flex items-center gap-3 cursor-pointer group">
                   <div className="relative flex items-center justify-center">
                     <input type="checkbox" checked={showFreeShipping} onChange={e => setShowFreeShipping(e.target.checked)} className="peer sr-only" />
-                    <div className="w-5 h-5 border-2 border-gray-300 bg-white rounded peer-checked:bg-[#0071E3] peer-checked:border-[#0071E3] transition-all"></div>
+                    <div className="w-5 h-5 border-2 border-[#71717A] rounded peer-checked:bg-pink-500 peer-checked:border-pink-500 transition-all"></div>
                     <svg className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
                   </div>
-                  <span className="text-sm font-semibold text-gray-600 group-hover:text-gray-900 transition-colors">Tampilkan Label Free Shipping</span>
+                  <span className="text-sm font-semibold text-[#A1A1AA] group-hover:text-[#F3F4F6] transition-colors">Tampilkan Label Free Shipping</span>
                 </label>
                 
                 {productLayout === 'shopee' && (
                   <label className="flex items-center gap-3 cursor-pointer group">
                     <div className="relative flex items-center justify-center">
                       <input type="checkbox" checked={showShopeeLive} onChange={e => setShowShopeeLive(e.target.checked)} className="peer sr-only" />
-                      <div className="w-5 h-5 border-2 border-gray-300 bg-white rounded peer-checked:bg-[#0071E3] peer-checked:border-[#0071E3] transition-all"></div>
+                      <div className="w-5 h-5 border-2 border-[#71717A] rounded peer-checked:bg-orange-500 peer-checked:border-orange-500 transition-all"></div>
                       <svg className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
                     </div>
-                    <span className="text-sm font-semibold text-gray-600 group-hover:text-gray-900 transition-colors">Tampilkan Label [LIVE]</span>
+                    <span className="text-sm font-semibold text-[#A1A1AA] group-hover:text-[#F3F4F6] transition-colors">Tampilkan Label [LIVE]</span>
                   </label>
                 )}
               </div>
-              <p className="text-[11px] text-gray-500 font-medium italic mt-2">*Diskon & format mata uang otomatis dihitung.</p>
+              <p className="text-[11px] text-[#71717A] font-medium italic mt-2">*Diskon & format mata uang otomatis dihitung.</p>
             </div>
 
-            <button onClick={exportProductImage} className="w-full bg-[#0071E3] hover:bg-[#0077ED] text-white font-semibold py-4 rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]">
+            <button onClick={exportProductImage} className={`w-full text-[#0F1115] font-bold py-4 rounded-xl shadow-lg transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98] ${productLayout === 'shopee' ? 'bg-gradient-to-r from-orange-400 to-orange-500 shadow-orange-500/10 hover:shadow-xl hover:shadow-orange-500/20' : 'bg-gradient-to-r from-pink-400 to-rose-500 shadow-pink-500/10 hover:shadow-xl hover:shadow-pink-500/20'}`}>
               📸 Download Product Card
             </button>
           </div>
 
-          <div className="bg-[#E5E5EA] border border-gray-200 rounded-[2rem] p-10 flex items-center justify-center min-h-[500px] overflow-hidden shadow-inner relative">
-            <div className="absolute inset-0 opacity-40 bg-[radial-gradient(#C7C7CC_1px,transparent_1px)] [background-size:16px_16px]"></div>
+          <div className="bg-[#0F1115] border border-[#262A35] rounded-[2rem] p-10 flex items-center justify-center min-h-[500px] overflow-hidden shadow-inner relative">
+            <div className="absolute inset-0 opacity-[0.05] bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
 
             <div style={{ padding: '40px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
               
               {/* SHOPEE RENDER */}
               {productLayout === 'shopee' && (
-                 <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '4px', width: '300px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontFamily: 'Arial, sans-serif' }}>
+                 <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '4px', width: '300px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.5)', fontFamily: 'Arial, sans-serif' }}>
                     <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
                        <img src={productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                        {autoDiscountBadge && (
@@ -931,11 +991,12 @@ export default function Home() {
                              <span style={{ color: '#ee4d2d', fontSize: shopeeMainFontSize, fontWeight: 'bold', whiteSpace: 'nowrap' }}>
                                {displayPrice}{productUnit && <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
                              </span>
-                             {rawOrigPrice && (
-                               <span style={{ color: '#757575', fontSize: '12px', textDecoration: 'line-through', whiteSpace: 'nowrap', marginLeft: '4px' }}>
-                                 {rawOrigPrice}
-                               </span>
-                             )}
+                             {/* ==== TAMBAHKAN KODE INI UNTUK HARGA CORET SHOPEE ==== */}
+     {rawOrigPrice && (
+       <span style={{ color: '#757575', fontSize: '12px', textDecoration: 'line-through', whiteSpace: 'nowrap', marginLeft: '4px' }}>
+         {rawOrigPrice}
+       </span>
+     )}
                              <ShopeeTicketIcon />
                              <span style={{ fontSize: '12px', color: '#757575', marginLeft: '4px', whiteSpace: 'nowrap' }}>{productSold}</span>
                           </div>
@@ -947,7 +1008,7 @@ export default function Home() {
 
               {/* TIKTOK RENDER */}
               {(productLayout === 'tiktok-portrait' || productLayout === 'tiktok-landscape') && (
-                <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: productLayout === 'tiktok-portrait' ? '300px' : '480px', display: 'flex', flexDirection: productLayout === 'tiktok-portrait' ? 'column' : 'row', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
+                <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: productLayout === 'tiktok-portrait' ? '300px' : '480px', display: 'flex', flexDirection: productLayout === 'tiktok-portrait' ? 'column' : 'row', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}>
                   <div style={{ position: 'relative', width: productLayout === 'tiktok-portrait' ? '300px' : '200px', height: productLayout === 'tiktok-portrait' ? '300px' : '220px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
                     <img key={productImage} src={productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                     {autoDiscountBadge && (
@@ -1003,16 +1064,16 @@ export default function Home() {
       )}
 
       {/* ========================================= */}
-      {/* TAB 4: DISCLAIMER */}
+      {/* TAB 4: DISCLAIMER (NEW TAB) */}
       {/* ========================================= */}
       {activeTab === 'disclaimer' && (
-        <div className="w-full max-w-4xl bg-white/70 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-500 rounded-[2rem] p-10 border border-white/60 z-10 animate-in fade-in zoom-in-95">
+        <div className="w-full max-w-4xl bg-[#171A21]/90 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 rounded-[2rem] p-10 border border-[#262A35] z-10 animate-in fade-in zoom-in-95">
           <div className="space-y-6">
             <div>
-              <h3 className="font-bold text-gray-900 uppercase text-sm tracking-widest flex items-center gap-2 mb-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#0071E3]"></span> Template Disclaimer
+              <h3 className="font-bold text-[#A78BFA] uppercase text-sm tracking-widest flex items-center gap-2 mb-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#C084FC]"></span> Template Disclaimer
               </h3>
-              <p className="text-gray-500 font-medium text-sm">Klik pada kotak disclaimer di bawah untuk menyalin (copy) teksnya secara otomatis.</p>
+              <p className="text-[#A1A1AA] font-medium text-sm">Klik pada kotak disclaimer di bawah untuk menyalin (copy) teksnya secara otomatis.</p>
             </div>
             
             <div className="grid grid-cols-1 gap-4">
@@ -1020,12 +1081,12 @@ export default function Home() {
                 <div 
                   key={idx}
                   onClick={() => handleCopyDisclaimer(text, idx)}
-                  className="p-5 bg-white border border-gray-200 hover:border-[#0071E3]/50 hover:bg-blue-50/50 rounded-2xl cursor-pointer transition-all flex items-center justify-between gap-6 group shadow-sm active:scale-[0.99]"
+                  className="p-5 bg-[#1D212B] border border-[#262A35] hover:border-[#C084FC]/50 hover:bg-[#262A35]/50 rounded-2xl cursor-pointer transition-all flex items-center justify-between gap-6 group shadow-sm active:scale-[0.99]"
                 >
-                  <div className="text-[15px] text-gray-600 group-hover:text-gray-900 transition-colors leading-relaxed font-medium">
+                  <div className="text-[15px] text-[#A1A1AA] group-hover:text-[#F3F4F6] transition-colors leading-relaxed font-medium">
                     {text}
                   </div>
-                  <button className={`text-xs uppercase font-bold px-5 py-2.5 rounded-xl transition-all whitespace-nowrap shadow-sm ${copiedIndex === idx ? 'bg-[#34C759] text-white' : 'bg-gray-100 text-gray-700 group-hover:bg-[#0071E3] group-hover:text-white'}`}>
+                  <button className={`text-xs uppercase font-bold px-5 py-2.5 rounded-xl transition-all whitespace-nowrap shadow-sm ${copiedIndex === idx ? 'bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115]' : 'bg-[#262A35] text-[#F3F4F6] group-hover:bg-[#3F3F46]'}`}>
                     {copiedIndex === idx ? '✓ COPIED' : 'COPY'}
                   </button>
                 </div>
@@ -1041,66 +1102,67 @@ export default function Home() {
       {activeTab === 'wa' && (
         <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 z-10 animate-in fade-in zoom-in-95">
           
-          <div className="bg-white/70 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-500 rounded-[2rem] p-8 border border-white/60 space-y-8 h-fit">
+          <div className="bg-[#171A21]/90 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 rounded-[2rem] p-8 border border-[#262A35] space-y-8 h-fit">
             
-            <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200/50">
-                <button onClick={() => setWaTheme('light')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${waTheme === 'light' ? 'bg-white shadow text-[#008069]' : 'text-gray-500 hover:text-gray-700'}`}>☀️ MODE TERANG</button>
-                <button onClick={() => setWaTheme('dark')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${waTheme === 'dark' ? 'bg-white shadow text-[#008069]' : 'text-gray-500 hover:text-gray-700'}`}>🌙 MODE MALAM</button>
+            <div className="flex gap-2 bg-[#1D212B] p-1.5 rounded-xl border border-white/5">
+                <button onClick={() => setWaTheme('light')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${waTheme === 'light' ? 'bg-[#262A35] shadow-sm text-[#00a884]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>☀️ MODE TERANG</button>
+                <button onClick={() => setWaTheme('dark')} className={`flex-1 py-2.5 rounded-lg font-bold text-xs tracking-wide transition-all ${waTheme === 'dark' ? 'bg-[#262A35] shadow-sm text-[#00a884]' : 'text-[#71717A] hover:text-[#A1A1AA]'}`}>🌙 MODE MALAM</button>
             </div>
 
             <div className="space-y-4">
-              <h3 className="font-bold text-gray-900 uppercase text-xs tracking-widest flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#008069]"></span> Grup / Chat Settings
+              <h3 className="font-bold text-[#00a884] uppercase text-xs tracking-widest flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#00a884]"></span> Grup / Chat Settings
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-2">Nama Grup (Fixed)</label>
-                  <input type="text" value="KOL ASIK 💄" disabled className="w-full p-3.5 bg-gray-50 text-gray-500 border border-gray-200 rounded-xl font-bold cursor-not-allowed text-sm" />
+                  <label className="block text-xs font-bold text-[#A1A1AA] mb-2">Nama Grup (Fixed)</label>
+                  <input type="text" value="KOL ASIK 💄" disabled className="w-full p-3.5 bg-[#111318] text-[#71717A] border border-[#262A35] rounded-xl font-bold cursor-not-allowed text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-2">Avatar Grup</label>
-                  <input type="file" onChange={(e) => handleImageUpload(e, setWaGroupAvatar)} className="text-sm block w-full file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#008069]/10 file:text-[#008069] hover:file:bg-[#008069]/20 transition-all cursor-pointer text-gray-500" />
+                  <label className="block text-xs font-bold text-[#A1A1AA] mb-2">Avatar Grup</label>
+                  <input type="file" onChange={(e) => handleImageUpload(e, setWaGroupAvatar)} className="text-sm block w-full file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#008069]/20 file:text-[#00a884] hover:file:bg-[#008069]/40 transition-all cursor-pointer text-[#71717A]" />
                 </div>
               </div>
             </div>
 
-            <hr className="border-gray-200" />
+            <hr className="border-white/5" />
 
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                 <h3 className="font-bold text-gray-900 uppercase text-xs tracking-widest flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#008069]"></span> Daftar Chat
+                 <h3 className="font-bold text-[#00a884] uppercase text-xs tracking-widest flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#00a884]"></span> Daftar Chat
                  </h3>
-                 <button onClick={addWaMessage} className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-900 px-4 py-2 rounded-lg font-bold transition-all active:scale-95">+ Tambah</button>
+                 <button onClick={addWaMessage} className="text-xs bg-[#008069] hover:bg-[#00a884] text-[#F3F4F6] px-4 py-2 rounded-lg font-bold shadow-md shadow-[#008069]/20 transition-all active:scale-95">+ Tambah</button>
               </div>
               
               <div className="space-y-4 max-h-[400px] overflow-y-auto pr-3 custom-scrollbar">
                 {waMessages.map((msg, index) => (
-                  <div key={msg.id} className="p-5 bg-white border border-gray-200 rounded-2xl relative group shadow-sm transition-all">
-                    <button onClick={() => removeWaMessage(msg.id)} className="absolute -top-2 -right-2 text-[#FF3B30] text-xs font-bold bg-white shadow-md border border-gray-200 w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-50">✕</button>
+                  <div key={msg.id} className="p-5 bg-[#1D212B] border border-[#262A35] rounded-2xl relative group hover:border-[#4B5563] transition-all">
+                    <button onClick={() => removeWaMessage(msg.id)} className="absolute -top-2 -right-2 text-red-400 text-xs font-bold bg-[#262A35] shadow-sm border border-[#4B5563] w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500/20 hover:text-red-300">✕</button>
                     <div className="grid grid-cols-2 gap-3 mb-3">
-                      <select value={msg.sender} onChange={(e) => updateWaMessage(msg.id, 'sender', e.target.value)} className="p-2.5 bg-white border border-gray-200 text-gray-900 rounded-xl text-sm font-medium focus:outline-none focus:border-[#008069] focus:ring-2 focus:ring-[#008069]/20">
+                      <select value={msg.sender} onChange={(e) => updateWaMessage(msg.id, 'sender', e.target.value)} className="p-2.5 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] rounded-xl text-sm font-medium focus:outline-none focus:border-[#00a884] focus:ring-2 focus:ring-[#00a884]/20">
                         <option value="other">Orang Lain (Kiri)</option>
                         <option value="me">Saya (Kanan)</option>
                       </select>
                       {msg.sender === 'other' ? (
-                        <input type="text" value={msg.name} onChange={(e) => updateWaMessage(msg.id, 'name', e.target.value)} placeholder="Nama Pengirim" className="p-2.5 bg-white border border-gray-200 text-gray-900 placeholder-gray-400 rounded-xl text-sm font-medium focus:outline-none focus:border-[#008069] focus:ring-2 focus:ring-[#008069]/20" />
+                        <input type="text" value={msg.name} onChange={(e) => updateWaMessage(msg.id, 'name', e.target.value)} placeholder="Nama Pengirim" className="p-2.5 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] placeholder-[#71717A] rounded-xl text-sm font-medium focus:outline-none focus:border-[#00a884] focus:ring-2 focus:ring-[#00a884]/20" />
                       ) : (
-                         <div className="p-2.5 text-sm font-medium text-gray-500 bg-gray-50 border border-transparent rounded-xl text-center cursor-not-allowed">Anda</div>
+                         <div className="p-2.5 text-sm font-medium text-[#71717A] bg-[#111318] border border-transparent rounded-xl text-center cursor-not-allowed">Anda</div>
                       )}
                     </div>
 
+                    {/* TEXTAREA WA CHAT + WARNING */}
                     <div className="relative mb-3">
-                      <textarea value={msg.text} onChange={(e) => updateWaMessage(msg.id, 'text', e.target.value)} placeholder="Isi pesan..." className="w-full p-3 bg-white border border-gray-200 text-gray-900 placeholder-gray-400 rounded-xl text-sm min-h-[60px] focus:outline-none focus:border-[#008069] focus:ring-2 focus:ring-[#008069]/20 font-medium leading-[1.6]" />
+                      <textarea value={msg.text} onChange={(e) => updateWaMessage(msg.id, 'text', e.target.value)} placeholder="Isi pesan..." className="w-full p-3 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] placeholder-[#71717A] rounded-xl text-sm min-h-[60px] focus:outline-none focus:border-[#00a884] focus:ring-2 focus:ring-[#00a884]/20 font-medium leading-[1.6]" />
                       
                       {getDetectedBannedWords(msg.text).length > 0 && (
-                        <div className="mt-2 p-2 bg-[#FF3B30]/10 border border-[#FF3B30]/20 rounded-lg space-y-1">
-                          <p className="text-[11px] text-[#FF3B30] font-bold flex gap-1 items-center">⚠️ Mengandung Banned Word:</p>
-                          <ul className="text-[11px] text-gray-700 list-disc pl-4 space-y-2">
+                        <div className="mt-2 p-2 bg-red-500/10 border border-red-500/30 rounded-lg space-y-1">
+                          <p className="text-[11px] text-red-400 font-bold flex gap-1 items-center">⚠️ Mengandung Banned Word:</p>
+                          <ul className="text-[11px] text-[#A1A1AA] list-disc pl-4 space-y-2">
                             {getDetectedBannedWords(msg.text).map((d, i) => (
                               <li key={i}>
-                                Hapus: <span className="font-bold text-white bg-[#FF3B30] px-1 rounded">{d.word}</span> <br/>
-                                Saran: <span className="italic text-green-600">{d.suggestion}</span>
+                                Hapus: <span className="font-bold text-white bg-red-500/40 px-1 rounded">{d.word}</span> <br/>
+                                Saran: <span className="italic text-green-400">{d.suggestion}</span>
                               </li>
                             ))}
                           </ul>
@@ -1109,37 +1171,40 @@ export default function Home() {
                     </div>
                     
                     <div className="grid grid-cols-2 gap-3 items-center">
-                      <input type="time" value={msg.time} onChange={(e) => updateWaMessage(msg.id, 'time', e.target.value)} className="p-2.5 bg-white border border-gray-200 text-gray-900 rounded-xl text-sm font-medium focus:outline-none focus:border-[#008069]" />
-                      <input type="file" onChange={(e) => handleWaMessageImage(msg.id, e)} className="text-[10px] p-2 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:bg-gray-100 file:text-gray-600 cursor-pointer text-gray-500" />
+                      <input type="time" value={msg.time} onChange={(e) => updateWaMessage(msg.id, 'time', e.target.value)} className="p-2.5 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] rounded-xl text-sm font-medium focus:outline-none focus:border-[#00a884]" style={{ colorScheme: 'dark' }} />
+                      <input type="file" onChange={(e) => handleWaMessageImage(msg.id, e)} className="text-[10px] p-2 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:bg-[#262A35] file:text-[#A1A1AA] cursor-pointer text-[#71717A]" />
                     </div>
                     {msg.image && (
-                      <button onClick={() => updateWaMessage(msg.id, 'image', '')} className="mt-3 text-[11px] font-bold text-[#FF3B30] hover:text-red-700 transition-colors flex items-center gap-1">✕ Hapus Gambar Terlampir</button>
+                      <button onClick={() => updateWaMessage(msg.id, 'image', '')} className="mt-3 text-[11px] font-bold text-red-400 hover:text-red-300 transition-colors flex items-center gap-1">✕ Hapus Gambar Terlampir</button>
                     )}
                   </div>
                 ))}
               </div>
             </div>
 
-            <button onClick={exportWaImage} className="w-full bg-[#008069] hover:bg-[#006e5a] text-white font-semibold py-4 rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]">
+            <button onClick={exportWaImage} className="w-full bg-[#008069] hover:bg-[#00a884] text-[#F3F4F6] font-bold py-4 rounded-xl shadow-lg shadow-[#008069]/10 hover:shadow-xl hover:shadow-[#008069]/20 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]">
               📸 Download WA Chat
             </button>
           </div>
 
-          {/* PREVIEW WHATSAPP (PIXEL STRICT MODE - APPLE THEME & EXPORT FIX) */}
-          <div className="bg-[#E5E5EA] border border-gray-200 rounded-[2rem] p-6 flex items-center justify-center min-h-[500px] overflow-hidden shadow-inner relative">
-             <div className="absolute inset-0 opacity-40 bg-[radial-gradient(#C7C7CC_1px,transparent_1px)] [background-size:16px_16px]"></div>
+          {/* PREVIEW WHATSAPP (PIXEL STRICT MODE) */}
+          <div className="bg-[#0F1115] border border-[#262A35] rounded-[2rem] p-6 flex items-center justify-center min-h-[500px] overflow-hidden shadow-inner relative">
+             <div className="absolute inset-0 opacity-[0.05] bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
             
             <div style={{ padding: '20px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
               
               <div ref={waPreviewRef} style={{ 
+                backgroundImage: waTheme === 'dark' ? "url('/bg/wadark.jpg')" : "url('/bg/wawhite.jpg')",
                 backgroundColor: waTheme === 'dark' ? WA_GELAP_BG : WA_TERANG_BG,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
                 width: '360px', 
                 height: '640px', 
                 display: 'flex', 
                 flexDirection: 'column', 
                 fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
                 overflow: 'hidden',
-                boxShadow: '0 12px 32px rgba(0,0,0,0.1)'
+                boxShadow: '0 12px 32px rgba(0,0,0,0.5)'
               }}>
                 
                 {/* WA Header */}
@@ -1206,7 +1271,7 @@ export default function Home() {
                               borderRadius: '8px',
                               borderTopLeftRadius: isMe ? '8px' : '0px',
                               borderTopRightRadius: isMe ? '0px' : '8px',
-                              boxShadow: '0 1px 1px rgba(0,0,0,0.1)',
+                              boxShadow: '0 1px 1px rgba(0,0,0,0.15)',
                               position: 'relative',
                               border: 'none', 
                               outline: 'none'
@@ -1288,10 +1353,10 @@ export default function Home() {
       )}
 
       <footer style={{ 
-        marginTop: '60px', paddingTop: '30px', paddingBottom: '30px', textAlign: 'center', width: '100%', maxWidth: '1152px', borderTop: '1px solid rgba(0,0,0,0.05)', zIndex: 10 
+        marginTop: '80px', paddingTop: '40px', paddingBottom: '30px', textAlign: 'center', width: '100%', maxWidth: '1152px', borderTop: '1px solid rgba(255,255,255,0.05)', zIndex: 10 
       }}>
-        <p style={{ color: '#8E8E93', fontSize: '14px', fontWeight: 500 }}>
-          &copy; {new Date().getFullYear()} <span style={{ fontWeight: '600', color: '#1D1D1F' }}>Aditya Satria Pratama</span>. All rights reserved.
+        <p style={{ color: '#71717A', fontSize: '14px', fontWeight: 500 }}>
+          &copy; {new Date().getFullYear()} <span style={{ fontWeight: 'bold', color: '#A1A1AA' }}>Aditya Satria Pratama</span>. All rights reserved.
         </p>
       </footer>
 
@@ -1299,8 +1364,8 @@ export default function Home() {
       <style dangerouslySetInnerHTML={{__html: `
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.15); border-radius: 20px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: rgba(0,0,0,0.25); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #262A35; border-radius: 20px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #4B5563; }
       `}} />
     </main>
   );
