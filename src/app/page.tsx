@@ -93,10 +93,12 @@ export default function Home() {
   const [checkerText, setCheckerText] = useState("");
 
   useEffect(() => {
-    const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1RUWiTF4k0JVVU4HOWmPCrECv0T5k2MHssfi7sZMn70I/export?format=csv';
+   // Tambahkan parameter waktu (t) agar URL selalu unik setiap di-refresh
+const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/1RUWiTF4k0JVVU4HOWmPCrECv0T5k2MHssfi7sZMn70I/export?format=csv&t=${new Date().getTime()}`;
 
-    fetch(SHEET_CSV_URL)
-      .then(res => res.text())
+// Tambahkan opsi { cache: 'no-store' } untuk memastikan browser tidak menyimpan cache
+fetch(SHEET_CSV_URL, { cache: 'no-store' })
+  .then(res => res.text())
       .then(csvText => {
         // --- CUSTOM CSV PARSER PINTAR ---
         const rows: string[][] = [];
