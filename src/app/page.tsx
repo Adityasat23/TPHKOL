@@ -613,27 +613,25 @@ export default function Home() {
       {/* TAB 1: DOWNLOADER */}
       {/* ========================================= */}
       {activeTab === 'downloader' && (
-        <div className="w-full max-w-2xl bg-[#171A21]/90 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-500 rounded-[2rem] p-8 border border-[#262A35] z-10 animate-in fade-in zoom-in-95">
-          <form onSubmit={handleDownload} className="space-y-4">
-            <div className="relative group">
-              <input type="text" placeholder="Paste link TikTok di sini..." className="w-full pl-6 pr-40 py-5 bg-[#1D212B] border border-[#262A35] rounded-2xl focus:outline-none focus:border-[#C084FC] focus:ring-4 focus:ring-[#C084FC]/10 text-[#F3F4F6] transition-all placeholder:text-[#71717A] font-medium" value={url} onChange={(e) => setUrl(e.target.value)} required />
-              <button type="submit" disabled={loading} className="absolute right-2 top-2 bottom-2 bg-[#F3F4F6] hover:bg-white text-[#0F1115] font-bold px-8 rounded-xl disabled:opacity-50 transition-all shadow-md active:scale-95">{loading ? 'Processing...' : 'Download'}</button>
-            </div>
-          </form>
-          {error && <div className="mt-6 p-4 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-sm font-medium">{error}</div>}
-          {result && (
-            <div className="mt-8 flex flex-col md:flex-row gap-8 items-center bg-[#1D212B] p-6 rounded-2xl border border-white/5">
-              {result.cover && <img src={result.cover} alt="thumbnail" className="w-32 h-32 object-cover rounded-2xl shadow-md border-2 border-[#262A35]" />}
-              <div className="flex-1 text-center md:text-left w-full">
-                <h3 className="font-bold text-[#F3F4F6] text-lg mb-4 line-clamp-2 leading-snug">{result.title}</h3>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  {result.play && <a href={result.play} target="_blank" rel="noreferrer" className="flex-1 bg-gradient-to-r from-[#A78BFA] to-[#C084FC] text-[#0F1115] font-bold py-3 rounded-xl text-center shadow-lg hover:shadow-xl transition-all active:scale-95">Unduh Video</a>}
-                  {result.music && <a href={result.music} target="_blank" rel="noreferrer" className="flex-1 bg-[#171A21] border border-[#262A35] text-[#F3F4F6] hover:bg-[#262A35] font-bold py-3 rounded-xl text-center shadow-sm transition-all active:scale-95">Unduh MP3</a>}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', gap: '8px' }}>
+   <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
+      <span style={{ color: '#ee4d2d', fontSize: shopeeMainFontSize, fontWeight: 'bold', whiteSpace: 'nowrap' }}>
+        {displayPrice}{productUnit && <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
+      </span>
+      
+      {/* --- TAMBAHKAN BAGIAN INI UNTUK HARGA CORET --- */}
+      {rawOrigPrice && (
+        <span style={{ color: '#757575', fontSize: '12px', textDecoration: 'line-through', marginLeft: '2px', whiteSpace: 'nowrap' }}>
+          {rawOrigPrice}
+        </span>
+      )}
+      {/* --------------------------------------------- */}
+
+      <ShopeeTicketIcon />
+      <span style={{ fontSize: '12px', color: '#757575', marginLeft: '4px', whiteSpace: 'nowrap' }}>{productSold}</span>
+   </div>
+   <div style={{ flexShrink: 0 }}><ShopeeDots /></div>
+</div>
       )}
 
       {/* ========================================= */}
