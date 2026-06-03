@@ -516,7 +516,7 @@ export default function Home() {
           Editor Tools
         </h1>
         <p className="text-gray-500 text-base font-medium tracking-wide max-w-xl mx-auto">
-          Workspace
+          Semoga membantu, kalo bug Ding aja
         </p>
       </div>
 
