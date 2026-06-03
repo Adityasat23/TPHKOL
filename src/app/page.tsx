@@ -94,7 +94,8 @@ export default function Home() {
 
   useEffect(() => {
    // Tambahkan parameter waktu (t) agar URL selalu unik setiap di-refresh
-const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/1RUWiTF4k0JVVU4HOWmPCrECv0T5k2MHssfi7sZMn70I/export?format=csv&t=${new Date().getTime()}`;
+// Tambahkan parameter gid agar mengarah ke tab yang tepat
+const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/1RUWiTF4k0JVVU4HOWmPCrECv0T5k2MHssfi7sZMn70I/export?format=csv&gid=520891865&t=${new Date().getTime()}`;
 
 // Tambahkan opsi { cache: 'no-store' } untuk memastikan browser tidak menyimpan cache
 fetch(SHEET_CSV_URL, { cache: 'no-store' })
