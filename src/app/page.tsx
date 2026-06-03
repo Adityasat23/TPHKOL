@@ -783,9 +783,9 @@ export default function Home() {
           <div className="bg-white/60 backdrop-blur-3xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-500 rounded-[2rem] p-8 border-[1.5px] border-white space-y-8 h-fit">
             
             <div className="flex bg-white/60 p-1.5 rounded-xl border border-white shadow-sm">
-              <button onClick={() => setProductLayout('tiktok-portrait')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${productLayout === 'tiktok-portrait' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>TK Portrait</button>
-              <button onClick={() => setProductLayout('tiktok-landscape')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${productLayout === 'tiktok-landscape' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>TK Landscape</button>
-              <button onClick={() => setProductLayout('shopee')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${productLayout === 'shopee' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>Shopee</button>
+              <button onClick={() => setProductLayout('tiktok-portrait')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${productLayout === 'tiktok-portrait' ? 'bg-white shadow-sm text-pink-600' : 'text-gray-500 hover:text-gray-700'}`}>TIKTOK Portrait</button>
+              <button onClick={() => setProductLayout('tiktok-landscape')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${productLayout === 'tiktok-landscape' ? 'bg-white shadow-sm text-pink-600' : 'text-gray-500 hover:text-gray-700'}`}>TIKTOK Landscape</button>
+              <button onClick={() => setProductLayout('shopee')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${productLayout === 'shopee' ? 'bg-white shadow-sm text-orange-500' : 'text-gray-500 hover:text-gray-700'}`}>Shopee</button>
             </div>
 
             <div className="flex bg-white/60 p-1.5 rounded-xl border border-white shadow-sm">
@@ -796,9 +796,9 @@ export default function Home() {
             </div>
 
             <div className="flex bg-white/60 p-1.5 rounded-xl border border-white shadow-sm">
-              <button onClick={() => setCurrency('Rp')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${currency === 'Rp' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>IDR (Rp)</button>
-              <button onClick={() => { setCurrency('RM'); setPriceFormat('exact'); }} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${currency === 'RM' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>MYR (RM)</button>
-              <button onClick={() => { setCurrency('$'); setPriceFormat('exact'); }} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${currency === '$' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>USD ($)</button>
+              <button onClick={() => setCurrency('Rp')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${currency === 'Rp' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>🇮🇩IDR (Rp)</button>
+              <button onClick={() => { setCurrency('RM'); setPriceFormat('exact'); }} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${currency === 'RM' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>🇲🇾MYR (RM)</button>
+              <button onClick={() => { setCurrency('$'); setPriceFormat('exact'); }} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${currency === '$' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>🇺🇸USD ($)</button>
             </div>
 
             {(productLayout === 'tiktok-portrait' || productLayout === 'tiktok-landscape') && (
@@ -1124,18 +1124,14 @@ export default function Home() {
             
             <div style={{ padding: '20px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
               
-<div ref={waPreviewRef} style={{ 
-                backgroundColor: waTheme === 'dark' ? '#0b141a' : '#efeae2',
-                
-                /* OPACITY GRADIENT DIKURANGI AGAR WALLPAPER TEMBUS */
+              <div ref={waPreviewRef} style={{ 
+                /* Mengambil aset lokal dari folder public/bg */
                 backgroundImage: waTheme === 'dark' 
-                  ? 'linear-gradient(rgba(11, 20, 26, 0.75), rgba(11, 20, 26, 0.75)), url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png")'
-                  : 'linear-gradient(rgba(239, 234, 226, 0.6), rgba(239, 234, 226, 0.6)), url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png")',
-                
-                /* SETTING REPEAT AGAR POLA MENYAMBUNG SEPERTI WA ASLI */
-                backgroundSize: '300px', 
-                backgroundRepeat: 'repeat',
-                
+                  ? 'url("/bg/wadark.jpg")' 
+                  : 'url("/bg/wawhite.jpg")',
+                backgroundSize: 'cover', /* Menyesuaikan ukuran gambar dengan container */
+                backgroundPosition: 'center',
+                backgroundColor: waTheme === 'dark' ? '#0b141a' : '#efeae2',
                 width: '360px', 
                 height: '640px', 
                 display: 'flex', 
