@@ -134,16 +134,12 @@ fetch(SHEET_CSV_URL, { cache: 'no-store' })
           rows.push(row);
         }
 
-        // Cek Dinamis Index Kolom (jaga-jaga kalau Kolom A kosong di sheet)
-        let bCol = 0; // Kolom Banned Words (Default Col A)
-        let sCol = 1; // Kolom Saran (Default Col B)
-        
-        // Deteksi jika Kolom A kosong semua, geser ke Kolom B & C
-        const isCol0Empty = rows.slice(1, 5).every(r => !r[0] || r[0].trim() === '');
-        if (isCol0Empty) {
-          bCol = 1;
-          sCol = 2;
-        }
+// FIX: Kunci langsung ke index kolom yang sesuai dengan Sheet.
+        // Kolom A = 0 (Nomor)
+        // Kolom B = 1 (Banned Words)
+        // Kolom C = 2 (Suggestions)
+        let bCol = 1; 
+        let sCol = 2;
 
         const parsedData: {word: string, suggestion: string, regexStr: string}[] = [];
 
