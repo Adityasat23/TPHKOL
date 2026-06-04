@@ -121,6 +121,11 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
     image: "/products/TWO WAY CAKE.jpg",
     category: "Face"
   },
+    {
+    name: "TIMELESS FIXION ALL DAY PERFECTION SKIN TINT STICK",
+    image: "/products/TIMELESS FIXION ALL DAY PERFECTION SKIN TINT STICK.jpg",
+    category: "Face"
+  },
 
   {
     name: "2PCS Stellar Dust Lip Stain",
