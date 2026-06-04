@@ -679,7 +679,7 @@ export default function Home() {
                 </div>
                 {showReply && (
                   <div className="animate-in fade-in slide-in-from-top-2 duration-300 space-y-3">
-                    <p className="text-[11px] text-gray-500 font-medium">Avatar & Nama diset otomatis ke Timephoria.</p>
+                    <p className="text-[11px] text-gray-500 font-medium">Avatar & Nama diset otomatis ke Timephoria.id.</p>
                     <div className="grid grid-cols-2 gap-3">
                       <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="Likes Balasan" className="w-full p-3.5 bg-white/60 border border-gray-200/60 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-900 placeholder-gray-400" />
                       <input type="date" value={replyDate} onChange={(e) => setReplyDate(e.target.value)} className="w-full p-3.5 bg-white/60 border border-gray-200/60 rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-700" />
@@ -754,7 +754,7 @@ export default function Home() {
                       <div style={{ display: 'flex', gap: '14px', marginLeft: '54px' }}>
                         <img src={TIMEPHORIA_LOGO} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                         <div style={{ flex: 1 }}>
-                          <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'inherit' }}>Timephoria</p>
+                          <p style={{ color: TIKTOK_GRAY_TEXT, fontSize: '14px', fontWeight: 600, margin: 0, fontFamily: 'inherit' }}>Timephoria.id</p>
                           <p style={{ color: threadTheme === 'dark' ? TIKTOK_WHITE_TEXT : TIKTOK_BLACK_TEXT, fontSize: '15px', margin: '4px 0', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'inherit' }}>{renderWithHighlights(replyText)}</p>
                           <div style={{ display: 'flex', gap: '16px', color: TIKTOK_GRAY_TEXT, fontSize: '13px', fontWeight: 500, marginTop: '8px', fontFamily: 'inherit' }}>
                             <span>{replyDate}</span><span>Reply</span>
