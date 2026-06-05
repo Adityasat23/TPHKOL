@@ -294,7 +294,7 @@ export default function ProductCardTool() {
             {/* RENDER: TIKTOK LANDSCAPE (ULTIMATE FIX) */}
             {productLayout === 'tiktok-landscape' && (
               // FIX: Kunci width di 540px, tambahkan minWidth agar tidak bisa digencet oleh layar kecil.
-              <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: '6000px', minWidth: '600px', display: 'flex', flexDirection: 'row', boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}>
+              <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: '540px', minWidth: '540px', display: 'flex', flexDirection: 'row', boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}>
                 {/* Bagian Kiri: Kunci lebar gambar di 220px, jangan izinkan menyusut (flexShrink: 0) */}
                 <div style={{ position: 'relative', width: '220px', minWidth: '220px', flexShrink: 0, backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'stretch' }}>
                   <img key={productImage} src={productImage} style={{ width: '100%', height: '100%', minHeight: '220px', objectFit: 'cover', display: 'block' }} onError={(e) => { (e.target as HTMLImageElement).src = SAFE_IMAGE; }} />
