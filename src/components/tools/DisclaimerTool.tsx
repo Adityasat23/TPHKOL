@@ -1,26 +1,58 @@
 'use client';
 
 import { useState } from 'react';
-import { DISCLAIMERS } from '../../constants'; // Tetap di-import untuk legacy disclaimer
+import { DISCLAIMERS } from '../../constants';
 
 export default function DisclaimerTool() {
-  // State untuk Generator Form
   const [promoType, setPromoType] = useState<'DAILY' | 'CAMPAIGN'>('DAILY');
-  const [hargaGimik, setHargaGimik] = useState('');
+  
+  // State Input
+  const [hargaGimik, setHargaGimik] = useState(''); 
   const [hargaClear, setHargaClear] = useState('');
   const [namaCampaign, setNamaCampaign] = useState('');
   const [tanggalCampaign, setTanggalCampaign] = useState('');
   
-  // State untuk UI Copy
+  // State UI Copy
   const [copiedGenerator, setCopiedGenerator] = useState(false);
   const [copiedLegacyIndex, setCopiedLegacyIndex] = useState<number | null>(null);
 
-  // Logic Rangkaian Teks Generator
+  // Auto-format & Auto-calculate Harga
+  const handleHargaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/\D/g, ''); // Paksa hanya menerima angka
+    setHargaGimik(rawValue);
+
+    if (rawValue) {
+      const num = parseInt(rawValue, 10);
+      if (num >= 1000) {
+        // Konversi ke format 'K' (contoh: 95000 -> 95K)
+        const kValue = num / 1000;
+        setHargaClear(`${kValue % 1 === 0 ? kValue : kValue.toFixed(1)}K`);
+      } else {
+        setHargaClear(`${num}`);
+      }
+    } else {
+      setHargaClear('');
+    }
+  };
+
+  // Format visual untuk output teks (titik ribuan)
+  const formattedHargaGimik = hargaGimik ? parseInt(hargaGimik, 10).toLocaleString('id-ID') : '[Harga Gimik]';
+
+  // Format tanggal ke Bahasa Indonesia (contoh: 6 Juni 2026)
+  let formattedTanggal = '[Tanggal Campaign]';
+  if (tanggalCampaign) {
+    const d = new Date(tanggalCampaign);
+    if (!isNaN(d.getTime())) {
+      formattedTanggal = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+  }
+
+  // Rangkaian Teks
   let generatedText = '';
   if (promoType === 'DAILY') {
-    generatedText = `*Harga ${hargaGimik || '[Harga Gimik]'} (${hargaClear || '[Harga Clear]'}) dapat berubah mengikuti promo/voucher/subsidi yang berlaku saat pembelian.`;
+    generatedText = `*Harga ${formattedHargaGimik} (${hargaClear || '[Harga Clear]'}) dapat berubah mengikuti promo/voucher/subsidi yang berlaku saat pembelian.`;
   } else {
-    generatedText = `*Harga ${hargaGimik || '[Harga Gimik]'} (${hargaClear || '[Harga Clear]'}) dapat berubah di luar periode ${namaCampaign || '[Nama Campaign]'} (${tanggalCampaign || '[Tanggal Campaign]'}) mengikuti promo/voucher/subsidi yang berlaku saat pembelian.`;
+    generatedText = `*Harga ${formattedHargaGimik} (${hargaClear || '[Harga Clear]'}) dapat berubah di luar periode ${namaCampaign || '[Nama Campaign]'} (${formattedTanggal}) mengikuti promo/voucher/subsidi yang berlaku saat pembelian.`;
   }
 
   const handleCopyGenerator = () => {
@@ -38,7 +70,7 @@ export default function DisclaimerTool() {
   return (
     <div className="w-full max-w-5xl grid grid-cols-1 gap-8 z-10 animate-in fade-in zoom-in-95">
       
-      {/* SECTION 1: DYNAMIC GENERATOR (NEW FEATURE) */}
+      {/* SECTION 1: DYNAMIC GENERATOR */}
       <div className="bg-white/70 backdrop-blur-3xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-500 rounded-[2rem] p-8 border-[1.5px] border-white space-y-6">
         <div>
           <h3 className="font-bold text-gray-900 uppercase text-sm tracking-widest flex items-center gap-2 mb-2">
@@ -66,12 +98,25 @@ export default function DisclaimerTool() {
         {/* Input Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-2">Harga Gimik</label>
-            <input type="text" value={hargaGimik} onChange={(e) => setHargaGimik(e.target.value)} placeholder="Contoh: 90 RIBUAN" className="w-full p-3.5 bg-white/80 border border-gray-200 shadow-sm rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-900" />
+            <label className="block text-xs font-semibold text-gray-500 mb-2">Harga Gimik (Otomatis)</label>
+            <input 
+              type="text" 
+              inputMode="numeric"
+              value={hargaGimik ? parseInt(hargaGimik, 10).toLocaleString('id-ID') : ''} 
+              onChange={handleHargaChange} 
+              placeholder="Contoh: 95000" 
+              className="w-full p-3.5 bg-white/80 border border-gray-200 shadow-sm rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-900" 
+            />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-2">Harga Clear</label>
-            <input type="text" value={hargaClear} onChange={(e) => setHargaClear(e.target.value)} placeholder="Contoh: 95K" className="w-full p-3.5 bg-white/80 border border-gray-200 shadow-sm rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium text-gray-900" />
+            <label className="block text-xs font-semibold text-gray-500 mb-2">Harga Clear (Auto K)</label>
+            <input 
+              type="text" 
+              value={hargaClear} 
+              onChange={(e) => setHargaClear(e.target.value)} 
+              placeholder="Contoh: 95K" 
+              className="w-full p-3.5 bg-gray-50/50 border border-gray-200 shadow-sm rounded-xl focus:outline-none focus:border-[#0071E3] transition-all text-sm font-medium text-gray-900" 
+            />
           </div>
           
           {/* Conditional Rendering: Hanya muncul jika CAMPAIGN */}
@@ -79,11 +124,23 @@ export default function DisclaimerTool() {
             <>
               <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                 <label className="block text-xs font-semibold text-gray-500 mb-2">Nama Campaign</label>
-                <input type="text" value={namaCampaign} onChange={(e) => setNamaCampaign(e.target.value)} placeholder="Contoh: 6.6 Big Sale" className="w-full p-3.5 bg-white/80 border border-gray-200 shadow-sm rounded-xl focus:outline-none focus:border-[#FF3B30] focus:ring-4 focus:ring-[#FF3B30]/10 transition-all text-sm font-medium text-gray-900" />
+                <input 
+                  type="text" 
+                  value={namaCampaign} 
+                  onChange={(e) => setNamaCampaign(e.target.value)} 
+                  placeholder="Contoh: 6.6 Big Sale" 
+                  className="w-full p-3.5 bg-white/80 border border-gray-200 shadow-sm rounded-xl focus:outline-none focus:border-[#FF3B30] focus:ring-4 focus:ring-[#FF3B30]/10 transition-all text-sm font-medium text-gray-900" 
+                />
               </div>
               <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                 <label className="block text-xs font-semibold text-gray-500 mb-2">Tanggal Berakhir</label>
-                <input type="text" value={tanggalCampaign} onChange={(e) => setTanggalCampaign(e.target.value)} placeholder="Contoh: 6 Juni 2026" className="w-full p-3.5 bg-white/80 border border-gray-200 shadow-sm rounded-xl focus:outline-none focus:border-[#FF3B30] focus:ring-4 focus:ring-[#FF3B30]/10 transition-all text-sm font-medium text-gray-900" />
+                {/* Perubahan menjadi tipe Date agar muncul kalender */}
+                <input 
+                  type="date" 
+                  value={tanggalCampaign} 
+                  onChange={(e) => setTanggalCampaign(e.target.value)} 
+                  className="w-full p-3.5 bg-white/80 border border-gray-200 shadow-sm rounded-xl focus:outline-none focus:border-[#FF3B30] focus:ring-4 focus:ring-[#FF3B30]/10 transition-all text-sm font-medium text-gray-900" 
+                />
               </div>
             </>
           )}
@@ -116,9 +173,7 @@ export default function DisclaimerTool() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Filter out index 0 if it's the old price disclaimer, or just map all depending on your constants */}
           {DISCLAIMERS.map((text, idx) => {
-             // Opsional: Sembunyikan disclaimer harga statis lama agar tidak bingung
              if (text.includes("HARGA BERLAKU") || text.includes("HARGA DAPAT BERUBAH")) return null;
 
              return (
@@ -136,7 +191,6 @@ export default function DisclaimerTool() {
           })}
         </div>
       </div>
-
     </div>
   );
 }
