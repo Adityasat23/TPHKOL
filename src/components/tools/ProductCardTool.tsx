@@ -255,53 +255,56 @@ export default function ProductCardTool() {
             </div>
           )}
 
-{/* RENDER: TIKTOK PORTRAIT / LANDSCAPE */}
-            {(productLayout === 'tiktok-portrait' || productLayout === 'tiktok-landscape') && (
-              <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: productLayout === 'tiktok-portrait' ? '300px' : '480px', display: 'flex', flexDirection: productLayout === 'tiktok-portrait' ? 'column' : 'row', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
-                <div style={{ position: 'relative', width: productLayout === 'tiktok-portrait' ? '300px' : '200px', height: productLayout === 'tiktok-portrait' ? '300px' : '220px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
-                  <img key={productImage} src={productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { (e.target as HTMLImageElement).src = SAFE_IMAGE; }} />
-                  {autoDiscountBadge && ( <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#fe2c55', color: '#fff', padding: '4px 8px', fontSize: '14px', fontWeight: 'bold', borderBottomLeftRadius: '8px', zIndex: 10 }}>{autoDiscountBadge}</div> )}
-                </div>
-                <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#ffffff', boxSizing: 'border-box', minWidth: 0 }}>
-                  <div style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#222', lineHeight: '20px', maxHeight: '40px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', wordWrap: 'break-word', whiteSpace: 'normal' }}>[MALL] TIMEPHORIA - {productTitle}</div>
-                  <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                   {autoDiscountTagText && ( <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>{autoDiscountTagText}</span> )}
+            {/* RENDER: TIKTOK PORTRAIT / LANDSCAPE */}
+                          {(productLayout === 'tiktok-portrait' || productLayout === 'tiktok-landscape') && (
+                <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: productLayout === 'tiktok-portrait' ? '300px' : '480px', display: 'flex', flexDirection: productLayout === 'tiktok-portrait' ? 'column' : 'row', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
+                  <div style={{ position: 'relative', width: productLayout === 'tiktok-portrait' ? '300px' : '200px', height: productLayout === 'tiktok-portrait' ? '300px' : '220px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
+                    <img key={productImage} src={productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                    {autoDiscountBadge && (
+                      <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#fe2c55', color: '#fff', padding: '4px 8px', fontSize: '14px', fontWeight: 'bold', borderBottomLeftRadius: '8px', zIndex: 10 }}>{autoDiscountBadge}</div>
+                    )}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#888', marginBottom: productLayout === 'tiktok-portrait' ? '12px' : 'auto' }}>
-                    {productLayout === 'tiktok-landscape' ? ( <span style={{ display: 'flex', alignItems: 'center' }}><StarBlack/><StarBlack/><StarBlack/><StarBlack/><StarBlack/></span> ) : ( <StarYellow /> )}
-                    <span style={{ color: productLayout === 'tiktok-landscape' ? '#222' : '#fabb05', fontWeight: productLayout === 'tiktok-landscape' ? 'normal' : 'bold', marginLeft: '2px' }}>{productRating}</span><span style={{ color: '#ccc', margin: '0 4px' }}>|</span><span>{productSold}</span>
-                  </div>
-                  
-                  {/* FIX: Perbaikan pada area harga agar tidak bertumpuk dengan tombol Buy */}
-                  {productLayout === 'tiktok-portrait' ? (
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: 'auto', flexWrap: 'wrap' }}>
-                      <span style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: tiktokPtMainFontSize, fontWeight: 'bold', fontFamily: 'Arial, sans-serif', wordWrap: 'break-word' }}>{displayPrice}{productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}</span>
-                      {rawOrigPrice && ( <div style={{ color: '#999999', fontSize: '14px', fontFamily: 'Arial, sans-serif' }}><del>{rawOrigPrice}</del>{productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}</div> )}
+                  <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#ffffff', boxSizing: 'border-box', minWidth: 0 }}>
+                    <div style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#222', lineHeight: '20px', maxHeight: '40px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', wordWrap: 'break-word', whiteSpace: 'normal' }}>[MALL] TIMEPHORIA - {productTitle}</div>
+                    <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                     {autoDiscountTagText && ( <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>{autoDiscountTagText}</span> )}
                     </div>
-                  ) : (
-                    // FIX: Tambahkan flexWrap: 'wrap' dan hapus whiteSpace: 'nowrap'
-                    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: '12px', gap: '8px', flexWrap: 'wrap' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, minWidth: '120px' }}>
-                        <div style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: tiktokLsMainFontSize, fontWeight: 'bold', lineHeight: '1.2', fontFamily: 'Arial, sans-serif', wordWrap: 'break-word' }}>
-                          {displayPrice}
-                          {productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
-                        </div>
-                        {rawOrigPrice && ( 
-                          <div style={{ color: '#999999', fontSize: '13px', lineHeight: '1.2', marginTop: '2px', fontFamily: 'Arial, sans-serif', wordWrap: 'break-word' }}>
-                            <del>{rawOrigPrice}</del>
-                            {productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}
-                          </div> 
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#888', marginBottom: productLayout === 'tiktok-portrait' ? '12px' : 'auto' }}>
+                      {productLayout === 'tiktok-landscape' ? ( <span style={{ display: 'flex', alignItems: 'center' }}><StarBlack/><StarBlack/><StarBlack/><StarBlack/><StarBlack/></span> ) : ( <StarYellow /> )}
+                      <span style={{ color: productLayout === 'tiktok-landscape' ? '#222' : '#fabb05', fontWeight: productLayout === 'tiktok-landscape' ? 'normal' : 'bold', marginLeft: '2px' }}>{productRating}</span>
+                      <span style={{ color: '#ccc', margin: '0 4px' }}>|</span><span>{productSold}</span>
+                    </div>
+
+                    {productLayout === 'tiktok-portrait' ? (
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: 'auto', flexWrap: 'wrap' }}>
+                        <span style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: tiktokPtMainFontSize, fontWeight: 'bold', fontFamily: 'Arial, sans-serif' }}>{displayPrice}{productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}</span>
+                        {rawOrigPrice && (
+                          <div style={{ color: '#999999', fontSize: '14px', fontFamily: 'Arial, sans-serif' }}>
+                            <del>{rawOrigPrice}</del>{productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}
+                          </div>
                         )}
                       </div>
-                      <div style={{ display: 'flex', height: '32px', flexShrink: 0, marginLeft: 'auto' }}>
-                        <div style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '0 10px', display: 'flex', alignItems: 'center', borderTopLeftRadius: '4px', borderBottomLeftRadius: '4px' }}><CartIcon /></div>
-                        <div style={{ backgroundColor: '#fe2c55', color: '#ffffff', padding: '0 16px', display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '14px', borderTopRightRadius: '4px', borderBottomRightRadius: '4px' }}>Buy</div>
+                    ) : (
+                      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: '12px', gap: '12px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, minWidth: 0 }}>
+                          <div style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: tiktokLsMainFontSize, fontWeight: 'bold', lineHeight: '1.2', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>
+                            {displayPrice}{productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
+                          </div>
+                          {rawOrigPrice && (
+                            <div style={{ color: '#999999', fontSize: '14px', lineHeight: '1.2', marginTop: '2px', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>
+                              <del>{rawOrigPrice}</del>{productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}
+                            </div>
+                          )}
+                        </div>
+                        <div style={{ display: 'flex', height: '32px', flexShrink: 0 }}>
+                          <div style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '0 10px', display: 'flex', alignItems: 'center', borderTopLeftRadius: '4px', borderBottomLeftRadius: '4px' }}><CartIcon /></div>
+                          <div style={{ backgroundColor: '#fe2c55', color: '#ffffff', padding: '0 16px', display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '14px', borderTopRightRadius: '4px', borderBottomRightRadius: '4px' }}>Buy</div>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
        </div>
      </div>
