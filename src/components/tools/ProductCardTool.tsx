@@ -257,8 +257,10 @@ const priceStrLength = displayPrice.length + productUnit.length;
           )}
 
             {/* RENDER: TIKTOK PORTRAIT / LANDSCAPE */}
+            {/* RENDER: TIKTOK PORTRAIT / LANDSCAPE */}
             {(productLayout === 'tiktok-portrait' || productLayout === 'tiktok-landscape') && (
-              <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: productLayout === 'tiktok-portrait' ? '300px' : '480px', display: 'flex', flexDirection: productLayout === 'tiktok-portrait' ? 'column' : 'row', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
+              // FIX: Lebarkan width untuk landscape dari 480px menjadi 520px agar muat banyak teks
+              <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: productLayout === 'tiktok-portrait' ? '300px' : '520px', display: 'flex', flexDirection: productLayout === 'tiktok-portrait' ? 'column' : 'row', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
                 <div style={{ position: 'relative', width: productLayout === 'tiktok-portrait' ? '300px' : '200px', height: productLayout === 'tiktok-portrait' ? '300px' : '220px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
                   <img key={productImage} src={productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { (e.target as HTMLImageElement).src = SAFE_IMAGE; }} />
                   {autoDiscountBadge && ( <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#fe2c55', color: '#fff', padding: '4px 8px', fontSize: '14px', fontWeight: 'bold', borderBottomLeftRadius: '8px', zIndex: 10 }}>{autoDiscountBadge}</div> )}
@@ -275,21 +277,19 @@ const priceStrLength = displayPrice.length + productUnit.length;
                   
                   {productLayout === 'tiktok-portrait' ? (
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: 'auto', flexWrap: 'wrap' }}>
-                      <span style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: tiktokPtMainFontSize, fontWeight: 'bold', fontFamily: 'Arial, sans-serif', wordBreak: 'break-word' }}>{displayPrice}{productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}</span>
+                      <span style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: tiktokPtMainFontSize, fontWeight: 'bold', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>{displayPrice}{productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}</span>
                       {rawOrigPrice && ( <div style={{ color: '#999999', fontSize: '14px', fontFamily: 'Arial, sans-serif' }}><del>{rawOrigPrice}</del>{productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}</div> )}
                     </div>
                   ) : (
-                    // FIX: Hapus flexWrap, biarkan sejajar secara paksa, dan pastikan flex: 1 & minWidth: 0 menekan teks ke dalam.
+                    // FIX: Karena kotaknya sudah lebar (520px), kita bisa kembali memakai layout original yang bersih
                     <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: '12px', gap: '12px' }}>
                       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, minWidth: 0 }}>
-                        <div style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: tiktokLsMainFontSize, fontWeight: 'bold', lineHeight: '1.2', fontFamily: 'Arial, sans-serif', wordBreak: 'break-word' }}>
-                          {displayPrice}
-                          {productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
+                        <div style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: tiktokLsMainFontSize, fontWeight: 'bold', lineHeight: '1.2', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>
+                          {displayPrice}{productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
                         </div>
                         {rawOrigPrice && ( 
-                          <div style={{ color: '#999999', fontSize: '13px', lineHeight: '1.2', marginTop: '2px', fontFamily: 'Arial, sans-serif', wordBreak: 'break-word' }}>
-                            <del>{rawOrigPrice}</del>
-                            {productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}
+                          <div style={{ color: '#999999', fontSize: '14px', lineHeight: '1.2', marginTop: '2px', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>
+                            <del>{rawOrigPrice}</del>{productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}
                           </div> 
                         )}
                       </div>
