@@ -14,11 +14,10 @@ export interface CatalogItem {
 }
 
 export default function ProductCardTool() {
-  const [productLayout, setProductLayout] = useState<'tiktok-portrait' | 'tiktok-landscape' | 'shopee' | 'shopee-horizontal'>('shopee-horizontal');
-  // Kembalikan ke default bawaan
+  const [productLayout, setProductLayout] = useState<'tiktok-portrait' | 'tiktok-landscape' | 'shopee' | 'shopee-horizontal'>('tiktok-landscape');
   const [productImage, setProductImage] = useState(SAFE_IMAGE);
-  const [productTitle, setProductTitle] = useState("");
-  const [productPrice, setProductPrice] = useState("87.120");
+  const [productTitle, setProductTitle] = useState("ALTERA BLURRING LIP TINT + LIP MATTE");
+  const [productPrice, setProductPrice] = useState("87K-an");
   const [productOriginalPrice, setProductOriginalPrice] = useState("238.000");
   const [productUnit, setProductUnit] = useState("/pcs");
   const [productSold, setProductSold] = useState("1.1K sold");
@@ -75,7 +74,6 @@ export default function ProductCardTool() {
     if (!productPreviewRef.current) return;
     try {
       await document.fonts.ready;
-      // FIX: Kembalikan ke transparent agar lengkungan pojok sempurna
       const dataUrl = await toPng(productPreviewRef.current, { cacheBust: true, pixelRatio: 3.5, backgroundColor: 'transparent' });
       const link = document.createElement('a');
       link.download = `product-${productLayout}-${Date.now()}.png`; link.href = dataUrl; link.click();
@@ -97,11 +95,6 @@ export default function ProductCardTool() {
   let displayPrice = rawPrice;
   if (priceFormat === 'k-an' && newPriceNum > 0 && currency === 'Rp') { const kValue = Math.floor(newPriceNum / 1000); displayPrice = `${currency}${kValue}K-an`; }
 
-const priceStrLength = displayPrice.length + productUnit.length;
-  // FIX: Perkecil sedikit dari 18/24 ke 17/22 agar muat berdampingan
-  const tiktokLsMainFontSize = priceStrLength > 11 ? '17px' : '22px';
-  const tiktokPtMainFontSize = priceStrLength > 12 ? '20px' : '24px';
-  const shopeeMainFontSize = priceStrLength > 12 ? '17px' : '20px';
   return (
      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 z-10 animate-in fade-in zoom-in-95">
        <div className="bg-white/60 backdrop-blur-3xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-500 rounded-[2rem] p-8 border-[1.5px] border-white space-y-8 h-fit">
@@ -207,7 +200,7 @@ const priceStrLength = displayPrice.length + productUnit.length;
                      <div style={{ marginTop: '8px' }}><div style={{ border: '1px solid #fabb05', display: 'inline-flex', alignItems: 'center', padding: '1px 4px', borderRadius: '2px', gap: '4px' }}><StarYellow /><span style={{ fontSize: '12px', color: '#222' }}>{productRating}</span></div></div>
                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', gap: '8px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
-                           <span style={{ color: '#ee4d2d', fontSize: shopeeMainFontSize, fontWeight: 'bold', whiteSpace: 'nowrap' }}>{displayPrice}{productUnit && <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}</span>
+                           <span style={{ color: '#ee4d2d', fontSize: '18px', fontWeight: 'bold', whiteSpace: 'nowrap' }}>{displayPrice}{productUnit && <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}</span>
                            {rawOrigPrice && ( <span style={{ color: '#757575', fontSize: '12px', textDecoration: 'line-through', whiteSpace: 'nowrap', marginLeft: '4px' }}>{rawOrigPrice}</span> )}
                            <ShopeeTicketIcon /><span style={{ fontSize: '12px', color: '#757575', marginLeft: '4px', whiteSpace: 'nowrap' }}>{productSold}</span>
                         </div>
@@ -217,51 +210,48 @@ const priceStrLength = displayPrice.length + productUnit.length;
                </div>
             )}
 
-            {/* RENDER: SHOPEE HORIZONTAL (Dengan tambahan MALL TIMEPHORIA) */}
+            {/* RENDER: SHOPEE HORIZONTAL */}
             {productLayout === 'shopee-horizontal' && (
-            <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', width: '400px', padding: '6px', display: 'flex', flexDirection: 'row', gap: '10px', fontFamily: 'Arial, sans-serif' }}>
-              {/* Gambar Produk: Padding tipis, border radius tipis */}
-              <div style={{ position: 'relative', width: '120px', height: '120px', flexShrink: 0, borderRadius: '2px', overflow: 'hidden', backgroundColor: '#f5f5f5' }}>
-                <img src={productImage} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { (e.target as HTMLImageElement).src = SAFE_IMAGE; }} />
-                {autoDiscountBadge && (
-                  <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#fcebea', color: '#ee4d2d', padding: '2px 6px', fontSize: '12px', fontWeight: 'bold', borderBottomLeftRadius: '4px' }}>
-                    {autoDiscountBadge}
-                  </div>
-                )}
-              </div>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, paddingRight: '4px' }}>
-                <div style={{ fontSize: '14px', lineHeight: '20px', color: '#222', maxHeight: '40px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordWrap: 'break-word', whiteSpace: 'normal', marginBottom: '4px' }}>
-                  <span style={{ backgroundColor: '#ee4d2d', color: '#fff', fontSize: '10px', fontWeight: 'bold', padding: '1px 4px', borderRadius: '2px', marginRight: '6px', verticalAlign: 'middle' }}>Star+</span>
-                  <span style={{ verticalAlign: 'middle' }}>[MALL] TIMEPHORIA - {productTitle}</span>
+              <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', width: '400px', padding: '6px', display: 'flex', flexDirection: 'row', gap: '10px', fontFamily: 'Arial, sans-serif' }}>
+                <div style={{ position: 'relative', width: '120px', height: '120px', flexShrink: 0, borderRadius: '2px', overflow: 'hidden', backgroundColor: '#f5f5f5' }}>
+                  <img src={productImage} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { (e.target as HTMLImageElement).src = SAFE_IMAGE; }} />
+                  {autoDiscountBadge && (
+                    <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#fcebea', color: '#ee4d2d', padding: '2px 6px', fontSize: '12px', fontWeight: 'bold', borderBottomLeftRadius: '4px' }}>
+                      {autoDiscountBadge}
+                    </div>
+                  )}
                 </div>
                 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 'auto' }}>
-                  <div style={{ border: '1px solid #fabb05', display: 'inline-flex', alignItems: 'center', padding: '1px 4px', borderRadius: '2px', gap: '2px' }}>
-                    <StarYellow /><span style={{ fontSize: '12px', color: '#222' }}>{productRating}</span>
+                <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, paddingRight: '4px' }}>
+                  <div style={{ fontSize: '14px', lineHeight: '20px', color: '#222', maxHeight: '40px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordWrap: 'break-word', whiteSpace: 'normal', marginBottom: '4px' }}>
+                    <span style={{ backgroundColor: '#ee4d2d', color: '#fff', fontSize: '10px', fontWeight: 'bold', padding: '1px 4px', borderRadius: '2px', marginRight: '6px', verticalAlign: 'middle' }}>Star+</span>
+                    <span style={{ verticalAlign: 'middle' }}>[MALL] TIMEPHORIA - {productTitle}</span>
                   </div>
-                  <span style={{ fontSize: '12px', color: '#757575' }}>{productSold.includes('terjual') ? productSold : `${productSold} terjual`}</span>
-                </div>
-                
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '8px' }}>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', flexWrap: 'wrap' }}>
-                    <span style={{ color: '#ee4d2d', fontSize: '18px', fontWeight: 'bold' }}>{displayPrice}</span>
-                    {rawOrigPrice && ( <span style={{ color: '#757575', fontSize: '13px', textDecoration: 'line-through' }}>{rawOrigPrice}</span> )}
+                  
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 'auto' }}>
+                    <div style={{ border: '1px solid #fabb05', display: 'inline-flex', alignItems: 'center', padding: '1px 4px', borderRadius: '2px', gap: '2px' }}>
+                      <StarYellow /><span style={{ fontSize: '12px', color: '#222' }}>{productRating}</span>
+                    </div>
+                    <span style={{ fontSize: '12px', color: '#757575' }}>{productSold.includes('terjual') ? productSold : `${productSold} terjual`}</span>
                   </div>
-                  <div style={{ backgroundColor: '#ee4d2d', color: '#fff', padding: '6px 16px', borderRadius: '4px', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer' }}>
-                    Beli
+                  
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', flexWrap: 'wrap' }}>
+                      <span style={{ color: '#ee4d2d', fontSize: '18px', fontWeight: 'bold' }}>{displayPrice}</span>
+                      {rawOrigPrice && ( <span style={{ color: '#757575', fontSize: '13px', textDecoration: 'line-through' }}>{rawOrigPrice}</span> )}
+                    </div>
+                    <div style={{ backgroundColor: '#ee4d2d', color: '#fff', padding: '6px 16px', borderRadius: '4px', fontSize: '14px', fontWeight: 'bold', cursor: 'pointer' }}>
+                      Beli
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-            {/* RENDER: TIKTOK PORTRAIT / LANDSCAPE */}
-            {/* RENDER: TIKTOK PORTRAIT / LANDSCAPE */}
-            {(productLayout === 'tiktok-portrait' || productLayout === 'tiktok-landscape') && (
-              // FIX: Lebarkan width untuk landscape dari 480px menjadi 520px agar muat banyak teks
-              <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: productLayout === 'tiktok-portrait' ? '300px' : '520px', display: 'flex', flexDirection: productLayout === 'tiktok-portrait' ? 'column' : 'row', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
-                <div style={{ position: 'relative', width: productLayout === 'tiktok-portrait' ? '300px' : '200px', height: productLayout === 'tiktok-portrait' ? '300px' : '220px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
+            {/* RENDER: TIKTOK PORTRAIT (Terpisah) */}
+            {productLayout === 'tiktok-portrait' && (
+              <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: '300px', display: 'flex', flexDirection: 'column', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
+                <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
                   <img key={productImage} src={productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { (e.target as HTMLImageElement).src = SAFE_IMAGE; }} />
                   {autoDiscountBadge && ( <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#fe2c55', color: '#fff', padding: '4px 8px', fontSize: '14px', fontWeight: 'bold', borderBottomLeftRadius: '8px', zIndex: 10 }}>{autoDiscountBadge}</div> )}
                 </div>
@@ -270,38 +260,89 @@ const priceStrLength = displayPrice.length + productUnit.length;
                   <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                    {autoDiscountTagText && ( <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>{autoDiscountTagText}</span> )}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#888', marginBottom: productLayout === 'tiktok-portrait' ? '12px' : 'auto' }}>
-                    {productLayout === 'tiktok-landscape' ? ( <span style={{ display: 'flex', alignItems: 'center' }}><StarBlack/><StarBlack/><StarBlack/><StarBlack/><StarBlack/></span> ) : ( <StarYellow /> )}
-                    <span style={{ color: productLayout === 'tiktok-landscape' ? '#222' : '#fabb05', fontWeight: productLayout === 'tiktok-landscape' ? 'normal' : 'bold', marginLeft: '2px' }}>{productRating}</span><span style={{ color: '#ccc', margin: '0 4px' }}>|</span><span>{productSold}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#888', marginBottom: '12px' }}>
+                    <StarYellow />
+                    <span style={{ color: '#fabb05', fontWeight: 'bold', marginLeft: '2px' }}>{productRating}</span><span style={{ color: '#ccc', margin: '0 4px' }}>|</span><span>{productSold}</span>
                   </div>
                   
-                  {productLayout === 'tiktok-portrait' ? (
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: 'auto', flexWrap: 'wrap' }}>
-                      <span style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: tiktokPtMainFontSize, fontWeight: 'bold', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>{displayPrice}{productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}</span>
-                      {rawOrigPrice && ( <div style={{ color: '#999999', fontSize: '14px', fontFamily: 'Arial, sans-serif' }}><del>{rawOrigPrice}</del>{productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}</div> )}
-                    </div>
-                  ) : (
-                    // FIX: Karena kotaknya sudah lebar (520px), kita bisa kembali memakai layout original yang bersih
-                    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: '12px', gap: '12px' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, minWidth: 0 }}>
-                        <div style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: tiktokLsMainFontSize, fontWeight: 'bold', lineHeight: '1.2', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>
-                          {displayPrice}{productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
-                        </div>
-                        {rawOrigPrice && ( 
-                          <div style={{ color: '#999999', fontSize: '14px', lineHeight: '1.2', marginTop: '2px', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>
-                            <del>{rawOrigPrice}</del>{productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}
-                          </div> 
-                        )}
-                      </div>
-                      <div style={{ display: 'flex', height: '32px', flexShrink: 0 }}>
-                        <div style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '0 10px', display: 'flex', alignItems: 'center', borderTopLeftRadius: '4px', borderBottomLeftRadius: '4px' }}><CartIcon /></div>
-                        <div style={{ backgroundColor: '#fe2c55', color: '#ffffff', padding: '0 16px', display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '14px', borderTopRightRadius: '4px', borderBottomRightRadius: '4px' }}>Buy</div>
-                      </div>
-                    </div>
-                  )}
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: 'auto', flexWrap: 'wrap' }}>
+                    <span style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: '24px', fontWeight: 'bold', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>{displayPrice}{productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}</span>
+                    {rawOrigPrice && ( <div style={{ color: '#999999', fontSize: '14px', fontFamily: 'Arial, sans-serif' }}><del>{rawOrigPrice}</del>{productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}</div> )}
+                  </div>
                 </div>
               </div>
             )}
+
+            {/* RENDER: TIKTOK LANDSCAPE (Sesuai Referensi Gambar) */}
+            {productLayout === 'tiktok-landscape' && (
+              <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: '480px', display: 'flex', flexDirection: 'row', boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}>
+                {/* Bagian Kiri: Gambar Full Height */}
+                <div style={{ position: 'relative', width: '210px', flexShrink: 0, backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'stretch' }}>
+                  <img key={productImage} src={productImage} style={{ width: '100%', height: '100%', minHeight: '220px', objectFit: 'cover', display: 'block' }} onError={(e) => { (e.target as HTMLImageElement).src = SAFE_IMAGE; }} />
+                  {autoDiscountBadge && (
+                    <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#fe2c55', color: '#fff', padding: '6px 12px', fontSize: '16px', fontWeight: 'bold', borderBottomLeftRadius: '8px', zIndex: 10 }}>
+                      {autoDiscountBadge}
+                    </div>
+                  )}
+                </div>
+
+                {/* Bagian Kanan: Konten Informasi */}
+                <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#ffffff', minWidth: 0 }}>
+                  
+                  {/* Judul (Uppercase, Bold) */}
+                  <div style={{ fontSize: '16px', fontWeight: 800, color: '#222', lineHeight: '1.4', maxHeight: '44px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', textTransform: 'uppercase', marginBottom: '8px' }}>
+                    [MALL] TIMEPHORIA - {productTitle}
+                  </div>
+
+                  {/* Tag Diskon (Kotak Pink) */}
+                  {autoDiscountTagText && (
+                    <div style={{ marginBottom: '12px' }}>
+                      <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '4px 8px', fontSize: '13px', borderRadius: '4px', fontWeight: 'bold' }}>
+                        {autoDiscountTagText}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Rating Bintang (Hitam) & Terjual */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', color: '#888', marginBottom: '16px' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '2px', color: '#222' }}>
+                      <StarBlack/><StarBlack/><StarBlack/><StarBlack/><StarBlack/>
+                    </span>
+                    <span style={{ color: '#222', fontWeight: '600', marginLeft: '4px' }}>{productRating}</span>
+                    <span style={{ color: '#ddd', margin: '0 4px' }}>|</span>
+                    <span>{productSold}</span>
+                  </div>
+
+                  {/* Baris Bawah: Harga & Tombol Buy */}
+                  <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 'auto', width: '100%' }}>
+                    
+                    {/* Kolom Harga (Vertikal) */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1, minWidth: 0, paddingRight: '12px' }}>
+                      <div style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: '24px', fontWeight: '800', lineHeight: '1.1', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {displayPrice}{productUnit && <span style={{ fontSize: '15px', fontWeight: '500' }}>{productUnit}</span>}
+                      </div>
+                      {rawOrigPrice && (
+                        <div style={{ color: '#999999', fontSize: '15px', lineHeight: '1.1', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          <del>{rawOrigPrice}</del>{productUnit && <span style={{ textDecoration: 'none' }}>{productUnit}</span>}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Tombol Buy (Kanan) */}
+                    <div style={{ display: 'flex', height: '36px', flexShrink: 0, borderRadius: '6px', overflow: 'hidden' }}>
+                      <div style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '0 12px', display: 'flex', alignItems: 'center' }}>
+                        <CartIcon />
+                      </div>
+                      <div style={{ backgroundColor: '#fe2c55', color: '#ffffff', padding: '0 20px', display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '15px' }}>
+                        Buy
+                      </div>
+                    </div>
+                    
+                  </div>
+                </div>
+              </div>
+            )}
+            
           </div>
        </div>
      </div>
