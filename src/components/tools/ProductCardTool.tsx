@@ -124,32 +124,12 @@ const priceStrLength = displayPrice.length + productUnit.length;
             <button onClick={() => { setCurrency('$'); setPriceFormat('exact'); }} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${currency === '$' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>🇺🇸USD ($)</button>
           </div>
 
-          {productLayout === 'tiktok-portrait' ? (
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: 'auto', flexWrap: 'wrap' }}>
-                      <span style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: tiktokPtMainFontSize, fontWeight: 'bold', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>{displayPrice}{productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}</span>
-                      {rawOrigPrice && ( <div style={{ color: '#999999', fontSize: '14px', fontFamily: 'Arial, sans-serif' }}><del>{rawOrigPrice}</del>{productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}</div> )}
-                    </div>
-                  ) : (
-                    // FIX: Hapus flexWrap agar tombol Buy kembali ke samping, dan gunakan whiteSpace: nowrap
-                    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: '12px', gap: '8px' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, minWidth: 0 }}>
-                        <div style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: tiktokLsMainFontSize, fontWeight: 'bold', lineHeight: '1.2', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>
-                          {displayPrice}
-                          {productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
-                        </div>
-                        {rawOrigPrice && ( 
-                          <div style={{ color: '#999999', fontSize: '13px', lineHeight: '1.2', marginTop: '2px', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            <del>{rawOrigPrice}</del>
-                            {productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}
-                          </div> 
-                        )}
-                      </div>
-                      <div style={{ display: 'flex', height: '32px', flexShrink: 0 }}>
-                        <div style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '0 10px', display: 'flex', alignItems: 'center', borderTopLeftRadius: '4px', borderBottomLeftRadius: '4px' }}><CartIcon /></div>
-                        <div style={{ backgroundColor: '#fe2c55', color: '#ffffff', padding: '0 16px', display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '14px', borderTopRightRadius: '4px', borderBottomRightRadius: '4px' }}>Buy</div>
-                      </div>
-                    </div>
-                  )}
+          {(productLayout === 'tiktok-portrait' || productLayout === 'tiktok-landscape') && (
+            <div className="flex bg-white/60 p-1.5 rounded-xl border border-white shadow-sm animate-in fade-in">
+              <button onClick={() => setPriceColor('pink')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${priceColor === 'pink' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>Harga Pink</button>
+              <button onClick={() => setPriceColor('black')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${priceColor === 'black' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>Harga Hitam</button>
+            </div>
+          )}
 
           <div className="space-y-5">
             <h3 className="font-semibold text-gray-900 text-sm tracking-wide flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-[#0071E3]"></span> Detail Produk</h3>
@@ -295,19 +275,19 @@ const priceStrLength = displayPrice.length + productUnit.length;
                   
                   {productLayout === 'tiktok-portrait' ? (
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: 'auto', flexWrap: 'wrap' }}>
-                      <span style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: tiktokPtMainFontSize, fontWeight: 'bold', fontFamily: 'Arial, sans-serif', wordBreak: 'break-word' }}>{displayPrice}{productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}</span>
+                      <span style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: tiktokPtMainFontSize, fontWeight: 'bold', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>{displayPrice}{productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}</span>
                       {rawOrigPrice && ( <div style={{ color: '#999999', fontSize: '14px', fontFamily: 'Arial, sans-serif' }}><del>{rawOrigPrice}</del>{productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}</div> )}
                     </div>
                   ) : (
-                    // FIX: Hapus flexWrap, biarkan sejajar secara paksa, dan pastikan flex: 1 & minWidth: 0 menekan teks ke dalam.
-                    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: '12px', gap: '12px' }}>
+                    // FIX: Hapus flexWrap agar tombol Buy kembali ke samping, dan gunakan whiteSpace: nowrap
+                    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: '12px', gap: '8px' }}>
                       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, minWidth: 0 }}>
-                        <div style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: tiktokLsMainFontSize, fontWeight: 'bold', lineHeight: '1.2', fontFamily: 'Arial, sans-serif', wordBreak: 'break-word' }}>
+                        <div style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: tiktokLsMainFontSize, fontWeight: 'bold', lineHeight: '1.2', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>
                           {displayPrice}
                           {productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}
                         </div>
                         {rawOrigPrice && ( 
-                          <div style={{ color: '#999999', fontSize: '13px', lineHeight: '1.2', marginTop: '2px', fontFamily: 'Arial, sans-serif', wordBreak: 'break-word' }}>
+                          <div style={{ color: '#999999', fontSize: '13px', lineHeight: '1.2', marginTop: '2px', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             <del>{rawOrigPrice}</del>
                             {productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}
                           </div> 
