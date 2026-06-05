@@ -95,6 +95,19 @@ export default function ProductCardTool() {
   let displayPrice = rawPrice;
   if (priceFormat === 'k-an' && newPriceNum > 0 && currency === 'Rp') { const kValue = Math.floor(newPriceNum / 1000); displayPrice = `${currency}${kValue}K-an`; }
 
+  // ==========================================
+  // DYNAMIC FONT SIZING LOGIC (AUTO-SHRINK)
+  // ==========================================
+  const priceStrLength = displayPrice.length + productUnit.length;
+  
+  let dynamicPriceFontSize = '24px'; // Default besar
+  if (priceStrLength > 16) dynamicPriceFontSize = '15px'; // Sangat panjang
+  else if (priceStrLength > 13) dynamicPriceFontSize = '17px'; // Panjang
+  else if (priceStrLength > 10) dynamicPriceFontSize = '20px'; // Lumayan panjang
+
+  const tiktokPtMainFontSize = priceStrLength > 12 ? '20px' : '24px';
+  const shopeeMainFontSize = priceStrLength > 12 ? '17px' : '20px';
+
   return (
      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 z-10 animate-in fade-in zoom-in-95">
        <div className="bg-white/60 backdrop-blur-3xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-500 rounded-[2rem] p-8 border-[1.5px] border-white space-y-8 h-fit">
@@ -181,13 +194,18 @@ export default function ProductCardTool() {
           </button>
        </div>
 
-       <div className="bg-[#E5E5EA] border border-gray-200 rounded-[2rem] p-10 flex items-center justify-center min-h-[500px] overflow-hidden shadow-inner relative">
+       <div className="bg-[#E5E5EA] border border-gray-200 rounded-[2rem] p-10 flex items-center justify-center min-h-[500px] overflow-x-auto shadow-inner relative custom-scrollbar">
           <div className="absolute inset-0 opacity-40 bg-[radial-gradient(#C7C7CC_1px,transparent_1px)] [background-size:16px_16px]"></div>
-          <div style={{ padding: '40px', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'transparent', zIndex: 10, width: '100%', height: '100%' }}>
+          
+          {/* 
+            FIX UTAMA: Memastikan kontainer flex tidak menekan kanvas di dalamnya.
+            overflow-x-auto memungkinkan user men-scroll ke kanan jika layar kekecilan.
+          */}
+          <div style={{ padding: '40px', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'transparent', zIndex: 10, minWidth: 'min-content' }}>
             
             {/* RENDER: SHOPEE SQUARE */}
             {productLayout === 'shopee' && (
-               <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '4px', width: '300px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontFamily: 'Arial, sans-serif' }}>
+               <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '4px', width: '300px', minWidth: '300px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontFamily: 'Arial, sans-serif' }}>
                   <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
                      <img src={productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { (e.target as HTMLImageElement).src = SAFE_IMAGE; }} />
                      {autoDiscountBadge && ( <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#fff0f1', color: '#ee4d2d', padding: '4px 6px', fontSize: '14px', fontWeight: 'bold' }}>{autoDiscountBadge}</div> )}
@@ -200,7 +218,7 @@ export default function ProductCardTool() {
                      <div style={{ marginTop: '8px' }}><div style={{ border: '1px solid #fabb05', display: 'inline-flex', alignItems: 'center', padding: '1px 4px', borderRadius: '2px', gap: '4px' }}><StarYellow /><span style={{ fontSize: '12px', color: '#222' }}>{productRating}</span></div></div>
                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', gap: '8px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
-                           <span style={{ color: '#ee4d2d', fontSize: '18px', fontWeight: 'bold', whiteSpace: 'nowrap' }}>{displayPrice}{productUnit && <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}</span>
+                           <span style={{ color: '#ee4d2d', fontSize: shopeeMainFontSize, fontWeight: 'bold', whiteSpace: 'nowrap' }}>{displayPrice}{productUnit && <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}</span>
                            {rawOrigPrice && ( <span style={{ color: '#757575', fontSize: '12px', textDecoration: 'line-through', whiteSpace: 'nowrap', marginLeft: '4px' }}>{rawOrigPrice}</span> )}
                            <ShopeeTicketIcon /><span style={{ fontSize: '12px', color: '#757575', marginLeft: '4px', whiteSpace: 'nowrap' }}>{productSold}</span>
                         </div>
@@ -212,7 +230,7 @@ export default function ProductCardTool() {
 
             {/* RENDER: SHOPEE HORIZONTAL */}
             {productLayout === 'shopee-horizontal' && (
-              <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', width: '400px', padding: '6px', display: 'flex', flexDirection: 'row', gap: '10px', fontFamily: 'Arial, sans-serif' }}>
+              <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', width: '400px', minWidth: '400px', padding: '6px', display: 'flex', flexDirection: 'row', gap: '10px', fontFamily: 'Arial, sans-serif' }}>
                 <div style={{ position: 'relative', width: '120px', height: '120px', flexShrink: 0, borderRadius: '2px', overflow: 'hidden', backgroundColor: '#f5f5f5' }}>
                   <img src={productImage} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { (e.target as HTMLImageElement).src = SAFE_IMAGE; }} />
                   {autoDiscountBadge && (
@@ -250,7 +268,7 @@ export default function ProductCardTool() {
 
             {/* RENDER: TIKTOK PORTRAIT (Terpisah) */}
             {productLayout === 'tiktok-portrait' && (
-              <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: '300px', display: 'flex', flexDirection: 'column', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
+              <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: '300px', minWidth: '300px', display: 'flex', flexDirection: 'column', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
                 <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
                   <img key={productImage} src={productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { (e.target as HTMLImageElement).src = SAFE_IMAGE; }} />
                   {autoDiscountBadge && ( <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#fe2c55', color: '#fff', padding: '4px 8px', fontSize: '14px', fontWeight: 'bold', borderBottomLeftRadius: '8px', zIndex: 10 }}>{autoDiscountBadge}</div> )}
@@ -266,18 +284,19 @@ export default function ProductCardTool() {
                   </div>
                   
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: 'auto', flexWrap: 'wrap' }}>
-                    <span style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: '24px', fontWeight: 'bold', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>{displayPrice}{productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}</span>
+                    <span style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: tiktokPtMainFontSize, fontWeight: 'bold', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>{displayPrice}{productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}</span>
                     {rawOrigPrice && ( <div style={{ color: '#999999', fontSize: '14px', fontFamily: 'Arial, sans-serif' }}><del>{rawOrigPrice}</del>{productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}</div> )}
                   </div>
                 </div>
               </div>
             )}
 
-            {/* RENDER: TIKTOK LANDSCAPE (Sesuai Referensi Gambar) */}
+            {/* RENDER: TIKTOK LANDSCAPE (ULTIMATE FIX) */}
             {productLayout === 'tiktok-landscape' && (
-              <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: '480px', display: 'flex', flexDirection: 'row', boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}>
-                {/* Bagian Kiri: Gambar Full Height */}
-                <div style={{ position: 'relative', width: '210px', flexShrink: 0, backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'stretch' }}>
+              // FIX: Kunci width di 540px, tambahkan minWidth agar tidak bisa digencet oleh layar kecil.
+              <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: '6000px', minWidth: '600px', display: 'flex', flexDirection: 'row', boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}>
+                {/* Bagian Kiri: Kunci lebar gambar di 220px, jangan izinkan menyusut (flexShrink: 0) */}
+                <div style={{ position: 'relative', width: '220px', minWidth: '220px', flexShrink: 0, backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'stretch' }}>
                   <img key={productImage} src={productImage} style={{ width: '100%', height: '100%', minHeight: '220px', objectFit: 'cover', display: 'block' }} onError={(e) => { (e.target as HTMLImageElement).src = SAFE_IMAGE; }} />
                   {autoDiscountBadge && (
                     <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#fe2c55', color: '#fff', padding: '6px 12px', fontSize: '16px', fontWeight: 'bold', borderBottomLeftRadius: '8px', zIndex: 10 }}>
@@ -289,12 +308,12 @@ export default function ProductCardTool() {
                 {/* Bagian Kanan: Konten Informasi */}
                 <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#ffffff', minWidth: 0 }}>
                   
-                  {/* Judul (Uppercase, Bold) */}
+                  {/* Judul */}
                   <div style={{ fontSize: '16px', fontWeight: 800, color: '#222', lineHeight: '1.4', maxHeight: '44px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', textTransform: 'uppercase', marginBottom: '8px' }}>
                     [MALL] TIMEPHORIA - {productTitle}
                   </div>
 
-                  {/* Tag Diskon (Kotak Pink) */}
+                  {/* Tag Diskon */}
                   {autoDiscountTagText && (
                     <div style={{ marginBottom: '12px' }}>
                       <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '4px 8px', fontSize: '13px', borderRadius: '4px', fontWeight: 'bold' }}>
@@ -303,8 +322,8 @@ export default function ProductCardTool() {
                     </div>
                   )}
 
-                  {/* Rating Bintang (Hitam) & Terjual */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', color: '#888', marginBottom: '16px' }}>
+                  {/* Rating Bintang */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', color: '#888', marginBottom: '16px', whiteSpace: 'nowrap' }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '2px', color: '#222' }}>
                       <StarBlack/><StarBlack/><StarBlack/><StarBlack/><StarBlack/>
                     </span>
@@ -313,22 +332,22 @@ export default function ProductCardTool() {
                     <span>{productSold}</span>
                   </div>
 
-                  {/* Baris Bawah: Harga & Tombol Buy */}
-                  <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 'auto', width: '100%' }}>
+                  {/* Baris Bawah: Harga (Kiri) & Tombol Buy (Kanan) berdampingan permanen */}
+                  <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 'auto', width: '100%', gap: '12px' }}>
                     
-                    {/* Kolom Harga (Vertikal) */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1, minWidth: 0, paddingRight: '12px' }}>
-                      <div style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: '24px', fontWeight: '800', lineHeight: '1.1', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {displayPrice}{productUnit && <span style={{ fontSize: '15px', fontWeight: '500' }}>{productUnit}</span>}
+                    {/* Kolom Harga (Menggunakan Auto-Shrink Font Size yang sudah dihitung di atas) */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1, minWidth: 0 }}>
+                      <div style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: dynamicPriceFontSize, fontWeight: '800', lineHeight: '1.1', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {displayPrice}{productUnit && <span style={{ fontSize: '14px', fontWeight: '500' }}>{productUnit}</span>}
                       </div>
                       {rawOrigPrice && (
-                        <div style={{ color: '#999999', fontSize: '15px', lineHeight: '1.1', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <div style={{ color: '#999999', fontSize: '14px', lineHeight: '1.1', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           <del>{rawOrigPrice}</del>{productUnit && <span style={{ textDecoration: 'none' }}>{productUnit}</span>}
                         </div>
                       )}
                     </div>
 
-                    {/* Tombol Buy (Kanan) */}
+                    {/* Tombol Buy: Kunci agar tidak ikut menyusut (flexShrink: 0) */}
                     <div style={{ display: 'flex', height: '36px', flexShrink: 0, borderRadius: '6px', overflow: 'hidden' }}>
                       <div style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '0 12px', display: 'flex', alignItems: 'center' }}>
                         <CartIcon />
