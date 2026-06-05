@@ -17,8 +17,8 @@ export default function ProductCardTool() {
   const [productLayout, setProductLayout] = useState<'tiktok-portrait' | 'tiktok-landscape' | 'shopee' | 'shopee-horizontal'>('tiktok-landscape');
   const [productImage, setProductImage] = useState(SAFE_IMAGE);
   const [productTitle, setProductTitle] = useState("ALTERA BLURRING LIP TINT + LIP MATTE");
-  const [productPrice, setProductPrice] = useState("87K-an");
-  const [productOriginalPrice, setProductOriginalPrice] = useState("238.000");
+  const [productPrice, setProductPrice] = useState("");
+  const [productOriginalPrice, setProductOriginalPrice] = useState("");
   const [productUnit, setProductUnit] = useState("/pcs");
   const [productSold, setProductSold] = useState("1.1K sold");
   const [productRating, setProductRating] = useState("4.9");
