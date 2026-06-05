@@ -1,0 +1,111 @@
+import { useState, useEffect, ReactNode } from 'react';
+
+export interface BannedItem {
+  word: string;
+  suggestion: string;
+  regexStr: string;
+}
+
+export function useBannedWords() {
+  const [bannedData, setBannedData] = useState<BannedItem[]>([]);
+
+  useEffect(() => {
+    const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/1RUWiTF4k0JVVU4HOWmPCrECv0T5k2MHssfi7sZMn70I/export?format=csv&gid=520891865&t=${new Date().getTime()}`;
+
+    fetch(SHEET_CSV_URL, { cache: 'no-store' })
+      .then(res => res.text())
+      .then(csvText => {
+        const rows: string[][] = [];
+        let row: string[] = [];
+        let currentVal = '';
+        let insideQuotes = false;
+
+        for (let i = 0; i < csvText.length; i++) {
+          const char = csvText[i];
+          const nextChar = csvText[i + 1];
+
+          if (char === '"' && insideQuotes && nextChar === '"') {
+            currentVal += '"'; i++; 
+          } else if (char === '"') {
+            insideQuotes = !insideQuotes;
+          } else if (char === ',' && !insideQuotes) {
+            row.push(currentVal); currentVal = '';
+          } else if ((char === '\n' || char === '\r') && !insideQuotes) {
+            if (char === '\r' && nextChar === '\n') i++;
+            row.push(currentVal); rows.push(row); row = []; currentVal = '';
+          } else {
+            currentVal += char;
+          }
+        }
+        if (currentVal || row.length > 0) { row.push(currentVal); rows.push(row); }
+
+        let bCol = 1; let sCol = 2;
+        const parsedData: BannedItem[] = [];
+
+        rows.forEach((cols, index) => {
+          if (index === 0) return; 
+          if (cols.length > bCol) {
+            const bannedCell = cols[bCol] || '';
+            const suggestion = (cols[sCol] && cols[sCol].trim() !== '') ? cols[sCol].trim() : '-take out-';
+            const cleanCell = bannedCell.replace(/\([^)]*\)/g, '');
+            const wordsInCell = cleanCell.split(/[\n,\/]+/).map(w => w.trim().toLowerCase()).filter(w => w.length > 1);
+            
+            wordsInCell.forEach(word => {
+              let cleanWord = word.replace(/^[^a-zA-Z0-9%]+|[^a-zA-Z0-9%]+$/g, '');
+              if (!cleanWord) return;
+              const tokens = cleanWord.split(/([\W_]+)/);
+              let regexStr = "";
+              for (let i = 0; i < tokens.length; i++) {
+                const token = tokens[i];
+                if (i % 2 === 0) { regexStr += token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); } 
+                else { regexStr += token.includes('%') ? '[\\W_]*%[\\W_]*' : '[\\W_]*'; }
+              }
+              const prefix = /^[a-zA-Z0-9]/.test(cleanWord) ? '\\b' : '';
+              const suffix = /[a-zA-Z0-9]$/.test(cleanWord) ? '\\b' : '';
+              parsedData.push({ word: cleanWord, suggestion, regexStr: `${prefix}${regexStr}${suffix}` });
+            });
+          }
+        });
+        setBannedData(parsedData.sort((a, b) => b.word.length - a.word.length));
+      })
+      .catch(err => console.error("Gagal load banned words:", err));
+  }, []);
+
+  const getDetectedBannedWords = (text: string): BannedItem[] => {
+    if (!text) return [];
+    const detected: BannedItem[] = [];
+    bannedData.forEach(item => {
+      try {
+        const regex = new RegExp(item.regexStr, 'i');
+        if (regex.test(text) && !detected.some((d: BannedItem) => d.word === item.word)) detected.push(item);
+      } catch (e) { console.error("Regex Invalid:", item.regexStr); }
+    });
+    return detected;
+  };
+
+  const renderWithHighlights = (text: string): ReactNode => {
+    if (!bannedData.length || !text) return text;
+    
+    const detectedItems = getDetectedBannedWords(text);
+    if (detectedItems.length === 0) return text;
+
+    const regexParts = detectedItems.map((d: BannedItem) => d.regexStr).filter(Boolean);
+    const combinedRegex = new RegExp(`(${regexParts.join('|')})`, 'gi');
+    
+    const parts = text.split(combinedRegex);
+    
+    return parts.map((part: string, i: number) => {
+      if (!part) return null;
+      const isBanned = detectedItems.some((d: BannedItem) => new RegExp(`^${d.regexStr}$`, 'i').test(part));
+      return isBanned ? (
+        <span key={i} style={{ backgroundColor: '#FF3B30', color: 'white', padding: '0 4px', borderRadius: '4px', display: 'inline-block' }}>
+          {part}
+        </span>
+      ) : (
+        part
+      );
+    });
+  };
+
+  return { bannedData, getDetectedBannedWords, renderWithHighlights };
+}
