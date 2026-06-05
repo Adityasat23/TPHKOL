@@ -172,23 +172,19 @@ export default function DisclaimerTool() {
           <p className="text-gray-500 font-medium text-sm">Klik kotak di bawah untuk menyalin disclaimer umum non-harga.</p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {DISCLAIMERS.map((text, idx) => {
-             if (text.includes("HARGA BERLAKU") || text.includes("HARGA DAPAT BERUBAH")) return null;
-
-             return (
-              <div key={idx} onClick={() => handleCopyLegacy(text, idx)} className="p-5 bg-white border border-gray-200 hover:border-gray-400 rounded-2xl cursor-pointer transition-all flex flex-col justify-between gap-4 group shadow-sm active:scale-[0.99] h-full">
-                <div className="text-[14px] text-gray-600 group-hover:text-gray-900 transition-colors leading-relaxed font-medium">
-                  {text}
-                </div>
-                <div className="self-end mt-auto">
-                  <span className={`text-[11px] uppercase font-bold px-4 py-1.5 rounded-lg transition-all ${copiedLegacyIndex === idx ? 'bg-[#34C759] text-white' : 'bg-gray-100 text-gray-500 group-hover:bg-gray-800 group-hover:text-white'}`}>
-                    {copiedLegacyIndex === idx ? '✓ COPIED' : 'COPY'}
-                  </span>
-                </div>
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {DISCLAIMERS.map((text, idx) => (
+            <div key={idx} onClick={() => handleCopyLegacy(text, idx)} className="p-5 bg-white border border-gray-200 hover:border-[#0071E3]/50 hover:bg-blue-50/50 rounded-2xl cursor-pointer transition-all flex flex-col justify-between gap-4 group shadow-sm active:scale-[0.99] h-full">
+              <div className="text-[14px] text-gray-600 group-hover:text-gray-900 transition-colors leading-relaxed font-medium">
+                {text}
               </div>
-            )
-          })}
+              <div className="self-end mt-auto pt-4">
+                <span className={`text-[11px] uppercase font-bold px-4 py-1.5 rounded-lg transition-all ${copiedLegacyIndex === idx ? 'bg-[#34C759] text-white' : 'bg-gray-100 text-gray-500 group-hover:bg-[#0071E3] group-hover:text-white'}`}>
+                  {copiedLegacyIndex === idx ? '✓ COPIED' : 'COPY'}
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
