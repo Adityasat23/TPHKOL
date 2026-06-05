@@ -10,65 +10,95 @@ export function useBannedWords() {
   const [bannedData, setBannedData] = useState<BannedItem[]>([]);
 
   useEffect(() => {
-    const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/1RUWiTF4k0JVVU4HOWmPCrECv0T5k2MHssfi7sZMn70I/export?format=csv&gid=520891865&t=${new Date().getTime()}`;
+    const fetchBannedWords = async () => {
+      try {
+        const url1 = `https://docs.google.com/spreadsheets/d/1RUWiTF4k0JVVU4HOWmPCrECv0T5k2MHssfi7sZMn70I/export?format=csv&gid=520891865&t=${new Date().getTime()}`;
+        const url2 = `https://docs.google.com/spreadsheets/d/1cDI2VEyloCxr3M5AeOpLTjh3NWUoM6v3mvwl-SExaww/export?format=csv&gid=1767021555&t=${new Date().getTime()}`;
 
-    fetch(SHEET_CSV_URL, { cache: 'no-store' })
-      .then(res => res.text())
-      .then(csvText => {
-        const rows: string[][] = [];
-        let row: string[] = [];
-        let currentVal = '';
-        let insideQuotes = false;
+        // Mengambil dua sumber data sekaligus
+        const [res1, res2] = await Promise.all([
+          fetch(url1, { cache: 'no-store' }),
+          fetch(url2, { cache: 'no-store' })
+        ]);
 
-        for (let i = 0; i < csvText.length; i++) {
-          const char = csvText[i];
-          const nextChar = csvText[i + 1];
+        const csvText1 = await res1.text();
+        const csvText2 = await res2.text();
 
-          if (char === '"' && insideQuotes && nextChar === '"') {
-            currentVal += '"'; i++; 
-          } else if (char === '"') {
-            insideQuotes = !insideQuotes;
-          } else if (char === ',' && !insideQuotes) {
-            row.push(currentVal); currentVal = '';
-          } else if ((char === '\n' || char === '\r') && !insideQuotes) {
-            if (char === '\r' && nextChar === '\n') i++;
-            row.push(currentVal); rows.push(row); row = []; currentVal = '';
-          } else {
-            currentVal += char;
-          }
-        }
-        if (currentVal || row.length > 0) { row.push(currentVal); rows.push(row); }
-
-        let bCol = 1; let sCol = 2;
         const parsedData: BannedItem[] = [];
 
-        rows.forEach((cols, index) => {
-          if (index === 0) return; 
-          if (cols.length > bCol) {
-            const bannedCell = cols[bCol] || '';
-            const suggestion = (cols[sCol] && cols[sCol].trim() !== '') ? cols[sCol].trim() : '-take out-';
-            const cleanCell = bannedCell.replace(/\([^)]*\)/g, '');
-            const wordsInCell = cleanCell.split(/[\n,\/]+/).map(w => w.trim().toLowerCase()).filter(w => w.length > 1);
-            
-            wordsInCell.forEach(word => {
-              let cleanWord = word.replace(/^[^a-zA-Z0-9%]+|[^a-zA-Z0-9%]+$/g, '');
-              if (!cleanWord) return;
-              const tokens = cleanWord.split(/([\W_]+)/);
-              let regexStr = "";
-              for (let i = 0; i < tokens.length; i++) {
-                const token = tokens[i];
-                if (i % 2 === 0) { regexStr += token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); } 
-                else { regexStr += token.includes('%') ? '[\\W_]*%[\\W_]*' : '[\\W_]*'; }
-              }
-              const prefix = /^[a-zA-Z0-9]/.test(cleanWord) ? '\\b' : '';
-              const suffix = /[a-zA-Z0-9]$/.test(cleanWord) ? '\\b' : '';
-              parsedData.push({ word: cleanWord, suggestion, regexStr: `${prefix}${regexStr}${suffix}` });
-            });
+        // Helper Processor agar parsing modular
+        const processCsv = (csv: string, bannedColIndex: number, suggestionColIndex: number) => {
+          const rows: string[][] = [];
+          let row: string[] = [];
+          let currentVal = '';
+          let insideQuotes = false;
+
+          for (let i = 0; i < csv.length; i++) {
+            const char = csv[i];
+            const nextChar = csv[i + 1];
+
+            if (char === '"' && insideQuotes && nextChar === '"') {
+              currentVal += '"'; i++; 
+            } else if (char === '"') {
+              insideQuotes = !insideQuotes;
+            } else if (char === ',' && !insideQuotes) {
+              row.push(currentVal); currentVal = '';
+            } else if ((char === '\n' || char === '\r') && !insideQuotes) {
+              if (char === '\r' && nextChar === '\n') i++;
+              row.push(currentVal); rows.push(row); row = []; currentVal = '';
+            } else {
+              currentVal += char;
+            }
           }
-        });
+          if (currentVal || row.length > 0) { row.push(currentVal); rows.push(row); }
+
+          rows.forEach((cols, index) => {
+            if (index === 0) return; // Skip Header
+            
+            if (cols.length > bannedColIndex) {
+              const bannedCell = cols[bannedColIndex] || '';
+              const suggestion = (cols[suggestionColIndex] && cols[suggestionColIndex].trim() !== '') ? cols[suggestionColIndex].trim() : '-take out-';
+              const cleanCell = bannedCell.replace(/\([^)]*\)/g, '');
+              const wordsInCell = cleanCell.split(/[\n,\/]+/).map(w => w.trim().toLowerCase()).filter(w => w.length > 1);
+              
+              wordsInCell.forEach(word => {
+                let cleanWord = word.replace(/^[^a-zA-Z0-9%]+|[^a-zA-Z0-9%]+$/g, '');
+                if (!cleanWord) return;
+                const tokens = cleanWord.split(/([\W_]+)/);
+                let regexStr = "";
+                for (let i = 0; i < tokens.length; i++) {
+                  const token = tokens[i];
+                  if (i % 2 === 0) { regexStr += token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); } 
+                  else { regexStr += token.includes('%') ? '[\\W_]*%[\\W_]*' : '[\\W_]*'; }
+                }
+                const prefix = /^[a-zA-Z0-9]/.test(cleanWord) ? '\\b' : '';
+                const suffix = /[a-zA-Z0-9]$/.test(cleanWord) ? '\\b' : '';
+                
+                const newRegex = `${prefix}${regexStr}${suffix}`;
+                
+                // Mencegah duplikasi kata jika ada di 2 sheet
+                if (!parsedData.some(item => item.word === cleanWord)) {
+                  parsedData.push({ word: cleanWord, suggestion, regexStr: newRegex });
+                }
+              });
+            }
+          });
+        };
+
+        // Spreadsheet 1: Kolom B (Index 1) untuk Banned, Kolom C (Index 2) untuk Suggestion
+        processCsv(csvText1, 1, 2);
+        
+        // Spreadsheet 2: Kolom D (Index 3) untuk Banned, Kolom E (Index 4) untuk Suggestion
+        processCsv(csvText2, 3, 4);
+
         setBannedData(parsedData.sort((a, b) => b.word.length - a.word.length));
-      })
-      .catch(err => console.error("Gagal load banned words:", err));
+
+      } catch (err) {
+        console.error("Gagal load banned words:", err);
+      }
+    };
+
+    fetchBannedWords();
   }, []);
 
   const getDetectedBannedWords = (text: string): BannedItem[] => {
