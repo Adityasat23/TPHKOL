@@ -1,0 +1,2 @@
+/products/*
+  Access-Control-Allow-Origin: *

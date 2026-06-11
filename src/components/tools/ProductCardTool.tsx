@@ -39,47 +39,27 @@ export default function ProductCardTool() {
 // Fungsi konversi Base64 menggunakan Canvas (Aman dari blokir Cloudflare)
 // Fungsi ini 100% aman dari blokir CORS Cloudflare untuk file lokal
 const urlToBase64 = (url: string): Promise<string> => {
-    return new Promise((resolve) => {
-      // 1. Ubah path relatif (/products/...) menjadi Absolute URL (https://domain.com/products/...)
-      const absoluteUrl = url.startsWith('http') ? url : `${window.location.origin}${url}`;
+  return new Promise(async (resolve) => {
+    try {
+      const absoluteUrl = url.startsWith('http') 
+        ? url 
+        : `${window.location.origin}${url}`;
       
-      const img = new Image();
+      // Fetch pakai blob — ini bypass canvas taint sepenuhnya
+      const response = await fetch(absoluteUrl, { cache: 'no-store' });
+      if (!response.ok) throw new Error('Fetch failed');
       
-      // 2. KUNCI UNTUK CLOUDFLARE: 
-      // JANGAN gunakan crossOrigin='anonymous' jika gambarnya dari domain sendiri (lokal).
-      // Hanya gunakan jika gambar berasal dari luar domain.
-      if (absoluteUrl.startsWith('http') && !absoluteUrl.includes(window.location.hostname)) {
-        img.crossOrigin = 'anonymous';
-      }
-
-      img.onload = () => {
-        try {
-          const canvas = document.createElement('canvas');
-          canvas.width = img.naturalWidth;
-          canvas.height = img.naturalHeight;
-          const ctx = canvas.getContext('2d');
-          
-          if (ctx) {
-            ctx.drawImage(img, 0, 0);
-            resolve(canvas.toDataURL('image/png'));
-          } else {
-            resolve(SAFE_IMAGE);
-          }
-        } catch (e) {
-          console.error("Canvas error:", e);
-          resolve(SAFE_IMAGE);
-        }
-      };
-      
-      img.onerror = (err) => {
-        console.error("Gagal load gambar ke canvas:", absoluteUrl, err);
-        resolve(SAFE_IMAGE);
-      };
-      
-      // 3. Tambahkan parameter waktu agar selalu mengambil gambar baru, bukan dari cache Cloudflare
-      img.src = `${absoluteUrl}?v=${Date.now()}`;
-    });
-  };
+      const blob = await response.blob();
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = () => resolve(SAFE_IMAGE);
+      reader.readAsDataURL(blob);
+    } catch (e) {
+      console.error("urlToBase64 error:", e);
+      resolve(SAFE_IMAGE);
+    }
+  });
+};
   useEffect(() => { 
     const handleClickOutside = (event: MouseEvent) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) setShowSuggestions(false);
