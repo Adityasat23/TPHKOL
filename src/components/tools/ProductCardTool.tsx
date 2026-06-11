@@ -41,14 +41,14 @@ export default function ProductCardTool() {
 const urlToBase64 = (url: string): Promise<string> => {
   return new Promise(async (resolve) => {
     try {
-      const absoluteUrl = url.startsWith('http') 
-        ? url 
-        : `${window.location.origin}${url}`;
-      
-      // Fetch pakai blob — ini bypass canvas taint sepenuhnya
-      const response = await fetch(absoluteUrl, { cache: 'no-store' });
-      if (!response.ok) throw new Error('Fetch failed');
-      
+      // Encode path segments (handle spasi & karakter aneh di nama file)
+      const encodedUrl = url.startsWith('http')
+        ? url
+        : `${window.location.origin}${url.split('/').map((seg) => encodeURIComponent(seg)).join('/')}`;
+
+      const response = await fetch(encodedUrl, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
       const blob = await response.blob();
       const reader = new FileReader();
       reader.onloadend = () => resolve(reader.result as string);
