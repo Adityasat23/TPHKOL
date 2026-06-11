@@ -7,7 +7,6 @@ import FakeCommentTool from '../components/tools/FakeCommentTool';
 import WordCheckerTool from '../components/tools/WordCheckerTool';
 import WaChatTool from '../components/tools/WaChatTool';
 import DisclaimerTool from '../components/tools/DisclaimerTool';
-import { Analytics } from "@vercel/analytics/next"
 type TabType = 'downloader' | 'comment' | 'product' | 'disclaimer' | 'checker' | 'wa';
 
 export default function Home() {
