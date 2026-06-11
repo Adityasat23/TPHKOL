@@ -36,23 +36,34 @@ export default function ProductCardTool() {
   
   const categories = ["All", ...Array.from(new Set((TIMEPHORIA_CATALOG || []).map((item: any) => item.category)))];
 // Fungsi untuk mengubah URL gambar menjadi format Base64
-const urlToBase64 = async (url: string) => {
-    try {
-      // Tambahkan encodeURI di sini untuk menangani spasi pada nama file
-      const response = await fetch(encodeURI(url));
-      if (!response.ok) throw new Error(`Image not found: ${response.status}`);
+// Fungsi konversi Base64 menggunakan Canvas (Aman dari blokir Cloudflare)
+  const urlToBase64 = (url: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new window.Image();
+      img.crossOrigin = "anonymous"; // Hindari masalah CORS lokal
       
-      const blob = await response.blob();
-      return new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    } catch (err) {
-      console.warn("Gagal konversi gambar, menggunakan gambar aman.", err);
-      return SAFE_IMAGE;
-    }
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        
+        if (ctx) {
+          ctx.drawImage(img, 0, 0);
+          resolve(canvas.toDataURL("image/png")); // Ubah ke teks Base64
+        } else {
+          resolve(SAFE_IMAGE);
+        }
+      };
+      
+      img.onerror = () => {
+        console.warn("Gagal render gambar ke canvas");
+        resolve(SAFE_IMAGE);
+      };
+
+      // Tambahkan cache-buster agar Cloudflare tidak memberikan respons basi
+      img.src = `${encodeURI(url)}?t=${new Date().getTime()}`; 
+    });
   };
   useEffect(() => { 
     const handleClickOutside = (event: MouseEvent) => {
@@ -76,16 +87,16 @@ const urlToBase64 = async (url: string) => {
     setShowSuggestions(productTitle.trim().length > 0 || category !== "All");
   };
 
-  const handleSelectProduct = async (product: { name: string; image: string; category?: string }) => {
+const handleSelectProduct = async (product: { name: string; image: string; category?: string }) => {
     setProductTitle(product.name);
     
-    // Konversi gambar ke base64 sebelum di-set ke state
+    // Tunggu gambar diubah jadi Base64 lewat Canvas
     const base64Image = await urlToBase64(product.image || DEFAULT_PRODUCT);
     setProductImage(base64Image);
     
     if (product.category && selectedCategory === "All") setSelectedCategory(product.category);
     setShowSuggestions(false);
-  }; 
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
