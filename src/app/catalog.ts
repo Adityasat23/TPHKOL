@@ -15,121 +15,127 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
 
   {
     name: "Altera Blurring Lip Tint",
-    image: "/products/BLURRING TINT.jpg",
+    image: "/products/blurring-tint.jpg",
     category: "Lips"
   },
 
   {
     name: "Eternal Lip Matte",
-    image: "/products/LIP MATTE.jpg",
+    image: "/products/lip-matte.jpg",
     category: "Lips"
   },
 
   {
     name: "Illumina Jelly Eyeshadow Stick",
-    image: "/products/JELLY EYESHADOW STICK.jpg",
-    category: "Eyes" 
+    image: "/products/jelly-eyeshadow-stick.jpg",
+    category: "Eyes"
   },
 
   {
     name: "Lumina Matte Perfection Cushion",
-    image: "/products/MATTE CUSHION.jpg",
+    image: "/products/matte-cushion.jpg",
     category: "Face"
   },
 
   {
     name: "Lumina Matte Perfection Cushion + Timeless Optima Two Way Cake",
-    image: "/products/TWC MATTE CUSHION.jpg",
+    image: "/products/twc-matte-cushion.jpg",
     category: "Combo"
   },
 
   {
     name: "Lunara Frost 3D Lip Gloss Lipstick",
-    image: "/products/Lunara Frost 3D Lip Gloss Lipstick.jpg",
+    image: "/products/lunara-frost-3d-lip-gloss-lipstick.jpg",
     category: "Lips"
   },
 
   {
     name: "Milkyway Melting Lip Balm",
-    image: "/products/MILKYWAY MELTING LIP BALM.jpg",
+    image: "/products/milkyway-melting-lip-balm.jpg",
     category: "Lips"
   },
 
   {
     name: "Orbita 3-in-1 Blurring Pot Liptint",
-    image: "/products/BLURRING POT.jpg",
+    image: "/products/blurring-pot.jpg",
     category: "Lips"
   },
 
   {
     name: "Orion Cloud Matte Intense Smooth Lipstick",
-    image: "/products/ORION CLOUD MATTE LIPSTICK.jpg",
+    image: "/products/orion-cloud-matte-lipstick.jpg",
     category: "Lips"
   },
 
   {
     name: "Revela Tinted Eyebrow Mascara",
-    image: "/products/EYEBROW MASCARA.jpg",
+    image: "/products/eyebrow-mascara.jpg",
     category: "Eyes"
   },
 
   {
     name: "Spectra Ultra Stay Color Transfer Proof Lip Glaze",
-    image: "/products/LIP GLAZE.jpg",
+    image: "/products/lip-glaze.jpg",
     category: "Lips"
   },
+
   {
     name: "SUPERNOVA SETTING SPRAY",
-    image: "/products/SUPERNOVA SETTING SPRAY.jpg",
+    image: "/products/supernova-setting-spray.jpg",
     category: "Face"
   },
+
   {
     name: "Timephoria Aion Superstain Lip Tattoo Ink",
-    image: "/products/Timephoria Aion Superstain Lip Tattoo Ink.jpg",
+    image: "/products/timephoria-aion-superstain-lip-tattoo-ink.jpg",
     category: "Lips"
   },
+
   {
     name: "Stellar Dust Lip Stain",
-    image: "/products/LIP STAIN.jpg",
+    image: "/products/lip-stain.jpg",
     category: "Lips"
   },
 
   {
     name: "Stellar Dust Lip Stain + Eternal Lip Matte",
-    image: "/products/Stellar Dust Lip Stain-Eternal Lip Matte.jpg",
+    image: "/products/stellar-dust-lip-stain-eternal-lip-matte.jpg",
     category: "Combo"
   },
 
   {
     name: "Timeless Utopia Glow Perfection Cushion",
-    image: "/products/GLOW CUSHION.jpg",
+    image: "/products/glow-cushion.jpg",
     category: "Face"
   },
- {
+
+  {
     name: "ECLIPSE SPARK 2 IN 1 FACE CONTOUR",
-    image: "/products/ECLIPSE SPARK 2 IN 1 FACE CONTOUR.jpg",
+    image: "/products/eclipse-spark-2-in-1-face-contour.jpg",
     category: "Face"
   },
+
   {
     name: "Timeless Valora Fit Perfection Concealer",
-    image: "/products/CONCEALER.jpg",
+    image: "/products/concealer.jpg",
     category: "Face"
   },
 
   {
     name: "Two Way Cake Timeless Optima Cover",
-    image: "/products/TWO WAY CAKE.jpg",
+    image: "/products/two-way-cake.jpg",
     category: "Face"
   },
-    {
+
+  {
     name: "TIMELESS FIXION ALL DAY PERFECTION SKIN TINT STICK",
-    image: "/products/TIMELESS FIXION ALL DAY PERFECTION SKIN TINT STICK.jpg",
+    image: "/products/timeless-fixion-all-day-perfection-skin-tint-stick.jpg",
     category: "Face"
   },
 
   {
     name: "2PCS Stellar Dust Lip Stain",
-    image: "/products/LIP STAIN 2PCS.jpg",
+    image: "/products/lip-stain-2pcs.jpg",
     category: "Combo"
   }
 
