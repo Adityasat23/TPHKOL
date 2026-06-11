@@ -28,7 +28,7 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
   {
     name: "Illumina Jelly Eyeshadow Stick",
     image: "/products/JELLY EYESHADOW STICK.jpg",
-    category: "Eyes"
+    category: "Eyes" 
   },
 
   {
