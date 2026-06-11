@@ -38,30 +38,38 @@ export default function ProductCardTool() {
 // Fungsi untuk mengubah URL gambar menjadi format Base64
 // Fungsi konversi Base64 menggunakan Canvas (Aman dari blokir Cloudflare)
 // Fungsi ini 100% aman dari blokir CORS Cloudflare untuk file lokal
-  const urlToBase64 = async (url: string): Promise<string> => {
-    try {
-      // Wajib encodeURI agar spasi pada nama file menjadi format URL (%20)
-      const safeUrl = encodeURI(url);
+  const urlToBase64 = (url: string): Promise<string> => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    
+    // Mencegah canvas ter-taint jika suatu saat pindah ke CDN beda domain
+    img.crossOrigin = 'anonymous'; 
+    
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
       
-      const response = await fetch(safeUrl);
-      
-      // Jika file tidak ditemukan, langsung fallback ke gambar aman
-      if (!response.ok) {
-        console.error("Gambar gagal diload:", safeUrl);
-        return SAFE_IMAGE; 
+      if (ctx) {
+        ctx.drawImage(img, 0, 0);
+        resolve(canvas.toDataURL('image/png'));
+      } else {
+        resolve(SAFE_IMAGE);
       }
-      
-      const blob = await response.blob();
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.readAsDataURL(blob);
-      });
-    } catch (err) {
-      console.error("Error konversi Base64:", err);
-      return SAFE_IMAGE;
-    }
-  };
+    };
+    
+    img.onerror = (err) => {
+      console.error("Gambar gagal diload lewat native Image API:", url, err);
+      resolve(SAFE_IMAGE);
+    };
+    
+    // Encode URL dan tambahkan parameter timestamp (cache buster)
+    // agar Cloudflare selalu memberikan gambar fresh, bukan cached challenge page.
+    const safeUrl = encodeURI(url);
+    img.src = `${safeUrl}?v=${new Date().getTime()}`;
+  });
+};
   useEffect(() => { 
     const handleClickOutside = (event: MouseEvent) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) setShowSuggestions(false);
