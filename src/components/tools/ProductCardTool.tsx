@@ -103,14 +103,27 @@ const handleSelectProduct = async (product: { name: string; image: string; categ
     if (file) { const reader = new FileReader(); reader.onloadend = () => setProductImage(reader.result as string); reader.readAsDataURL(file); }
   };
 
-  const exportProductImage = async () => {
+const exportProductImage = async () => {
     if (!productPreviewRef.current) return;
     try {
       await document.fonts.ready;
-      const dataUrl = await toPng(productPreviewRef.current, { cacheBust: true, pixelRatio: 3.5, backgroundColor: 'transparent' });
+      
+      // KUNCI RAHASIA: Hapus cacheBust, dan tambahkan skipFonts: true
+      // Ini akan membuat proses download 100% OFFLINE tanpa memicu sekuriti Cloudflare!
+      const dataUrl = await toPng(productPreviewRef.current, { 
+        pixelRatio: 3.5, 
+        backgroundColor: 'transparent',
+        skipFonts: true 
+      });
+      
       const link = document.createElement('a');
-      link.download = `product-${productLayout}-${Date.now()}.png`; link.href = dataUrl; link.click();
-    } catch (err) { alert("Export Product Card gagal."); }
+      link.download = `product-${productLayout}-${Date.now()}.png`; 
+      link.href = dataUrl; 
+      link.click();
+    } catch (err) { 
+      alert("Export Product Card gagal."); 
+      console.error(err);
+    }
   };
 
   const getNum = (str: string, curr: string) => curr === 'Rp' ? parseInt(str.replace(/[^0-9]/g, ''), 10) || 0 : parseFloat(str.replace(/[^0-9.]/g, '')) || 0;
