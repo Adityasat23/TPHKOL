@@ -1,7 +1,45 @@
 import { NextResponse } from 'next/server';
 
+// WAJIB UNTUK CLOUDFLARE PAGES
+export const runtime = 'edge';
+
+// ==========================================
+// ANTI-BOT RATE LIMITER (In-Memory)
+// ==========================================
+// Membatasi request agar 1 IP maksimal 5 request per 60 detik.
+const rateLimitMap = new Map<string, { count: number, lastReset: number }>();
+const RATE_LIMIT = 5; // Batas maksimal request
+const TIME_WINDOW = 60 * 1000; // Waktu reset (60.000 ms = 1 menit)
+
 export async function POST(request: Request) {
   try {
+    // --- 1. CEK RATE LIMIT DULU SEBELUM MEMPROSES ---
+    // Mengambil IP Address dari headers (Cloudflare / Vercel standar)
+    const ip = request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || 'unknown';
+    const now = Date.now();
+    
+    if (ip !== 'unknown') {
+      const userLimit = rateLimitMap.get(ip);
+      if (userLimit) {
+        // Jika sudah lebih dari 1 menit, reset hitungan
+        if (now - userLimit.lastReset > TIME_WINDOW) {
+          rateLimitMap.set(ip, { count: 1, lastReset: now });
+        } else {
+          // Jika masih dalam 1 menit dan melebihi batas, BLOKIR
+          if (userLimit.count >= RATE_LIMIT) {
+            console.log(`🚨 BOT TERDETEKSI / RATE LIMIT TERCAPAI UNTUK IP: ${ip}`);
+            return NextResponse.json({ error: 'Terlalu banyak klik. Tunggu 1 menit ya!' }, { status: 429 });
+          }
+          // Tambah hitungan jika masih aman
+          userLimit.count += 1;
+        }
+      } else {
+        // Jika IP baru pertama kali akses
+        rateLimitMap.set(ip, { count: 1, lastReset: now });
+      }
+    }
+    // ------------------------------------------------
+
     const { url } = await request.json();
     if (!url) return NextResponse.json({ error: 'URL kosong' }, { status: 400 });
 
@@ -9,7 +47,7 @@ export async function POST(request: Request) {
       return typeof link === 'string' && link.startsWith('http');
     };
 
-    console.log("🔍 Memproses URL:", url);
+    console.log(`🔍 Memproses URL: ${url} (dari IP: ${ip})`);
 
     // ==========================================
     // 1. YOUTUBE TO MP3 (Multi-Engine Fallback)
