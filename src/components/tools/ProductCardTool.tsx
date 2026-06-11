@@ -37,33 +37,30 @@ export default function ProductCardTool() {
   const categories = ["All", ...Array.from(new Set((TIMEPHORIA_CATALOG || []).map((item: any) => item.category)))];
 // Fungsi untuk mengubah URL gambar menjadi format Base64
 // Fungsi konversi Base64 menggunakan Canvas (Aman dari blokir Cloudflare)
-  const urlToBase64 = (url: string): Promise<string> => {
-    return new Promise((resolve) => {
-      const img = new window.Image();
-      img.crossOrigin = "anonymous"; // Hindari masalah CORS lokal
+// Fungsi ini 100% aman dari blokir CORS Cloudflare untuk file lokal
+  const urlToBase64 = async (url: string): Promise<string> => {
+    try {
+      // Wajib encodeURI agar spasi pada nama file menjadi format URL (%20)
+      const safeUrl = encodeURI(url);
       
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext("2d");
-        
-        if (ctx) {
-          ctx.drawImage(img, 0, 0);
-          resolve(canvas.toDataURL("image/png")); // Ubah ke teks Base64
-        } else {
-          resolve(SAFE_IMAGE);
-        }
-      };
+      const response = await fetch(safeUrl);
       
-      img.onerror = () => {
-        console.warn("Gagal render gambar ke canvas");
-        resolve(SAFE_IMAGE);
-      };
-
-      // Tambahkan cache-buster agar Cloudflare tidak memberikan respons basi
-      img.src = `${encodeURI(url)}?t=${new Date().getTime()}`; 
-    });
+      // Jika file tidak ditemukan, langsung fallback ke gambar aman
+      if (!response.ok) {
+        console.error("Gambar gagal diload:", safeUrl);
+        return SAFE_IMAGE; 
+      }
+      
+      const blob = await response.blob();
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(blob);
+      });
+    } catch (err) {
+      console.error("Error konversi Base64:", err);
+      return SAFE_IMAGE;
+    }
   };
   useEffect(() => { 
     const handleClickOutside = (event: MouseEvent) => {
@@ -90,7 +87,7 @@ export default function ProductCardTool() {
 const handleSelectProduct = async (product: { name: string; image: string; category?: string }) => {
     setProductTitle(product.name);
     
-    // Tunggu gambar diubah jadi Base64 lewat Canvas
+    // Tunggu gambar diubah jadi Base64
     const base64Image = await urlToBase64(product.image || DEFAULT_PRODUCT);
     setProductImage(base64Image);
     
