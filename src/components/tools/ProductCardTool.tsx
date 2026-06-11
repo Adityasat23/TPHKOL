@@ -38,38 +38,48 @@ export default function ProductCardTool() {
 // Fungsi untuk mengubah URL gambar menjadi format Base64
 // Fungsi konversi Base64 menggunakan Canvas (Aman dari blokir Cloudflare)
 // Fungsi ini 100% aman dari blokir CORS Cloudflare untuk file lokal
-  const urlToBase64 = (url: string): Promise<string> => {
-  return new Promise((resolve) => {
-    const img = new Image();
-    
-    // Mencegah canvas ter-taint jika suatu saat pindah ke CDN beda domain
-    img.crossOrigin = 'anonymous'; 
-    
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      const ctx = canvas.getContext('2d');
+const urlToBase64 = (url: string): Promise<string> => {
+    return new Promise((resolve) => {
+      // 1. Ubah path relatif (/products/...) menjadi Absolute URL (https://domain.com/products/...)
+      const absoluteUrl = url.startsWith('http') ? url : `${window.location.origin}${url}`;
       
-      if (ctx) {
-        ctx.drawImage(img, 0, 0);
-        resolve(canvas.toDataURL('image/png'));
-      } else {
-        resolve(SAFE_IMAGE);
+      const img = new Image();
+      
+      // 2. KUNCI UNTUK CLOUDFLARE: 
+      // JANGAN gunakan crossOrigin='anonymous' jika gambarnya dari domain sendiri (lokal).
+      // Hanya gunakan jika gambar berasal dari luar domain.
+      if (absoluteUrl.startsWith('http') && !absoluteUrl.includes(window.location.hostname)) {
+        img.crossOrigin = 'anonymous';
       }
-    };
-    
-    img.onerror = (err) => {
-      console.error("Gambar gagal diload lewat native Image API:", url, err);
-      resolve(SAFE_IMAGE);
-    };
-    
-    // Encode URL dan tambahkan parameter timestamp (cache buster)
-    // agar Cloudflare selalu memberikan gambar fresh, bukan cached challenge page.
-    const safeUrl = encodeURI(url);
-    img.src = `${safeUrl}?v=${new Date().getTime()}`;
-  });
-};
+
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          const ctx = canvas.getContext('2d');
+          
+          if (ctx) {
+            ctx.drawImage(img, 0, 0);
+            resolve(canvas.toDataURL('image/png'));
+          } else {
+            resolve(SAFE_IMAGE);
+          }
+        } catch (e) {
+          console.error("Canvas error:", e);
+          resolve(SAFE_IMAGE);
+        }
+      };
+      
+      img.onerror = (err) => {
+        console.error("Gagal load gambar ke canvas:", absoluteUrl, err);
+        resolve(SAFE_IMAGE);
+      };
+      
+      // 3. Tambahkan parameter waktu agar selalu mengambil gambar baru, bukan dari cache Cloudflare
+      img.src = `${absoluteUrl}?v=${Date.now()}`;
+    });
+  };
   useEffect(() => { 
     const handleClickOutside = (event: MouseEvent) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) setShowSuggestions(false);
