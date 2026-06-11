@@ -5,8 +5,8 @@ import { toPng } from 'html-to-image';
 import { TIMEPHORIA_CATALOG, DEFAULT_PRODUCT } from '../../app/catalog'; 
 import { StarYellow, StarBlack, CartIcon, ShopeeTicketIcon, ShopeeDots } from '../icons';
 
-const SAFE_IMAGE = DEFAULT_PRODUCT || "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk8A8AAQsAzQ/8/GkAAAAASUVORK5CYII=";
-
+// Hapus DEFAULT_PRODUCT dari sini
+const SAFE_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk8A8AAQsAzQ/8/GkAAAAASUVORK5CYII=";
 export interface CatalogItem {
   name: string;
   category: string;
@@ -36,9 +36,11 @@ export default function ProductCardTool() {
   
   const categories = ["All", ...Array.from(new Set((TIMEPHORIA_CATALOG || []).map((item: any) => item.category)))];
 // Fungsi untuk mengubah URL gambar menjadi format Base64
-  const urlToBase64 = async (url: string) => {
+const urlToBase64 = async (url: string) => {
     try {
       const response = await fetch(url);
+      if (!response.ok) throw new Error(`Image not found: ${response.status}`);
+      
       const blob = await response.blob();
       return new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
@@ -47,8 +49,8 @@ export default function ProductCardTool() {
         reader.readAsDataURL(blob);
       });
     } catch (err) {
-      console.error("Gagal mengkonversi gambar ke base64", err);
-      return SAFE_IMAGE; // Kembalikan ke gambar default jika gagal
+      console.warn("Gagal konversi gambar, menggunakan gambar aman.", err);
+      return SAFE_IMAGE;
     }
   };
   useEffect(() => { 
@@ -82,7 +84,7 @@ export default function ProductCardTool() {
     
     if (product.category && selectedCategory === "All") setSelectedCategory(product.category);
     setShowSuggestions(false);
-  };
+  }; 
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -173,7 +175,9 @@ export default function ProductCardTool() {
                 <ul className="absolute top-full left-0 right-0 z-50 mt-2 bg-white/95 backdrop-blur-xl border border-white rounded-xl shadow-xl max-h-64 overflow-y-auto custom-scrollbar">
                   {filteredCatalog.map((item: any, index: number) => (
                     <li key={index} onMouseDown={(e) => { e.preventDefault(); handleSelectProduct(item); }} className="p-3 hover:bg-gray-100 cursor-pointer flex items-center gap-3 border-b border-gray-100/50 transition-colors">
-                      <img src={item.image} alt={item.name} className="w-10 h-10 rounded-lg object-cover border border-gray-200" onError={(e) => { (e.target as HTMLImageElement).src = SAFE_IMAGE; }} />
+                      <img src={item.image} alt={item.name} className="w-10 h-10 rounded-lg object-cover border border-gray-200" onError={(e) => { 
+  e.currentTarget.onerror = null; // Wajib ditambahkan agar tidak infinite loop
+  e.currentTarget.src = SAFE_IMAGE; }} />
                       <span className="text-sm font-medium text-gray-900 flex-1">{item.name}</span>
                       <span className="text-xs font-semibold text-gray-500 bg-white shadow-sm px-2 py-1 rounded-md">{item.category}</span>
                     </li>
@@ -226,7 +230,10 @@ export default function ProductCardTool() {
             {productLayout === 'shopee' && (
                <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '4px', width: '300px', minWidth: '300px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontFamily: 'Arial, sans-serif' }}>
                   <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
-                     <img src={productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { (e.target as HTMLImageElement).src = SAFE_IMAGE; }} />
+                     <img src={productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { 
+  e.currentTarget.onerror = null; // Wajib ditambahkan agar tidak infinite loop
+  e.currentTarget.src = SAFE_IMAGE; 
+}} />
                      {autoDiscountBadge && ( <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#fff0f1', color: '#ee4d2d', padding: '4px 6px', fontSize: '14px', fontWeight: 'bold' }}>{autoDiscountBadge}</div> )}
                   </div>
                   <div style={{ padding: '8px', backgroundColor: '#ffffff' }}>
@@ -251,7 +258,10 @@ export default function ProductCardTool() {
             {productLayout === 'shopee-horizontal' && (
               <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', width: '400px', minWidth: '400px', padding: '6px', display: 'flex', flexDirection: 'row', gap: '10px', fontFamily: 'Arial, sans-serif' }}>
                 <div style={{ position: 'relative', width: '120px', height: '120px', flexShrink: 0, borderRadius: '2px', overflow: 'hidden', backgroundColor: '#f5f5f5' }}>
-                  <img src={productImage} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { (e.target as HTMLImageElement).src = SAFE_IMAGE; }} />
+                  <img src={productImage} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { 
+  e.currentTarget.onerror = null; // Wajib ditambahkan agar tidak infinite loop
+  e.currentTarget.src = SAFE_IMAGE; 
+}} />
                   {autoDiscountBadge && (
                     <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#fcebea', color: '#ee4d2d', padding: '2px 6px', fontSize: '12px', fontWeight: 'bold', borderBottomLeftRadius: '4px' }}>
                       {autoDiscountBadge}
@@ -289,7 +299,10 @@ export default function ProductCardTool() {
             {productLayout === 'tiktok-portrait' && (
               <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: '300px', minWidth: '300px', display: 'flex', flexDirection: 'column', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
                 <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
-                  <img key={productImage} src={productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { (e.target as HTMLImageElement).src = SAFE_IMAGE; }} />
+                  <img key={productImage} src={productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { 
+  e.currentTarget.onerror = null; // Wajib ditambahkan agar tidak infinite loop
+  e.currentTarget.src = SAFE_IMAGE; 
+}} />
                   {autoDiscountBadge && ( <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#fe2c55', color: '#fff', padding: '4px 8px', fontSize: '14px', fontWeight: 'bold', borderBottomLeftRadius: '8px', zIndex: 10 }}>{autoDiscountBadge}</div> )}
                 </div>
                 <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#ffffff', boxSizing: 'border-box', minWidth: 0 }}>
@@ -316,7 +329,10 @@ export default function ProductCardTool() {
               <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: '540px', minWidth: '540px', display: 'flex', flexDirection: 'row', boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}>
                 {/* Bagian Kiri: Kunci lebar gambar di 220px, jangan izinkan menyusut (flexShrink: 0) */}
                 <div style={{ position: 'relative', width: '220px', minWidth: '220px', flexShrink: 0, backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'stretch' }}>
-                  <img key={productImage} src={productImage} style={{ width: '100%', height: '100%', minHeight: '220px', objectFit: 'cover', display: 'block' }} onError={(e) => { (e.target as HTMLImageElement).src = SAFE_IMAGE; }} />
+                  <img key={productImage} src={productImage} style={{ width: '100%', height: '100%', minHeight: '220px', objectFit: 'cover', display: 'block' }} onError={(e) => { 
+  e.currentTarget.onerror = null; // Wajib ditambahkan agar tidak infinite loop
+  e.currentTarget.src = SAFE_IMAGE; 
+}} />
                   {autoDiscountBadge && (
                     <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#fe2c55', color: '#fff', padding: '6px 12px', fontSize: '16px', fontWeight: 'bold', borderBottomLeftRadius: '8px', zIndex: 10 }}>
                       {autoDiscountBadge}
