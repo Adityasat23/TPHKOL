@@ -35,7 +35,22 @@ export default function ProductCardTool() {
   const productPreviewRef = useRef<HTMLDivElement>(null);
   
   const categories = ["All", ...Array.from(new Set((TIMEPHORIA_CATALOG || []).map((item: any) => item.category)))];
-
+// Fungsi untuk mengubah URL gambar menjadi format Base64
+  const urlToBase64 = async (url: string) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (err) {
+      console.error("Gagal mengkonversi gambar ke base64", err);
+      return SAFE_IMAGE; // Kembalikan ke gambar default jika gagal
+    }
+  };
   useEffect(() => { 
     const handleClickOutside = (event: MouseEvent) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) setShowSuggestions(false);
@@ -58,9 +73,13 @@ export default function ProductCardTool() {
     setShowSuggestions(productTitle.trim().length > 0 || category !== "All");
   };
 
-  const handleSelectProduct = (product: { name: string; image: string; category?: string }) => {
+  const handleSelectProduct = async (product: { name: string; image: string; category?: string }) => {
     setProductTitle(product.name);
-    setProductImage(product.image || SAFE_IMAGE);
+    
+    // Konversi gambar ke base64 sebelum di-set ke state
+    const base64Image = await urlToBase64(product.image || DEFAULT_PRODUCT);
+    setProductImage(base64Image);
+    
     if (product.category && selectedCategory === "All") setSelectedCategory(product.category);
     setShowSuggestions(false);
   };
