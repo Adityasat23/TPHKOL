@@ -38,7 +38,8 @@ export default function ProductCardTool() {
 // Fungsi untuk mengubah URL gambar menjadi format Base64
 const urlToBase64 = async (url: string) => {
     try {
-      const response = await fetch(url);
+      // Tambahkan encodeURI di sini untuk menangani spasi pada nama file
+      const response = await fetch(encodeURI(url));
       if (!response.ok) throw new Error(`Image not found: ${response.status}`);
       
       const blob = await response.blob();
