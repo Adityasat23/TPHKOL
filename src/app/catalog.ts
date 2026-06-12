@@ -117,7 +117,7 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
 
   {
     name: "Timeless Valora Fit Perfection Concealer",
-    image: "/products/concealer.jpg",
+    image: "/products/valora-concealer.jpg",
     category: "Face"
   },
 
