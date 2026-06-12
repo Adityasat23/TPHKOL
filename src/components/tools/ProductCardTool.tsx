@@ -53,7 +53,7 @@ const urlToBase64 = (url: string): Promise<string> => {
         ? url
         : `${window.location.origin}${url.split('/').map((seg) => encodeURIComponent(seg)).join('/')}`;
 
-      const response = await fetch(encodedUrl, { cache: 'no-store' });
+      const response = await fetch(encodedUrl, { cache: 'force-cache' });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const blob = await response.blob();
