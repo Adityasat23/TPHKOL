@@ -38,10 +38,16 @@ export default function ProductCardTool() {
 // Fungsi untuk mengubah URL gambar menjadi format Base64
 // Fungsi konversi Base64 menggunakan Canvas (Aman dari blokir Cloudflare)
 // Fungsi ini 100% aman dari blokir CORS Cloudflare untuk file lokal
+const imageCache = new Map<string, string>();
 const urlToBase64 = (url: string): Promise<string> => {
   return new Promise(async (resolve) => {
+    // Kalau sudah pernah di-fetch, langsung return dari cache
+    if (imageCache.has(url)) {
+      resolve(imageCache.get(url)!);
+      return;
+    }
+
     try {
-      // Encode path segments (handle spasi & karakter aneh di nama file)
       const encodedUrl = url.startsWith('http')
         ? url
         : `${window.location.origin}${url.split('/').map((seg) => encodeURIComponent(seg)).join('/')}`;
@@ -51,7 +57,11 @@ const urlToBase64 = (url: string): Promise<string> => {
 
       const blob = await response.blob();
       const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result as string);
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        imageCache.set(url, result); // Simpan ke cache
+        resolve(result);
+      };
       reader.onerror = () => resolve(SAFE_IMAGE);
       reader.readAsDataURL(blob);
     } catch (e) {
@@ -61,6 +71,9 @@ const urlToBase64 = (url: string): Promise<string> => {
   });
 };
   useEffect(() => { 
+    TIMEPHORIA_CATALOG.forEach((item) => {
+    urlToBase64(item.image); // Hasilnya otomatis masuk cache
+  });
     const handleClickOutside = (event: MouseEvent) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) setShowSuggestions(false);
     };
