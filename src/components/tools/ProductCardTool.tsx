@@ -15,7 +15,8 @@ export interface CatalogItem {
 
 export default function ProductCardTool() {
   const [productLayout, setProductLayout] = useState<'tiktok-portrait' | 'tiktok-landscape' | 'shopee' | 'shopee-horizontal'>('tiktok-landscape');
-  const [productImage, setProductImage] = useState(SAFE_IMAGE);
+  const [productImage, setProductImage] = useState(SAFE_IMAGE); // Base64 — hanya untuk export
+  const [productImageUrl, setProductImageUrl] = useState(''); // URL asli — untuk preview (instant)
   const [productTitle, setProductTitle] = useState("ALTERA BLURRING LIP TINT + LIP MATTE");
   const [productPrice, setProductPrice] = useState("50.000");
   const [productOriginalPrice, setProductOriginalPrice] = useState("100.000");
@@ -95,29 +96,42 @@ const urlToBase64 = (url: string): Promise<string> => {
     setShowSuggestions(productTitle.trim().length > 0 || category !== "All");
   };
 
-const handleSelectProduct = async (product: { name: string; image: string; category?: string }) => {
+const handleSelectProduct = (product: { name: string; image: string; category?: string }) => {
     setProductTitle(product.name);
-    
-    // Tunggu gambar diubah jadi Base64
-    const base64Image = await urlToBase64(product.image || DEFAULT_PRODUCT);
-    setProductImage(base64Image);
-    
+    // Set URL langsung → preview instan, tanpa tunggu fetch
+    const imgUrl = product.image || DEFAULT_PRODUCT;
+    setProductImageUrl(imgUrl);
+    setProductImage(imgUrl); // sementara pakai URL dulu, nanti diganti Base64 saat export
     if (product.category && selectedCategory === "All") setSelectedCategory(product.category);
     setShowSuggestions(false);
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) { const reader = new FileReader(); reader.onloadend = () => setProductImage(reader.result as string); reader.readAsDataURL(file); }
+    if (file) { 
+      const reader = new FileReader(); 
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        setProductImage(result);
+        setProductImageUrl(result); // upload langsung jadi Base64, aman untuk keduanya
+      };
+      reader.readAsDataURL(file); 
+    }
   };
 
 const exportProductImage = async () => {
     if (!productPreviewRef.current) return;
     try {
       await document.fonts.ready;
-      
-      // KUNCI RAHASIA: Hapus cacheBust, dan tambahkan skipFonts: true
-      // Ini akan membuat proses download 100% OFFLINE tanpa memicu sekuriti Cloudflare!
+
+      // Konversi gambar ke Base64 hanya saat export (bukan saat pilih produk)
+      if (productImageUrl && !productImageUrl.startsWith('data:')) {
+        const base64 = await urlToBase64(productImageUrl);
+        setProductImage(base64);
+        // Tunggu React re-render dulu sebelum capture
+        await new Promise(resolve => setTimeout(resolve, 150));
+      }
+
       const dataUrl = await toPng(productPreviewRef.current, { 
         pixelRatio: 3.5, 
         backgroundColor: 'transparent',
@@ -263,7 +277,7 @@ const exportProductImage = async () => {
             {productLayout === 'shopee' && (
                <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '4px', width: '300px', minWidth: '300px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontFamily: 'Arial, sans-serif' }}>
                   <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
-                     <img src={productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { 
+                     <img src={productImageUrl || productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { 
   e.currentTarget.onerror = null; // Wajib ditambahkan agar tidak infinite loop
   e.currentTarget.src = SAFE_IMAGE; 
 }} />
@@ -291,7 +305,7 @@ const exportProductImage = async () => {
             {productLayout === 'shopee-horizontal' && (
               <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', width: '400px', minWidth: '400px', padding: '6px', display: 'flex', flexDirection: 'row', gap: '10px', fontFamily: 'Arial, sans-serif' }}>
                 <div style={{ position: 'relative', width: '120px', height: '120px', flexShrink: 0, borderRadius: '2px', overflow: 'hidden', backgroundColor: '#f5f5f5' }}>
-                  <img src={productImage} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { 
+                  <img src={productImageUrl || productImage} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { 
   e.currentTarget.onerror = null; // Wajib ditambahkan agar tidak infinite loop
   e.currentTarget.src = SAFE_IMAGE; 
 }} />
@@ -332,7 +346,7 @@ const exportProductImage = async () => {
             {productLayout === 'tiktok-portrait' && (
               <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: '300px', minWidth: '300px', display: 'flex', flexDirection: 'column', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
                 <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
-                  <img key={productImage} src={productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { 
+                  <img key={productImageUrl || productImage} src={productImageUrl || productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { 
   e.currentTarget.onerror = null; // Wajib ditambahkan agar tidak infinite loop
   e.currentTarget.src = SAFE_IMAGE; 
 }} />
@@ -362,7 +376,7 @@ const exportProductImage = async () => {
               <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: '540px', minWidth: '540px', display: 'flex', flexDirection: 'row', boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}>
                 {/* Bagian Kiri: Kunci lebar gambar di 220px, jangan izinkan menyusut (flexShrink: 0) */}
                 <div style={{ position: 'relative', width: '220px', minWidth: '220px', flexShrink: 0, backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'stretch' }}>
-                  <img key={productImage} src={productImage} style={{ width: '100%', height: '100%', minHeight: '220px', objectFit: 'cover', display: 'block' }} onError={(e) => { 
+                  <img key={productImageUrl || productImage} src={productImageUrl || productImage} style={{ width: '100%', height: '100%', minHeight: '220px', objectFit: 'cover', display: 'block' }} onError={(e) => { 
   e.currentTarget.onerror = null; // Wajib ditambahkan agar tidak infinite loop
   e.currentTarget.src = SAFE_IMAGE; 
 }} />
