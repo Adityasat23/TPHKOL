@@ -55,6 +55,12 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
     category: "Lips"
   },
 
+   {
+    name: "Aphrodite Everlasting Glossy Tint",
+    image: "products/aphrodite-everlasting-glossy-tint.jpg",
+    category: "Lips"
+  },
+
   {
     name: "Orbita 3-in-1 Blurring Pot Liptint",
     image: "/products/blurring-pot.jpg",
