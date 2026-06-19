@@ -143,6 +143,12 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
     name: "2PCS Stellar Dust Lip Stain",
     image: "/products/lip-stain-2pcs.jpg",
     category: "Combo"
+  },
+  {
+    name: "All Lip Products Collection",
+    image: "/products/All-Lip-Products-Collection.jpg",
+    category: "Combo"
   }
+
 
 ].sort((a, b) => a.name.localeCompare(b.name));
