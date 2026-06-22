@@ -140,75 +140,79 @@ export default function FakeCommentTool() {
 
 {commentMode === 'thread' && (
   <div style={{
-    backgroundColor: threadTheme === 'dark' ? '#121212' : '#FFFFFF',
-    padding: '16px 20px',
+    backgroundColor: threadTheme === 'dark' ? '#161823' : '#FFFFFF',
+    padding: '16px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '16px',
-    width: '420px',
+    width: '400px',
     boxShadow: threadTheme === 'light' ? '0 10px 40px -10px rgba(0,0,0,0.1)' : '0 10px 40px -10px rgba(0,0,0,0.5)',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
   }}>
     
     {/* KOMENTAR UTAMA */}
     <div style={{ display: 'flex', gap: '12px' }}>
-      <img key={avatar} src={avatar} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-      <div style={{ flex: 1, minWidth: 0 }}>
+      {/* Avatar Utama */}
+      <img key={avatar} src={avatar} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+      
+      {/* Konten Utama & Wrapper Balasan (Agar indentasi lurus) */}
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
         <p style={{ color: '#8A8B91', fontSize: '13px', fontWeight: 600, margin: 0 }}>{username}</p>
-        <p style={{ color: threadTheme === 'dark' ? '#E1E1E1' : '#161823', fontSize: '15px', margin: '4px 0 0 0', lineHeight: 1.4, whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
+        <p style={{ color: threadTheme === 'dark' ? '#E1E1E1' : '#161823', fontSize: '15px', fontWeight: 400, margin: '2px 0 0 0', lineHeight: 1.4, whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
           {renderWithHighlights(commentText)}
         </p>
         
-        {/* BARIS BAWAH: Tanggal, Reply, Like, Dislike */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
-          <div style={{ display: 'flex', gap: '16px', color: '#8A8B91', fontSize: '13px', fontWeight: 500 }}>
+        {/* Baris Bawah Utama: Tanggal, Reply, Like, Dislike */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+          <div style={{ display: 'flex', gap: '16px', color: '#8A8B91', fontSize: '12px', fontWeight: 600 }}>
             <span>{date}</span>
             <span style={{ cursor: 'pointer' }}>Reply</span>
           </div>
-          <div style={{ display: 'flex', gap: '16px', color: '#8A8B91', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '24px', color: '#8A8B91', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-              {likes && <span style={{ fontSize: '12px', fontWeight: 500 }}>{likes}</span>}
+              <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+              {likes && <span style={{ fontSize: '12px', fontWeight: 600 }}>{likes}</span>}
             </div>
-            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
+            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
           </div>
         </div>
+
+        {/* BALASAN BRAND */}
+        {showReply && (
+          <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+            {/* Avatar Balasan (Lebih Kecil) */}
+            <img src={TIMEPHORIA_LOGO} style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+            
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+              
+              <div style={{ display: 'flex', alignItems: 'center', margin: 0 }}>
+                <p style={{ color: '#8A8B91', fontSize: '13px', fontWeight: 600, margin: 0 }}>Timephoria.id</p>
+                <span style={{ color: '#8A8B91', fontSize: '13px', fontWeight: 600, margin: '0 4px' }}>·</span>
+                <span style={{ color: '#00D6E1', fontSize: '13px', fontWeight: 600 }}>Creator</span>
+              </div>
+              
+              <p style={{ color: threadTheme === 'dark' ? '#E1E1E1' : '#161823', fontSize: '15px', fontWeight: 400, margin: '2px 0 0 0', lineHeight: 1.4, whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
+                {renderWithHighlights(replyText)}
+              </p>
+              
+              {/* Baris Bawah Balasan */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+                <div style={{ display: 'flex', gap: '16px', color: '#8A8B91', fontSize: '12px', fontWeight: 600 }}>
+                  <span>{replyDate}</span>
+                  <span style={{ cursor: 'pointer' }}>Reply</span>
+                </div>
+                <div style={{ display: 'flex', gap: '24px', color: '#8A8B91', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                    {replyLikes && <span style={{ fontSize: '12px', fontWeight: 600 }}>{replyLikes}</span>}
+                  </div>
+                  <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
-
-    {/* BALASAN BRAND */}
-    {showReply && (
-      <div style={{ display: 'flex', gap: '12px', marginLeft: '48px' }}>
-        <img src={TIMEPHORIA_LOGO} style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
-            <p style={{ color: '#8A8B91', fontSize: '13px', fontWeight: 600, margin: 0 }}>Timephoria.id</p>
-            <span style={{ color: '#8A8B91', fontSize: '13px', fontWeight: 600 }}>·</span>
-            <span style={{ color: '#00D6E1', fontSize: '13px', fontWeight: 600 }}>Creator</span>
-          </div>
-          
-          <p style={{ color: threadTheme === 'dark' ? '#E1E1E1' : '#161823', fontSize: '15px', margin: 0, lineHeight: 1.4, whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
-            {renderWithHighlights(replyText)}
-          </p>
-          
-          {/* BARIS BAWAH BALASAN */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
-            <div style={{ display: 'flex', gap: '16px', color: '#8A8B91', fontSize: '13px', fontWeight: 500 }}>
-              <span>{replyDate}</span>
-              <span style={{ cursor: 'pointer' }}>Reply</span>
-            </div>
-            <div style={{ display: 'flex', gap: '16px', color: '#8A8B91', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                {replyLikes && <span style={{ fontSize: '12px', fontWeight: 500 }}>{replyLikes}</span>}
-              </div>
-              <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
-            </div>
-          </div>
-        </div>
-      </div>
-    )}
   </div>
 )}
           </div>
