@@ -139,12 +139,13 @@ export default function FakeCommentTool() {
             )}
 
 {commentMode === 'thread' && (
-  <div style={{
-    backgroundColor: threadTheme === 'dark' ? '#161823' : '#FFFFFF',
+<div style={{
+    backgroundColor: threadTheme === 'dark' ? '#1e1e1e' : '#FFFFFF',
     padding: '16px',
     display: 'flex',
     flexDirection: 'column',
-    width: '400px',
+    gap: '16px',
+    width: '430px',
     boxShadow: threadTheme === 'light' ? '0 10px 40px -10px rgba(0,0,0,0.1)' : '0 10px 40px -10px rgba(0,0,0,0.5)',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
   }}>
