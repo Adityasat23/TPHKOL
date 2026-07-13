@@ -148,7 +148,13 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
     name: "All Lip Products Collection",
     image: "/products/All-Lip-Products-Collection.jpg",
     category: "Combo"
+  },
+  {
+    name: "Matte Perfection Cushion & Timeless Valora Fit Perfection",
+    image: "/products/Matte-Perfection-Cushion-&-Timeless-Valora-Fit-Perfection.jpg",
+    category: "Combo"
   }
+
 
 
 ].sort((a, b) => a.name.localeCompare(b.name));
