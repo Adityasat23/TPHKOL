@@ -130,14 +130,46 @@ export async function POST(request: Request) {
         finalMusic = data.data.music || finalMusic;
         
         const playUrl = data.data.hdplay || data.data.play || data.data.wmplay;
-        
         if (playUrl) {
           return NextResponse.json({ title: finalTitle, cover: finalCover, play: playUrl, music: finalMusic });
         }
       }
     } catch (e) { console.log("❌ TikTok TikWM Error"); }
 
-    // Engine 2: Tikdown API
+    // Engine 2: LOVETIK (Super ampuh untuk Tiktok Ads / Spark Ads)
+    try {
+      const formData = new URLSearchParams();
+      formData.append('query', url);
+      const res = await fetch('https://lovetik.com/api/ajax/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': BROWSER_HEADERS['User-Agent']
+        },
+        body: formData.toString()
+      });
+      const data = await res.json();
+      
+      if (data && data.status === 'ok' && data.links && data.links.length > 0) {
+        finalTitle = data.desc || finalTitle;
+        finalCover = data.cover || finalCover;
+        
+        // Cari link video utama (mencari link yang bukan bertuliskan 'Audio')
+        let playUrl = '';
+        for (const link of data.links) {
+          if (link.a && !link.detail?.toLowerCase().includes('audio')) {
+             playUrl = link.a;
+             break; // Hentikan loop saat video pertama ketemu
+          }
+        }
+        
+        if (playUrl) {
+          return NextResponse.json({ title: finalTitle, cover: finalCover, play: playUrl, music: finalMusic });
+        }
+      }
+    } catch (e) { console.log("❌ TikTok Lovetik Error"); }
+
+    // Engine 3: Tikdown API
     try {
         const res = await fetch(`https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(url)}`, { headers: BROWSER_HEADERS });
         const data = await res.json();
@@ -153,7 +185,7 @@ export async function POST(request: Request) {
         }
     } catch(e) { console.log("❌ TikTok Tikdown Error"); }
 
-    // Engine 3: Cobalt API (Dewa penyelamat untuk link Ads / Spark Ads)
+    // Engine 4: Cobalt API
     try {
         const res = await fetch('https://co.wuk.sh/api/json', {
           method: 'POST',
@@ -166,7 +198,7 @@ export async function POST(request: Request) {
         }
     } catch (e) { console.log("❌ TikTok Cobalt Error"); }
 
-    // Fallback terakhir
+    // Fallback terakhir: Jika sudah lewati 4 Engine dan video TETAP kosong, berarti ini murni slide foto
     if (finalMusic || finalCover) {
          return NextResponse.json({ title: finalTitle, cover: finalCover, play: '', music: finalMusic });
     }
