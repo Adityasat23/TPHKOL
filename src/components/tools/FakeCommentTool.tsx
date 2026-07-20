@@ -15,6 +15,10 @@ export default function FakeCommentTool() {
   const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
   const [replyTo, setReplyTo] = useState('yeftajethro');
   const [showReply, setShowReply] = useState(true);
+  
+  // State baru untuk pilihan nama Brand/Admin
+  const [brandName, setBrandName] = useState('Timephoria.id');
+  
   const [replyText, setReplyText] = useState('BESOK!');
   const [replyLikes, setReplyLikes] = useState('5');
   const [replyDate, setReplyDate] = useState('2025-11-17');
@@ -106,9 +110,19 @@ export default function FakeCommentTool() {
             </div>
             {showReply && (
               <div className="animate-in fade-in slide-in-from-top-2 duration-300 space-y-3">
+                <div className="w-full">
+                  <select 
+                    value={brandName} 
+                    onChange={(e) => setBrandName(e.target.value)}
+                    className="w-full p-3.5 bg-white/60 border border-gray-200/60 rounded-xl text-sm font-medium text-gray-900 focus:outline-none cursor-pointer"
+                  >
+                    <option value="Timephoria.id">Timephoria.id</option>
+                    <option value="timephoria.basemakeup">timephoria.basemakeup</option>
+                  </select>
+                </div>
                 <div className="grid grid-cols-2 gap-3">
                   <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="Likes Balasan" className="w-full p-3.5 bg-white/60 border border-gray-200/60 rounded-xl text-sm font-medium text-gray-900" />
-                  <input type="date" value={replyDate} onChange={(e) => setReplyDate(e.target.value)} className="w-full p-3.5 bg-white/60 border border-gray-200/60 rounded-xl text-sm font-medium text-gray-700" />
+                  <input type="date" value={replyDate} onChange={(e) => setDate(e.target.value)} className="w-full p-3.5 bg-white/60 border border-gray-200/60 rounded-xl text-sm font-medium text-gray-700" />
                 </div>
                 <div className="relative">
                   <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full p-4 bg-white/60 border border-gray-200/60 rounded-xl text-sm font-medium min-h-[80px] text-gray-900" placeholder="Teks balasan admin..." />
@@ -138,84 +152,84 @@ export default function FakeCommentTool() {
               </div>
             )}
 
-{commentMode === 'thread' && (
-<div style={{
-    backgroundColor: threadTheme === 'dark' ? '#1e1e1e' : '#FFFFFF',
-    padding: '16px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '16px',
-    width: '430px',
-    boxShadow: threadTheme === 'light' ? '0 10px 40px -10px rgba(0,0,0,0.1)' : '0 10px 40px -10px rgba(0,0,0,0.5)',
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
-  }}>
-    
-    {/* KOMENTAR UTAMA */}
-    <div style={{ display: 'flex', gap: '12px' }}>
-      {/* Avatar Utama */}
-      <img key={avatar} src={avatar} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-      
-      {/* Konten Utama & Wrapper Balasan (Agar indentasi lurus) */}
-      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-        <p style={{ color: '#8A8B91', fontSize: '13px', fontWeight: 600, margin: 0 }}>{username}</p>
-        <p style={{ color: threadTheme === 'dark' ? '#E1E1E1' : '#161823', fontSize: '15px', fontWeight: 400, margin: '2px 0 0 0', lineHeight: 1.4, whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
-          {renderWithHighlights(commentText)}
-        </p>
-        
-        {/* Baris Bawah Utama: Tanggal, Reply, Like, Dislike */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
-          <div style={{ display: 'flex', gap: '16px', color: '#8A8B91', fontSize: '12px', fontWeight: 600 }}>
-            <span>{date}</span>
-            <span style={{ cursor: 'pointer' }}>Reply</span>
-          </div>
-          <div style={{ display: 'flex', gap: '24px', color: '#8A8B91', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-              {likes && <span style={{ fontSize: '12px', fontWeight: 600 }}>{likes}</span>}
-            </div>
-            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
-          </div>
-        </div>
+            {commentMode === 'thread' && (
+            <div style={{
+                backgroundColor: threadTheme === 'dark' ? '#1e1e1e' : '#FFFFFF',
+                padding: '16px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                width: '430px',
+                boxShadow: threadTheme === 'light' ? '0 10px 40px -10px rgba(0,0,0,0.1)' : '0 10px 40px -10px rgba(0,0,0,0.5)',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
+              }}>
+                
+                {/* KOMENTAR UTAMA */}
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  {/* Avatar Utama */}
+                  <img key={avatar} src={avatar} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                  
+                  {/* Konten Utama & Wrapper Balasan (Agar indentasi lurus) */}
+                  <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+                    <p style={{ color: '#8A8B91', fontSize: '13px', fontWeight: 600, margin: 0 }}>{username}</p>
+                    <p style={{ color: threadTheme === 'dark' ? '#E1E1E1' : '#161823', fontSize: '15px', fontWeight: 400, margin: '2px 0 0 0', lineHeight: 1.4, whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
+                      {renderWithHighlights(commentText)}
+                    </p>
+                    
+                    {/* Baris Bawah Utama: Tanggal, Reply, Like, Dislike */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+                      <div style={{ display: 'flex', gap: '16px', color: '#8A8B91', fontSize: '12px', fontWeight: 600 }}>
+                        <span>{date}</span>
+                        <span style={{ cursor: 'pointer' }}>Reply</span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '24px', color: '#8A8B91', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                          {likes && <span style={{ fontSize: '12px', fontWeight: 600 }}>{likes}</span>}
+                        </div>
+                        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
+                      </div>
+                    </div>
 
-        {/* BALASAN BRAND */}
-        {showReply && (
-          <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
-            {/* Avatar Balasan (Lebih Kecil) */}
-            <img src={TIMEPHORIA_LOGO} style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-            
-            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-              
-              <div style={{ display: 'flex', alignItems: 'center', margin: 0 }}>
-                <p style={{ color: '#8A8B91', fontSize: '13px', fontWeight: 600, margin: 0 }}>Timephoria.id</p>
-                <span style={{ color: '#8A8B91', fontSize: '13px', fontWeight: 600, margin: '0 4px' }}>·</span>
-                <span style={{ color: '#00D6E1', fontSize: '13px', fontWeight: 600 }}>Creator</span>
-              </div>
-              
-              <p style={{ color: threadTheme === 'dark' ? '#E1E1E1' : '#161823', fontSize: '15px', fontWeight: 400, margin: '2px 0 0 0', lineHeight: 1.4, whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
-                {renderWithHighlights(replyText)}
-              </p>
-              
-              {/* Baris Bawah Balasan */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
-                <div style={{ display: 'flex', gap: '16px', color: '#8A8B91', fontSize: '12px', fontWeight: 600 }}>
-                  <span>{replyDate}</span>
-                  <span style={{ cursor: 'pointer' }}>Reply</span>
-                </div>
-                <div style={{ display: 'flex', gap: '24px', color: '#8A8B91', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                    {replyLikes && <span style={{ fontSize: '12px', fontWeight: 600 }}>{replyLikes}</span>}
+                    {/* BALASAN BRAND */}
+                    {showReply && (
+                      <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+                        {/* Avatar Balasan (Lebih Kecil) */}
+                        <img src={TIMEPHORIA_LOGO} style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                        
+                        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+                          
+                          <div style={{ display: 'flex', alignItems: 'center', margin: 0 }}>
+                            <p style={{ color: '#8A8B91', fontSize: '13px', fontWeight: 600, margin: 0 }}>{brandName}</p>
+                            <span style={{ color: '#8A8B91', fontSize: '13px', fontWeight: 600, margin: '0 4px' }}>·</span>
+                            <span style={{ color: '#00D6E1', fontSize: '13px', fontWeight: 600 }}>Creator</span>
+                          </div>
+                          
+                          <p style={{ color: threadTheme === 'dark' ? '#E1E1E1' : '#161823', fontSize: '15px', fontWeight: 400, margin: '2px 0 0 0', lineHeight: 1.4, whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
+                            {renderWithHighlights(replyText)}
+                          </p>
+                          
+                          {/* Baris Bawah Balasan */}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+                            <div style={{ display: 'flex', gap: '16px', color: '#8A8B91', fontSize: '12px', fontWeight: 600 }}>
+                              <span>{replyDate}</span>
+                              <span style={{ cursor: 'pointer' }}>Reply</span>
+                            </div>
+                            <div style={{ display: 'flex', gap: '24px', color: '#8A8B91', alignItems: 'center' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                {replyLikes && <span style={{ fontSize: '12px', fontWeight: 600 }}>{replyLikes}</span>}
+                              </div>
+                              <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
                 </div>
               </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  </div>
-)}
+            )}
           </div>
         </div>
       </div>
