@@ -153,7 +153,13 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
     name: "Matte Perfection Cushion & Timeless Valora Fit Perfection",
     image: "/products/Matte-Perfection-Cushion-&-Timeless-Valora-Fit-Perfection.jpg",
     category: "Combo"
+  },
+   {
+    name: "Cosmic Volume Mascara",
+    image: "/products/cosmic-volume-mascara.jpg",
+    category: "Face"
   }
+
 
 
 
