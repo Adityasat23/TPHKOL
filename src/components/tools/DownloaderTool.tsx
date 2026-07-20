@@ -1,118 +1,169 @@
-'use client';
+import { NextResponse } from 'next/server';
 
-import { useState } from 'react';
+// WAJIB UNTUK CLOUDFLARE PAGES
+export const runtime = 'edge';
 
-export default function DownloaderTool() {
-  const [url, setUrl] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
-  const [error, setError] = useState('');
+// ==========================================
+// ANTI-BOT RATE LIMITER (In-Memory)
+// ==========================================
+const rateLimitMap = new Map<string, { count: number, lastReset: number }>();
+const RATE_LIMIT = 5;
+const TIME_WINDOW = 60 * 1000;
 
-  const handleDownload = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true); 
-    setError(''); 
-    setResult(null);
+// HEADER AJAIB: Menyamar jadi browser asli agar tidak diblokir oleh API pihak ketiga (TikWM dll)
+const BROWSER_HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  'Accept': 'application/json, text/plain, */*',
+};
+
+export async function POST(request: Request) {
+  try {
+    const ip = request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || 'unknown';
+    const now = Date.now();
+    
+    if (ip !== 'unknown') {
+      const userLimit = rateLimitMap.get(ip);
+      if (userLimit) {
+        if (now - userLimit.lastReset > TIME_WINDOW) {
+          rateLimitMap.set(ip, { count: 1, lastReset: now });
+        } else {
+          if (userLimit.count >= RATE_LIMIT) {
+            console.log(`🚨 BOT TERDETEKSI / RATE LIMIT TERCAPAI UNTUK IP: ${ip}`);
+            return NextResponse.json({ error: 'Terlalu banyak klik. Tunggu 1 menit ya!' }, { status: 429 });
+          }
+          userLimit.count += 1;
+        }
+      } else {
+        rateLimitMap.set(ip, { count: 1, lastReset: now });
+      }
+    }
+
+    const { url } = await request.json();
+    if (!url) return NextResponse.json({ error: 'URL kosong' }, { status: 400 });
+
+    const isLinkValid = (link?: string) => {
+      return typeof link === 'string' && link.startsWith('http');
+    };
+
+    console.log(`🔍 Memproses URL: ${url} (dari IP: ${ip})`);
+
+    // ==========================================
+    // 1. YOUTUBE TO MP3
+    // ==========================================
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      try {
+        const res = await fetch('https://co.wuk.sh/api/json', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...BROWSER_HEADERS },
+          body: JSON.stringify({ url: url, isAudioOnly: true })
+        });
+        const data = await res.json();
+        if (data && data.url) {
+          return NextResponse.json({ title: 'YouTube Audio', cover: '', play: '', music: data.url });
+        }
+      } catch (e) { console.log("❌ YouTube Engine 1 Error"); }
+
+      try {
+        const res = await fetch(`https://api.yt1s.com/api/v2/download?url=${encodeURIComponent(url)}&format=mp3`, {
+          headers: BROWSER_HEADERS
+        });
+        const data = await res.json();
+        if (data && data.status === 'ok' && data.data?.dlink) {
+           return NextResponse.json({ title: data.title || 'YouTube Audio', cover: data.thumbnail || '', play: '', music: data.data.dlink });
+        }
+      } catch (e) { console.log("❌ YouTube Engine 2 Error"); }
+
+      return NextResponse.json({ error: 'Semua server YouTube sedang sibuk. Coba beberapa saat lagi.' }, { status: 400 });
+    }
+
+    // ==========================================
+    // 2. PINTEREST TO MP4
+    // ==========================================
+    if (url.includes('pinterest.com') || url.includes('pin.it')) {
+      try {
+         const res = await fetch('https://co.wuk.sh/api/json', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...BROWSER_HEADERS },
+          body: JSON.stringify({ url: url })
+        });
+        const data = await res.json();
+        if (data && data.url) {
+          return NextResponse.json({ title: 'Pinterest Video', cover: '', play: data.url, music: '' });
+        }
+      } catch (e) { console.log("❌ Pinterest Engine 1 Error"); }
+
+      try {
+        const res = await fetch(`https://api.bk9.site/downloader/pinterest?url=${encodeURIComponent(url)}`, {
+          headers: BROWSER_HEADERS
+        });
+        const data = await res.json();
+        let videoUrl = '';
+        if (typeof data.BK9 === 'string' && data.BK9.includes('.mp4')) {
+            videoUrl = data.BK9;
+        } else if (Array.isArray(data.BK9)) {
+            const videoObj = data.BK9.find((item: any) => item.url && item.url.includes('.mp4'));
+            if (videoObj) videoUrl = videoObj.url;
+        }
+        if (isLinkValid(videoUrl)) {
+            return NextResponse.json({ title: 'Pinterest Video', cover: '', play: videoUrl, music: '' });
+        }
+      } catch (e) { console.log("❌ Pinterest Engine 2 Error"); }
+
+      return NextResponse.json({ error: 'Gagal ekstrak Pinterest. Pastikan link mengarah ke Video Pin.' }, { status: 400 });
+    }
+
+    // ==========================================
+    // 3. TIKTOK DOWNLOADER
+    // ==========================================
+    if (url.includes('/music/')) {
+      const match = url.match(/-(\d+)(?:\?|$)/);
+      if (match && match[1]) {
+        try {
+          const apiRes = await fetch(`https://api16-normal-c-useast1a.tiktokv.com/aweme/v1/music/detail/?music_id=${match[1]}`, {
+            headers: { 'User-Agent': 'TikTok 26.2.0 rv:262018 (iPhone; iOS 14.4.2; en_US) Cronet' }
+          });
+          const data = await apiRes.json();
+          const musicLink = data?.music_info?.play_url?.url_list?.[0];
+          if (isLinkValid(musicLink)) return NextResponse.json({ title: data.music_info.title, cover: data.music_info.cover_large?.url_list?.[0], play: '', music: musicLink });
+        } catch (e) { console.log("❌ TikTok Music API Error"); }
+      }
+    }
+
+    // Engine 1: TikWM (Primary untuk Video/Lagu/Photo Slide)
     try {
-      const res = await fetch('/api/download', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url }),
+      const res = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}&hd=1`, {
+        headers: BROWSER_HEADERS // Kunci untuk menembus IP Block
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Gagal memproses');
-      setResult(data);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+      if (data?.code === 0 && data?.data) {
+        return NextResponse.json({ 
+          title: data.data.title || 'TikTok Media', 
+          cover: data.data.cover || '', 
+          play: data.data.play || '', // Kalau berupa carousel/slide foto, ini akan kosong dan frontend akan men-fallback menampilkan cover
+          music: data.data.music || '' 
+        });
+      }
+    } catch (e) { console.log("❌ TikTok TikWM Error"); }
 
-  return (
-    <div className="w-full max-w-3xl bg-white/70 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-500 rounded-[2rem] p-8 border border-white/60 z-10 animate-in fade-in zoom-in-95">
-      <form onSubmit={handleDownload} className="space-y-4">
-        <div className="relative group">
-          <input 
-            type="text" 
-            placeholder="Paste link TikTok / Pinterest / YouTube di sini..." 
-            className="w-full pl-6 pr-40 py-5 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 text-gray-900 transition-all placeholder-gray-400 font-medium shadow-sm" 
-            value={url} 
-            onChange={(e) => setUrl(e.target.value)} 
-            required 
-          />
-          <button 
-            type="submit" 
-            disabled={loading} 
-            className="absolute right-2 top-2 bottom-2 bg-[#0071E3] hover:bg-[#0077ED] text-white font-semibold px-8 rounded-xl disabled:opacity-50 transition-all shadow-sm active:scale-95"
-          >
-            {loading ? 'Processing...' : 'Search'}
-          </button>
-        </div>
-      </form>
+    // Engine 2: Tikdown API (Alternative)
+    try {
+        const res = await fetch(`https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(url)}`, {
+          headers: BROWSER_HEADERS
+        });
+        const data = await res.json();
+        if (data?.result) {
+            return NextResponse.json({ 
+                title: data.result.description || 'TikTok Media', 
+                cover: data.result.cover || '', 
+                play: data.result.video?.noWatermark || '', 
+                music: data.result.music?.play_url || '' 
+            });
+        }
+    } catch(e) { console.log("❌ TikTok Tikdown Error"); }
 
-      {error && <div className="mt-6 p-4 bg-[#FF3B30]/10 border border-[#FF3B30]/20 text-[#FF3B30] rounded-xl text-sm font-medium">{error}</div>}
-      
-      {result && (
-        <div className="mt-8 flex flex-col md:flex-row gap-8 items-center md:items-start bg-gray-50/50 p-6 rounded-2xl border border-gray-200">
-          
-          {/* TIKTOK VIEWER / VIDEO PLAYER */}
-          <div className="w-full md:w-64 flex-shrink-0 flex justify-center bg-black/5 rounded-2xl overflow-hidden border border-gray-200">
-            {result.play ? (
-              <video 
-                src={result.play} 
-                controls 
-                poster={result.cover}
-                preload="metadata"
-                className="w-full h-auto max-h-[400px] object-contain bg-black"
-                playsInline
-              />
-            ) : result.cover ? (
-              <img 
-                src={result.cover} 
-                alt="thumbnail" 
-                className="w-full h-auto max-h-[400px] object-cover" 
-              />
-            ) : null}
-          </div>
+    return NextResponse.json({ error: 'Sistem gagal mengambil media. Periksa link kembali.' }, { status: 400 });
 
-          <div className="flex-1 text-center md:text-left w-full flex flex-col justify-between">
-            <div>
-              <h3 className="font-bold text-gray-900 text-lg mb-2 line-clamp-3 leading-snug">
-                {result.title || 'Video Tanpa Judul'}
-              </h3>
-              <p className="text-sm text-gray-500 mb-6">
-                Kamu bisa menonton videonya langsung di sini atau mengunduhnya.
-              </p>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-3">
-              {result.play && (
-                <a 
-                  href={result.play} 
-                  target="_blank" 
-                  rel="noreferrer" 
-                  className="flex-1 bg-[#0071E3] hover:bg-[#0077ED] text-white font-semibold py-3 rounded-xl text-center shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2"
-                >
-                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                  Unduh Video
-                </a>
-              )}
-              {result.music && (
-                <a 
-                  href={result.music} 
-                  target="_blank" 
-                  rel="noreferrer" 
-                  className="flex-1 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold py-3 rounded-xl text-center shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2"
-                >
-                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
-                  Unduh MP3
-                </a>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+  } catch (error: any) {
+    return NextResponse.json({ error: 'Sistem sedang sibuk.' }, { status: 500 });
+  }
 }
