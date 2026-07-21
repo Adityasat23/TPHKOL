@@ -158,6 +158,11 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
     name: "Cosmic Volume Mascara",
     image: "/products/cosmic-volume-mascara.jpg",
     category: "Face"
+  },
+  {
+    name: "Navi Eyeshadow Palette",
+    image: "/products/Navi-Eyeshadow-Palette.png",
+    category: "Face"
   }
 
 
