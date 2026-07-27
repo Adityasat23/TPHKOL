@@ -163,6 +163,11 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
     name: "Navi Eyeshadow Palette",
     image: "/products/Navi-Eyeshadow-Palette.png",
     category: "Face"
+  },
+   {
+    name: "Lip Matte & Skintint Stick",
+    image: "/products/lip-matte-skintint-stick.png",
+    category: "Combo"
   }
 
 
