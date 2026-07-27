@@ -16,12 +16,15 @@ export default function FakeCommentTool() {
   const [replyTo, setReplyTo] = useState('yeftajethro');
   const [showReply, setShowReply] = useState(true);
   
-  // State baru untuk pilihan nama Brand/Admin
+  // State pilihan nama Brand/Admin
   const [brandName, setBrandName] = useState('Timephoria.id');
-  
   const [replyText, setReplyText] = useState('BESOK!');
   const [replyLikes, setReplyLikes] = useState('5');
   const [replyDate, setReplyDate] = useState('2025-11-17');
+
+  // State untuk menyimpan gambar sisipan di komentar & balasan
+  const [commentImage, setCommentImage] = useState<string>('');
+  const [replyImage, setReplyImage] = useState<string>('');
   
   const previewRef = useRef<HTMLDivElement>(null);
   const { getDetectedBannedWords, renderWithHighlights } = useBannedWords();
@@ -97,6 +100,19 @@ export default function FakeCommentTool() {
               </div>
             )}
           </div>
+
+          {/* INPUT GAMBAR KOMENTAR UTAMA */}
+          {commentMode === 'thread' && (
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-2">Sisipkan Gambar (Opsional)</label>
+              <input type="file" onChange={(e) => handleImageUpload(e, setCommentImage)} className="text-sm block w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-medium file:bg-gray-200/50 file:text-gray-700 hover:file:bg-gray-200 transition-all cursor-pointer text-gray-500" />
+              {commentImage && (
+                <button onClick={() => setCommentImage('')} className="mt-2 text-xs font-semibold text-[#FF3B30] hover:text-red-700 transition-colors">
+                  ✕ Hapus Gambar Komentar
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {commentMode === 'thread' && (
@@ -127,6 +143,17 @@ export default function FakeCommentTool() {
                 <div className="relative">
                   <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full p-4 bg-white/60 border border-gray-200/60 rounded-xl text-sm font-medium min-h-[80px] text-gray-900" placeholder="Teks balasan admin..." />
                 </div>
+
+                {/* INPUT GAMBAR BALASAN BRAND */}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-2 mt-3">Sisipkan Gambar Brand (Opsional)</label>
+                  <input type="file" onChange={(e) => handleImageUpload(e, setReplyImage)} className="text-sm block w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-medium file:bg-gray-200/50 file:text-gray-700 hover:file:bg-gray-200 transition-all cursor-pointer text-gray-500" />
+                  {replyImage && (
+                    <button onClick={() => setReplyImage('')} className="mt-2 text-xs font-semibold text-[#FF3B30] hover:text-red-700 transition-colors">
+                      ✕ Hapus Gambar Balasan
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -139,9 +166,10 @@ export default function FakeCommentTool() {
         <div style={{ padding: '30px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
           <div ref={previewRef} style={{ display: 'inline-flex', flexDirection: 'column', fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
             
+            {/* PRATINJAU STICKER BUBBLE DIPERKECIL (maxWidth 350px) */}
             {commentMode === 'sticker' && (
               <div style={{ display: 'inline-flex', flexDirection: 'column', isolation: 'isolate', transform: 'translateZ(0)' }}>
-                <div style={{ backgroundColor: 'white', borderRadius: '16px 16px 16px 0px', padding: '24px 28px', display: 'flex', width: '100%', maxWidth: '480px', gap: '16px', alignItems: 'flex-start', border: '1px solid transparent', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.1)' }}>
+                <div style={{ backgroundColor: 'white', borderRadius: '16px 16px 16px 0px', padding: '24px 28px', display: 'flex', width: '100%', maxWidth: '350px', gap: '16px', alignItems: 'flex-start', border: '1px solid transparent', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.1)' }}>
                   <img key={avatar} src={avatar} style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, marginTop: '2px' }} />
                   <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
                     <p style={{ color: '#757575', fontSize: '16px', fontWeight: '600', margin: '0 0 6px 0', fontFamily: 'inherit' }}>Reply to {replyTo}'s comment</p>
@@ -152,6 +180,7 @@ export default function FakeCommentTool() {
               </div>
             )}
 
+            {/* PRATINJAU THREAD COMMENT DIPERKECIL (width 350px) */}
             {commentMode === 'thread' && (
             <div style={{
                 backgroundColor: threadTheme === 'dark' ? '#1e1e1e' : '#FFFFFF',
@@ -159,7 +188,7 @@ export default function FakeCommentTool() {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '16px',
-                width: '430px',
+                width: '350px',
                 boxShadow: threadTheme === 'light' ? '0 10px 40px -10px rgba(0,0,0,0.1)' : '0 10px 40px -10px rgba(0,0,0,0.5)',
                 fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
               }}>
@@ -175,6 +204,11 @@ export default function FakeCommentTool() {
                     <p style={{ color: threadTheme === 'dark' ? '#E1E1E1' : '#161823', fontSize: '15px', fontWeight: 400, margin: '2px 0 0 0', lineHeight: 1.4, whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
                       {renderWithHighlights(commentText)}
                     </p>
+
+                    {/* GAMBAR SISIPAN KOMENTAR UTAMA */}
+                    {commentImage && (
+                      <img src={commentImage} style={{ marginTop: '8px', borderRadius: '8px', maxWidth: '200px', maxHeight: '200px', objectFit: 'cover' }} alt="Attachment" />
+                    )}
                     
                     {/* Baris Bawah Utama: Tanggal, Reply, Like, Dislike */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
@@ -208,6 +242,11 @@ export default function FakeCommentTool() {
                           <p style={{ color: threadTheme === 'dark' ? '#E1E1E1' : '#161823', fontSize: '15px', fontWeight: 400, margin: '2px 0 0 0', lineHeight: 1.4, whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
                             {renderWithHighlights(replyText)}
                           </p>
+
+                          {/* GAMBAR SISIPAN BALASAN BRAND */}
+                          {replyImage && (
+                            <img src={replyImage} style={{ marginTop: '8px', borderRadius: '8px', maxWidth: '200px', maxHeight: '200px', objectFit: 'cover' }} alt="Reply Attachment" />
+                          )}
                           
                           {/* Baris Bawah Balasan */}
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
