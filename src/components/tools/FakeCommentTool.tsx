@@ -1,9 +1,18 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { toPng } from 'html-to-image';
 import { useBannedWords, BannedItem } from '../../hooks/useBannedWords';
 import { DEFAULT_AVATAR, TIMEPHORIA_LOGO, THEME_COLORS } from '../../constants';
+
+// FUNGSI BARU: Mengambil tanggal hari ini dengan format YYYY-MM-DD (Sesuai zona waktu lokal)
+const getTodayDate = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 export default function FakeCommentTool() {
   const [commentMode, setCommentMode] = useState<'sticker' | 'thread'>('sticker'); 
@@ -11,7 +20,10 @@ export default function FakeCommentTool() {
   const [username, setUsername] = useState('yeftajethro');
   const [commentText, setCommentText] = useState("busetdah timephoria\napaan lagi nih 😭😭😭");
   const [likes, setLikes] = useState('52');
-  const [date, setDate] = useState('2025-11-16');
+  
+  // STATE TANGGAL DIUBAH: Menggunakan fungsi getTodayDate() sebagai nilai default
+  const [date, setDate] = useState(getTodayDate());
+  
   const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
   const [replyTo, setReplyTo] = useState('yeftajethro');
   const [showReply, setShowReply] = useState(true);
@@ -20,7 +32,9 @@ export default function FakeCommentTool() {
   const [brandName, setBrandName] = useState('Timephoria.id');
   const [replyText, setReplyText] = useState('BESOK!');
   const [replyLikes, setReplyLikes] = useState('5');
-  const [replyDate, setReplyDate] = useState('2025-11-17');
+  
+  // STATE TANGGAL BALASAN DIUBAH: Menggunakan fungsi getTodayDate()
+  const [replyDate, setReplyDate] = useState(getTodayDate());
 
   // State untuk menyimpan gambar sisipan di komentar & balasan
   const [commentImage, setCommentImage] = useState<string>('');
@@ -166,7 +180,7 @@ export default function FakeCommentTool() {
         <div style={{ padding: '30px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
           <div ref={previewRef} style={{ display: 'inline-flex', flexDirection: 'column', fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
             
-            {/* PRATINJAU STICKER BUBBLE DIKEMBALIKAN KE MAXWIDTH ASLINYA (480px) */}
+            {/* PRATINJAU STICKER BUBBLE */}
             {commentMode === 'sticker' && (
               <div style={{ display: 'inline-flex', flexDirection: 'column', isolation: 'isolate', transform: 'translateZ(0)' }}>
                 <div style={{ backgroundColor: 'white', borderRadius: '16px 16px 16px 0px', padding: '24px 28px', display: 'flex', width: '100%', maxWidth: '480px', gap: '16px', alignItems: 'flex-start', border: '1px solid transparent', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.1)' }}>
@@ -180,7 +194,7 @@ export default function FakeCommentTool() {
               </div>
             )}
 
-            {/* PRATINJAU THREAD COMMENT DIKEMBALIKAN KE WIDTH ASLINYA (500px) */}
+            {/* PRATINJAU THREAD COMMENT */}
             {commentMode === 'thread' && (
             <div style={{
                 backgroundColor: threadTheme === 'dark' ? '#1e1e1e' : '#FFFFFF',
@@ -199,7 +213,7 @@ export default function FakeCommentTool() {
                   {/* Avatar Utama */}
                   <img key={avatar} src={avatar} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                   
-                  {/* Konten Utama & Wrapper Balasan (Agar indentasi lurus) */}
+                  {/* Konten Utama & Wrapper Balasan */}
                   <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
                     <p style={{ color: '#8A8B91', fontSize: '14px', fontWeight: 600, margin: 0 }}>{username}</p>
                     <p style={{ color: threadTheme === 'dark' ? '#E1E1E1' : '#161823', fontSize: '15px', fontWeight: 400, margin: '4px 0 0 0', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
