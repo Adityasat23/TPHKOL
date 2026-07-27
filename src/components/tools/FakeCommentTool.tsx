@@ -208,7 +208,7 @@ export default function FakeCommentTool() {
 
                     {/* GAMBAR SISIPAN KOMENTAR UTAMA */}
                     {commentImage && (
-                      <img src={commentImage} style={{ marginTop: '12px', borderRadius: '8px', maxWidth: '240px', maxHeight: '240px', objectFit: 'cover' }} alt="Attachment" />
+                      <img src={commentImage} style={{ marginTop: '12px', borderRadius: '8px', maxWidth: '120px', maxHeight: '120px', objectFit: 'cover' }} alt="Attachment" />
                     )}
                     
                     {/* Baris Bawah Utama: Tanggal, Reply */}
@@ -245,7 +245,7 @@ export default function FakeCommentTool() {
 
                       {/* GAMBAR SISIPAN BALASAN BRAND */}
                       {replyImage && (
-                        <img src={replyImage} style={{ marginTop: '12px', borderRadius: '8px', maxWidth: '240px', maxHeight: '240px', objectFit: 'cover' }} alt="Reply Attachment" />
+                        <img src={replyImage} style={{ marginTop: '12px', borderRadius: '8px', maxWidth: '120px', maxHeight: '120px', objectFit: 'cover' }} alt="Reply Attachment" />
                       )}
                       
                       {/* Baris Bawah Balasan: Tanggal, Reply */}
