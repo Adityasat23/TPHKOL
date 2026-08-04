@@ -5,7 +5,7 @@ import { toPng } from 'html-to-image';
 import { useBannedWords, BannedItem } from '../../hooks/useBannedWords';
 import { DEFAULT_AVATAR, TIMEPHORIA_LOGO, THEME_COLORS } from '../../constants';
 
-// FUNGSI BARU: Mengambil tanggal hari ini dengan format YYYY-MM-DD (Sesuai zona waktu lokal)
+// FUNGSI BARU: Mengambil tanggal hari ini dengan format YYYY-MM-DD
 const getTodayDate = () => {
   const today = new Date();
   const year = today.getFullYear();
@@ -20,23 +20,16 @@ export default function FakeCommentTool() {
   const [username, setUsername] = useState('yeftajethro');
   const [commentText, setCommentText] = useState("busetdah timephoria\napaan lagi nih 😭😭😭");
   const [likes, setLikes] = useState('52');
-  
-  // STATE TANGGAL DIUBAH: Menggunakan fungsi getTodayDate() sebagai nilai default
   const [date, setDate] = useState(getTodayDate());
-  
   const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
   const [replyTo, setReplyTo] = useState('yeftajethro');
   const [showReply, setShowReply] = useState(true);
   
-  // State pilihan nama Brand/Admin
   const [brandName, setBrandName] = useState('Timephoria.id');
   const [replyText, setReplyText] = useState('BESOK!');
   const [replyLikes, setReplyLikes] = useState('5');
-  
-  // STATE TANGGAL BALASAN DIUBAH: Menggunakan fungsi getTodayDate()
   const [replyDate, setReplyDate] = useState(getTodayDate());
 
-  // State untuk menyimpan gambar sisipan di komentar & balasan
   const [commentImage, setCommentImage] = useState<string>('');
   const [replyImage, setReplyImage] = useState<string>('');
   
@@ -115,7 +108,6 @@ export default function FakeCommentTool() {
             )}
           </div>
 
-          {/* INPUT GAMBAR KOMENTAR UTAMA */}
           {commentMode === 'thread' && (
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-2">Sisipkan Gambar (Opsional)</label>
@@ -158,7 +150,6 @@ export default function FakeCommentTool() {
                   <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full p-4 bg-white/60 border border-gray-200/60 rounded-xl text-sm font-medium min-h-[80px] text-gray-900" placeholder="Teks balasan admin..." />
                 </div>
 
-                {/* INPUT GAMBAR BALASAN BRAND */}
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-2 mt-3">Sisipkan Gambar Brand (Opsional)</label>
                   <input type="file" onChange={(e) => handleImageUpload(e, setReplyImage)} className="text-sm block w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-medium file:bg-gray-200/50 file:text-gray-700 hover:file:bg-gray-200 transition-all cursor-pointer text-gray-500" />
@@ -180,15 +171,13 @@ export default function FakeCommentTool() {
         <div style={{ padding: '30px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
           <div ref={previewRef} style={{ display: 'inline-flex', flexDirection: 'column', fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
             
-            {/* PRATINJAU STICKER BUBBLE - MENGGUNAKAN minWidth: 0 DAN wordBreak: 'break-word' */}
+            {/* PRATINJAU STICKER BUBBLE */}
             {commentMode === 'sticker' && (
               <div style={{ display: 'inline-flex', flexDirection: 'column', isolation: 'isolate', transform: 'translateZ(0)' }}>
                 <div style={{ backgroundColor: 'white', borderRadius: '16px 16px 16px 0px', padding: '24px 28px', display: 'flex', width: '100%', maxWidth: '480px', gap: '16px', alignItems: 'flex-start', border: '1px solid transparent', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.1)' }}>
                   <img key={avatar} src={avatar} style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, marginTop: '2px' }} />
-                  {/* PENAMBAHAN minWidth: 0 DISINI */}
                   <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%', minWidth: 0 }}>
                     <p style={{ color: '#757575', fontSize: '16px', fontWeight: '600', margin: '0 0 6px 0', fontFamily: 'inherit', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Reply to {replyTo}'s comment</p>
-                    {/* PENAMBAHAN wordBreak: 'break-word' dan overflowWrap: 'break-word' DISINI */}
                     <p style={{ color: '#000000', fontSize: '24px', fontWeight: '800', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', wordBreak: 'break-word', overflowWrap: 'break-word', fontFamily: 'inherit', letterSpacing: '-0.02em' }}>{renderWithHighlights(commentText)}</p>
                   </div>
                 </div>
@@ -196,7 +185,7 @@ export default function FakeCommentTool() {
               </div>
             )}
 
-            {/* PRATINJAU THREAD COMMENT - PENAMBAHAN wordBreak: 'break-word' AGAR LEBIH AMAN */}
+            {/* PRATINJAU THREAD COMMENT */}
             {commentMode === 'thread' && (
             <div style={{
                 backgroundColor: threadTheme === 'dark' ? '#1e1e1e' : '#FFFFFF',
@@ -215,30 +204,31 @@ export default function FakeCommentTool() {
                   {/* Avatar Utama */}
                   <img key={avatar} src={avatar} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                   
-                  {/* Konten Utama & Wrapper Balasan */}
+                  {/* Konten Utama */}
                   <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
                     <p style={{ color: '#8A8B91', fontSize: '14px', fontWeight: 600, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{username}</p>
-                    {/* PENAMBAHAN wordBreak dan overflowWrap DISINI */}
                     <p style={{ color: threadTheme === 'dark' ? '#E1E1E1' : '#161823', fontSize: '15px', fontWeight: 400, margin: '4px 0 0 0', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                       {renderWithHighlights(commentText)}
                     </p>
 
-                    {/* GAMBAR SISIPAN KOMENTAR UTAMA */}
                     {commentImage && (
                       <img src={commentImage} style={{ marginTop: '12px', borderRadius: '8px', maxWidth: '240px', maxHeight: '240px', objectFit: 'cover' }} alt="Attachment" />
                     )}
                     
-                    {/* Baris Bawah Utama: Tanggal, Reply */}
-                    <div style={{ display: 'flex', gap: '16px', color: '#8A8B91', fontSize: '13px', fontWeight: 500, marginTop: '8px' }}>
-                      <span>{date}</span>
-                      <span style={{ cursor: 'pointer' }}>Reply</span>
+                    {/* BARIS BAWAH UTAMA DIKEMBALIKAN KE LAYOUT ORIGINAL */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+                      <div style={{ display: 'flex', gap: '16px', color: '#8A8B91', fontSize: '12px', fontWeight: 600 }}>
+                        <span>{date}</span>
+                        <span style={{ cursor: 'pointer' }}>Reply</span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '24px', color: '#8A8B91', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                          {likes && <span style={{ fontSize: '12px', fontWeight: 600 }}>{likes}</span>}
+                        </div>
+                        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
+                      </div>
                     </div>
-                  </div>
-
-                  {/* Icon Likes di Kanan */}
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#8A8B91', flexShrink: 0, marginLeft: '8px', minWidth: '32px' }}>
-                    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                    {likes && <p style={{ fontSize: '12px', margin: '4px 0 0 0', textAlign: 'center', fontWeight: 600 }}>{likes}</p>}
                   </div>
                 </div>
 
@@ -256,27 +246,28 @@ export default function FakeCommentTool() {
                         <span style={{ color: '#00D6E1', fontSize: '14px', fontWeight: 600 }}>Creator</span>
                       </div>
                       
-                      {/* PENAMBAHAN wordBreak dan overflowWrap DISINI */}
                       <p style={{ color: threadTheme === 'dark' ? '#E1E1E1' : '#161823', fontSize: '15px', fontWeight: 400, margin: '4px 0 0 0', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                         {renderWithHighlights(replyText)}
                       </p>
 
-                      {/* GAMBAR SISIPAN BALASAN BRAND */}
                       {replyImage && (
                         <img src={replyImage} style={{ marginTop: '12px', borderRadius: '8px', maxWidth: '240px', maxHeight: '240px', objectFit: 'cover' }} alt="Reply Attachment" />
                       )}
                       
-                      {/* Baris Bawah Balasan: Tanggal, Reply */}
-                      <div style={{ display: 'flex', gap: '16px', color: '#8A8B91', fontSize: '13px', fontWeight: 500, marginTop: '8px' }}>
-                        <span>{replyDate}</span>
-                        <span style={{ cursor: 'pointer' }}>Reply</span>
+                      {/* BARIS BAWAH BALASAN DIKEMBALIKAN KE LAYOUT ORIGINAL */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+                        <div style={{ display: 'flex', gap: '16px', color: '#8A8B91', fontSize: '12px', fontWeight: 600 }}>
+                          <span>{replyDate}</span>
+                          <span style={{ cursor: 'pointer' }}>Reply</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: '24px', color: '#8A8B91', alignItems: 'center' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                            {replyLikes && <span style={{ fontSize: '12px', fontWeight: 600 }}>{replyLikes}</span>}
+                          </div>
+                          <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>
+                        </div>
                       </div>
-                    </div>
-
-                    {/* Icon Likes Balasan di Kanan */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#8A8B91', flexShrink: 0, marginLeft: '8px', minWidth: '32px' }}>
-                      <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                      {replyLikes && <p style={{ fontSize: '11px', margin: '4px 0 0 0', textAlign: 'center', fontWeight: 600 }}>{replyLikes}</p>}
                     </div>
                   </div>
                 )}
