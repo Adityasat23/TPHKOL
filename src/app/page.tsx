@@ -7,7 +7,7 @@ import FakeCommentTool from '../components/tools/FakeCommentTool';
 import WordCheckerTool from '../components/tools/WordCheckerTool';
 import WaChatTool from '../components/tools/WaChatTool';
 import DisclaimerTool from '../components/tools/DisclaimerTool';
-import FlowBuilderTool from '@/components/tools/FlowBuilderTool';
+//import FlowBuilderTool from '@/components/tools/FlowBuilderTool';
 
 // 1. Tambahkan 'ai-prompt' ke dalam tipe data
 type TabType = 'downloader' | 'comment' | 'product' | 'disclaimer' | 'checker' | 'wa' | 'ai-prompt';
@@ -54,9 +54,6 @@ export default function Home() {
       {activeTab === 'product' && <ProductCardTool />}
       {activeTab === 'disclaimer' && <DisclaimerTool />}
       {activeTab === 'checker' && <WordCheckerTool />}
-      {activeTab === 'wa' && <WaChatTool />}
-      {/* 4. Letakkan komponen FlowBuilderTool di sini */}
-      {activeTab === 'ai-prompt' && <FlowBuilderTool />}
 
       <footer style={{ marginTop: '60px', paddingTop: '30px', paddingBottom: '30px', textAlign: 'center', width: '100%', maxWidth: '1152px', borderTop: '1px solid rgba(0,0,0,0.05)', zIndex: 10 }}>
         <p style={{ color: '#8E8E93', fontSize: '14px', fontWeight: 500 }}>
