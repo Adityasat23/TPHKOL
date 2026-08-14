@@ -9,15 +9,18 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ai-sdk/google": "^4.0.34",
+    "ai": "^7.0.52",
     "framer-motion": "^12.38.0",
     "html-to-image": "^1.11.13",
     "html2canvas": "^1.4.1",
-    "lucide-react": "^1.14.0",
+    "lucide-react": "^1.28.0",
     "next": "16.2.6",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-rnd": "^10.5.3",
-    "sharp": "^0.35.1"
+    "sharp": "^0.35.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@cloudflare/next-on-pages": "^1.13.16",

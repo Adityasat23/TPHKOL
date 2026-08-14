@@ -7,10 +7,13 @@ import FakeCommentTool from '../components/tools/FakeCommentTool';
 import WordCheckerTool from '../components/tools/WordCheckerTool';
 import WaChatTool from '../components/tools/WaChatTool';
 import DisclaimerTool from '../components/tools/DisclaimerTool';
-type TabType = 'downloader' | 'comment' | 'product' | 'disclaimer' | 'checker' | 'wa';
+import FlowBuilderTool from '@/components/tools/FlowBuilderTool';
+
+// 1. Tambahkan 'ai-prompt' ke dalam tipe data
+type TabType = 'downloader' | 'comment' | 'product' | 'disclaimer' | 'checker' | 'wa' | 'ai-prompt';
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<TabType>('product');
+  const [activeTab, setActiveTab] = useState<TabType>('ai-prompt'); // Default bisa diubah
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
@@ -32,13 +35,15 @@ export default function Home() {
       </div>
 
       <div className="flex bg-white/50 backdrop-blur-3xl rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.1)] border-[1.5px] border-white p-1.5 mb-10 w-full max-w-5xl justify-center gap-2 z-10 overflow-x-auto custom-scrollbar">
-        {(['downloader', 'comment', 'product', 'disclaimer', 'checker', 'wa'] as TabType[]).map((tab) => (
+        {/* 2. Tambahkan 'ai-prompt' ke dalam array pembuat tombol */}
+        {(['downloader', 'comment', 'product', 'disclaimer', 'checker', 'wa', 'ai-prompt'] as TabType[]).map((tab) => (
           <button 
             key={tab}
             onClick={() => setActiveTab(tab)} 
             className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap capitalize ${activeTab === tab ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}
           >
-            {tab === 'wa' ? 'WA Chat' : tab.replace('-', ' ')}
+            {/* 3. Atur nama tombol khusus untuk AI Prompt */}
+            {tab === 'wa' ? 'WA Chat' : tab === 'ai-prompt' ? 'AI Prompt' : tab.replace('-', ' ')}
           </button>
         ))}
       </div>
@@ -50,6 +55,8 @@ export default function Home() {
       {activeTab === 'disclaimer' && <DisclaimerTool />}
       {activeTab === 'checker' && <WordCheckerTool />}
       {activeTab === 'wa' && <WaChatTool />}
+      {/* 4. Letakkan komponen FlowBuilderTool di sini */}
+      {activeTab === 'ai-prompt' && <FlowBuilderTool />}
 
       <footer style={{ marginTop: '60px', paddingTop: '30px', paddingBottom: '30px', textAlign: 'center', width: '100%', maxWidth: '1152px', borderTop: '1px solid rgba(0,0,0,0.05)', zIndex: 10 }}>
         <p style={{ color: '#8E8E93', fontSize: '14px', fontWeight: 500 }}>

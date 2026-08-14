@@ -164,6 +164,11 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
     image: "/products/Navi-Eyeshadow-Palette.png",
     category: "Face"
   },
+  {
+    name: "Skintint & Lip Tattoo",
+    image: "/products/skintint-liptattoo.jpg",
+    category: "Face"
+  },
    {
     name: "Lip Matte & Skintint Stick",
     image: "/products/lip-matte-skintint-stick.png",
