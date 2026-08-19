@@ -51,7 +51,7 @@ const urlToBase64 = (url: string): Promise<string> => {
     try {
       const encodedUrl = url.startsWith('http')
         ? url
-        : `${window.location.origin}${url.split('/').map((seg) => encodeURIComponent(seg)).join('/')}`;
+        : `${window.location.origin}/${url.replace(/^\//, '').split('/').map((seg) => encodeURIComponent(seg)).join('/')}`;
 
       const response = await fetch(encodedUrl, { cache: 'force-cache' });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);

@@ -166,8 +166,8 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
   },
   {
     name: "Skintint & Lip Tattoo",
-    image: "/products/skintint-liptattoo.jpg",
-    category: "Face"
+    image: "/products/skintint-liptattoo.png",
+    category: "Combo"
   },
    {
     name: "Lippies All Products",
