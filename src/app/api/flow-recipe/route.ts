@@ -2,11 +2,12 @@ import { generateObject } from 'ai';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-
+export const runtime = 'edge';
 // 1. SOLUSI API KEY (Memaksa SDK membaca kunci berformat AQ... milik Anda)
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY,
 });
+
 
 export async function POST(req: Request) {
   try {
