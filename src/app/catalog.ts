@@ -170,6 +170,11 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
     category: "Face"
   },
    {
+    name: "Lippies All Products",
+    image: "/products/ALL-PRODUCT.jpg",
+    category: "Lip"
+  },
+   {
     name: "Lip Matte & Skintint Stick",
     image: "/products/lip-matte-skintint-stick.png",
     category: "Combo"
