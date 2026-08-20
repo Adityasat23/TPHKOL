@@ -49,11 +49,13 @@ export default function Home() {
       </div>
 
       {/* RENDER HARUS PRESISI, TIDAK BOLEH TERTUKAR */}
-      {activeTab === 'downloader' && <DownloaderTool />}
-      {activeTab === 'comment' && <FakeCommentTool />}
-      {activeTab === 'product' && <ProductCardTool />}
-      {activeTab === 'disclaimer' && <DisclaimerTool />}
-      {activeTab === 'checker' && <WordCheckerTool />}
+{/* RENDER HARUS PRESISI, TIDAK BOLEH TERTUKAR */}
+{activeTab === 'downloader' && <DownloaderTool />}
+{activeTab === 'comment' && <FakeCommentTool />}
+{activeTab === 'product' && <ProductCardTool />}
+{activeTab === 'disclaimer' && <DisclaimerTool />}
+{activeTab === 'checker' && <WordCheckerTool />}
+{activeTab === 'wa' && <WaChatTool/>} 
 
       <footer style={{ marginTop: '60px', paddingTop: '30px', paddingBottom: '30px', textAlign: 'center', width: '100%', maxWidth: '1152px', borderTop: '1px solid rgba(0,0,0,0.05)', zIndex: 10 }}>
         <p style={{ color: '#8E8E93', fontSize: '14px', fontWeight: 500 }}>
