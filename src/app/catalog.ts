@@ -175,6 +175,11 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
     category: "Combo"
   },
    {
+    name: "Elixir Velvet Shine Switching Lip Cream",
+    image: "/products/elixir-velvet.png",
+    category: "Lips"
+  },
+   {
     name: "Lip Matte & Skintint Stick",
     image: "/products/lip-matte-skintint-stick.png",
     category: "Combo"
