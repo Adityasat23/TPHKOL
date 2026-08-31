@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { toPng } from 'html-to-image';
+// Gunakan Next.js Image component untuk optimasi loading gambar
+import Image from 'next/image'; 
 
 type TemplateKey = 'phone1' | 'phone2' | 'wmp1' | 'wmp2';
 
@@ -16,6 +18,14 @@ const PRESETS = {
 export default function RetroUITool() {
   const [activeTemplate, setActiveTemplate] = useState<TemplateKey>('wmp1');
 
+  // Pre-load images to memory so switching is instant
+  useEffect(() => {
+    Object.values(PRESETS).forEach((preset) => {
+      const img = new window.Image();
+      img.src = preset.src;
+    });
+  }, []);
+
   // Tampilan Layar
   const [screenBg, setScreenBg] = useState(PRESETS.wmp1.bg);
   const [textColor, setTextColor] = useState(PRESETS.wmp1.color);
@@ -27,7 +37,7 @@ export default function RetroUITool() {
   const [headerSize, setHeaderSize] = useState(PRESETS.wmp1.headerSize);
   const [isHeaderBold, setIsHeaderBold] = useState(true);
 
-  const [bodyText, setBodyText] = useState('KASI DISKON\nSAMPAI 80%!');
+  const [bodyText, setBodyText] = useState('FREE NEWJEANS\nRIGHT NOW!');
   const [bodySize, setBodySize] = useState(PRESETS.wmp1.bodySize);
   const [isBodyBold, setIsBodyBold] = useState(false);
 
@@ -51,12 +61,13 @@ export default function RetroUITool() {
     if (!previewRef.current) return;
     try {
       await document.fonts.ready;
-      const dataUrl = await toPng(previewRef.current, { cacheBust: true, pixelRatio: 3, backgroundColor: 'transparent' });
+      // Gunakan pixelRatio yang lebih rendah (misal 2) agar export tidak terlalu berat
+      const dataUrl = await toPng(previewRef.current, { cacheBust: true, pixelRatio: 2, backgroundColor: 'transparent' });
       const link = document.createElement('a');
       link.download = `retro-mockup-${Date.now()}.png`;
       link.href = dataUrl;
       link.click();
-    } catch (err) { alert("Export gagal."); }
+    } catch (err) { alert("Export gagal. Coba kecilkan resolusi gambar aslinya."); }
   };
 
   const getFontFamily = () => {
@@ -137,7 +148,6 @@ export default function RetroUITool() {
                   <span className="text-[11px] font-bold text-[#34C759] bg-[#34C759]/10 px-2 py-1.5 rounded-md">Size: {headerSize}px</span>
                 </div>
              </div>
-             {/* MIN DIMULAI DARI 0 AGAR BISA HILANG */}
              <input type="range" min="0" max="100" value={headerSize} onChange={(e) => setHeaderSize(Number(e.target.value))} className="w-full accent-[#34C759]" />
              <input type="text" value={headerText} onChange={(e) => setHeaderText(e.target.value)} placeholder="Teks Header" className="w-full p-3.5 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#34C759]/30 focus:border-[#34C759]" />
           </div>
@@ -150,7 +160,6 @@ export default function RetroUITool() {
                   <span className="text-[11px] font-bold text-[#34C759] bg-[#34C759]/10 px-2 py-1.5 rounded-md">Size: {bodySize}px</span>
                 </div>
              </div>
-             {/* MIN DIMULAI DARI 0 AGAR BISA HILANG */}
              <input type="range" min="0" max="100" value={bodySize} onChange={(e) => setBodySize(Number(e.target.value))} className="w-full accent-[#34C759]" />
              <textarea value={bodyText} onChange={(e) => setBodyText(e.target.value)} placeholder="Teks Utama..." className="w-full p-3.5 bg-white border border-gray-200 rounded-xl text-sm font-medium min-h-[100px] resize-y text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#34C759]/30 focus:border-[#34C759]" />
           </div>
@@ -178,7 +187,13 @@ export default function RetroUITool() {
               overflow: 'hidden'
           }}>
             
+            {/* 
+              Menggunakan tag <img> standar dengan force key update.
+              Memberikan 'key' pada <img> memaksa React merender ulang elemen tersebut 
+              setiap kali src berubah, menghindari bug gambar tidak termuat tapi state berubah.
+            */}
             <img 
+              key={screenPos.src}
               src={screenPos.src} 
               alt="Template Frame" 
               style={{ 
@@ -203,12 +218,10 @@ export default function RetroUITool() {
               {/* RENDER KONTEN TEKS */}
               <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center', minHeight: 0 }}>
                  
-                 {/* HANYA MUNCUL JIKA SIZE > 0 */}
                  {headerSize > 0 && headerText && (
                     <div style={{ 
                       fontSize: `${headerSize}px`, 
                       fontWeight: isHeaderBold ? 'bold' : 'normal', 
-                      // Beri jarak bawah HANYA JIKA body juga aktif, agar posisi center tetap sempurna kalau body kosong
                       marginBottom: bodySize > 0 && bodyText ? '4%' : '0', 
                       lineHeight: '1.1',
                       textTransform: fontFamily === 'impact' ? 'uppercase' : 'none',
@@ -219,7 +232,6 @@ export default function RetroUITool() {
                     </div>
                  )}
                  
-                 {/* HANYA MUNCUL JIKA SIZE > 0 */}
                  {bodySize > 0 && bodyText && (
                     <div style={{ 
                       fontSize: `${bodySize}px`, 
