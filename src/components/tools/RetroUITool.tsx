@@ -37,7 +37,7 @@ export default function RetroUITool() {
   const [headerSize, setHeaderSize] = useState(PRESETS.wmp1.headerSize);
   const [isHeaderBold, setIsHeaderBold] = useState(true);
 
-  const [bodyText, setBodyText] = useState('FREE NEWJEANS\nRIGHT NOW!');
+  const [bodyText, setBodyText] = useState('KASI DISKON\nSAMPAI 80%!');
   const [bodySize, setBodySize] = useState(PRESETS.wmp1.bodySize);
   const [isBodyBold, setIsBodyBold] = useState(false);
 

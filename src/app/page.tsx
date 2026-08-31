@@ -13,7 +13,7 @@ import RetroUITool from '../components/tools/RetroUITool';
 type TabType = 'downloader' | 'comment' | 'product' | 'disclaimer' | 'checker' | 'wa' | 'retro';
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<TabType>('downloader'); // Default diubah ke downloader
+  const [activeTab, setActiveTab] = useState<TabType>('product'); // Default diubah ke downloader
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
