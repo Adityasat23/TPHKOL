@@ -8,9 +8,11 @@ import Image from 'next/image';
 type TemplateKey = 'phone1' | 'phone2' | 'wmp1' | 'wmp2';
 
 // KORDINAT HARDCODE FIX
+// KORDINAT HARDCODE FIX
 const PRESETS = {
-  wmp1: { src: '/wmp1.png', top: 18.2, left: 2.3, width: 95.4, height: 62.5, radius: 0, font: 'impact', grid: false, bg: '#FFFFFF', color: '#000000', headerSize: 42, bodySize: 28 },
-  wmp2: { src: '/wmp2.png', top: 18.2, left: 2.3, width: 95.4, height: 62.5, radius: 0, font: 'impact', grid: false, bg: '#FFFFFF', color: '#000000', headerSize: 42, bodySize: 28 },
+  // Height for WMP increased from 62.5 to 66.5 to cover the gap behind "Ready"
+  wmp1: { src: '/wmp1.png', top: 18.2, left: 2.3, width: 95.4, height: 66.5, radius: 0, font: 'impact', grid: false, bg: '#FFFFFF', color: '#000000', headerSize: 42, bodySize: 28 },
+  wmp2: { src: '/wmp2.png', top: 18.2, left: 2.3, width: 95.4, height: 66.5, radius: 0, font: 'impact', grid: false, bg: '#FFFFFF', color: '#000000', headerSize: 42, bodySize: 28 },
   phone1: { src: '/phone1.png', top: 26.5, left: 18, width: 64, height: 27.5, radius: 12, font: 'pixel', grid: true, bg: '#93a86c', color: '#111111', headerSize: 18, bodySize: 14 },
   phone2: { src: '/phone2.png', top: 26.5, left: 18, width: 64, height: 27.5, radius: 12, font: 'pixel', grid: true, bg: '#93a86c', color: '#111111', headerSize: 18, bodySize: 14 },
 };
