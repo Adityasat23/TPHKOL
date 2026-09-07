@@ -168,8 +168,8 @@ export default function FakeCommentTool() {
 
       <div className="bg-[#E5E5EA] border border-gray-200 rounded-[2rem] p-10 flex items-center justify-center min-h-[500px] overflow-hidden shadow-inner relative">
         <div className="absolute inset-0 opacity-40 bg-[radial-gradient(#C7C7CC_1px,transparent_1px)] [background-size:16px_16px]"></div>
-        <div style={{ padding: '30px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
-          <div ref={previewRef} style={{ display: 'inline-flex', flexDirection: 'column', fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
+        <div style={{ display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
+          <div ref={previewRef} style={{ padding: '40px', display: 'inline-flex', flexDirection: 'column', fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', userSelect: 'none' }}>
             
             {/* PRATINJAU STICKER BUBBLE */}
             {commentMode === 'sticker' && (

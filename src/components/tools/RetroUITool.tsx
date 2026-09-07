@@ -178,9 +178,10 @@ export default function RetroUITool() {
       <div className="bg-[#E5E5EA] border border-gray-200 rounded-[2rem] p-6 flex flex-col items-center justify-center min-h-[500px] overflow-hidden shadow-inner relative">
         <div className="absolute inset-0 opacity-40 bg-[radial-gradient(#C7C7CC_1px,transparent_1px)] [background-size:16px_16px]"></div>
 
-        <div style={{ padding: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', position: 'relative', zIndex: 10 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', position: 'relative', zIndex: 10 }}>
           
           <div ref={previewRef} style={{ 
+              padding: '20px',
               position: 'relative', 
               display: 'inline-block',
               lineHeight: 0, 
