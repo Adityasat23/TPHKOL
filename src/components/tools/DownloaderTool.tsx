@@ -35,7 +35,7 @@ export default function DownloaderTool() {
         <div className="relative group">
           <input 
             type="text" 
-            placeholder="Paste link TikTok / Pinterest / YouTube di sini..." 
+            placeholder="Paste link TikTok / Pinterest / YouTube / Instagram di sini..." 
             className="w-full pl-6 pr-40 py-5 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 text-gray-900 transition-all placeholder-gray-400 font-medium shadow-sm" 
             value={url} 
             onChange={(e) => setUrl(e.target.value)} 
