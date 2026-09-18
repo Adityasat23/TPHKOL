@@ -13,6 +13,30 @@ export default function DownloaderTool() {
     setLoading(true); 
     setError(''); 
     setResult(null);
+
+    // CLIENT-SIDE BYPASS UNTUK TIKTOK (Menghindari blokir IP Server Cloudflare)
+    if (url.includes('tiktok.com')) {
+      try {
+        const tikwmRes = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}&hd=1`);
+        const data = await tikwmRes.json();
+        if (data?.code === 0 && data?.data) {
+          const finalTitle = data.data.title || 'TikTok Media';
+          const finalCover = data.data.cover || '';
+          const finalMusic = data.data.music || '';
+          const playUrl = data.data.hdplay || data.data.play || data.data.wmplay;
+          
+          if (playUrl || finalMusic || finalCover) {
+            setResult({ title: finalTitle, cover: finalCover, play: playUrl || '', music: finalMusic });
+            setLoading(false);
+            return; // Sukses di Client Side!
+          }
+        }
+      } catch (err) {
+        console.log("Client-side TikTok fetch failed, falling back to server...", err);
+      }
+    }
+
+    // JIKA BUKAN TIKTOK ATAU TIKTOK CLIENT-SIDE GAGAL, GUNAKAN SERVER (API)
     try {
       const res = await fetch('/api/download', {
         method: 'POST',
