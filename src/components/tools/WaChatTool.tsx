@@ -63,13 +63,19 @@ export default function WaChatTool() {
 
   const removeWaMessage = (id: number) => setWaMessages(waMessages.filter(msg => msg.id !== id));
 
+  const [isExporting, setIsExporting] = useState(false);
+  
   const exportWaImage = async () => {
     if (!waPreviewRef.current) return;
     try {
+      setIsExporting(true);
       await document.fonts.ready;
+      await new Promise(resolve => setTimeout(resolve, 150));
       const dataUrl = await toPng(waPreviewRef.current, { cacheBust: true, pixelRatio: 3, backgroundColor: waTheme === 'dark' ? '#000000' : '#ffffff' });
       const link = document.createElement('a'); link.download = `whatsapp-ios-${waTheme}-${Date.now()}.png`; link.href = dataUrl; link.click();
-    } catch (err) { alert("Export WA Chat gagal."); }
+    } catch (err) { alert("Export WA Chat gagal."); } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -260,7 +266,7 @@ export default function WaChatTool() {
                                   whiteSpace: 'pre-wrap', wordWrap: 'break-word',
                                   display: 'inline-block'
                               }}>
-                                  {renderWithHighlights(msg.text)}
+                                  {isExporting ? msg.text : renderWithHighlights(msg.text)}
                                   
                                   {/* Spasi kosong agar teks tidak menabrak jam di pojok kanan bawah */}
                                   <span style={{ display: 'inline-block', width: isMe ? '68px' : '44px', height: '10px' }}></span>

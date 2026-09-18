@@ -44,16 +44,21 @@ export default function FakeCommentTool() {
       reader.readAsDataURL(file);
     }
   };
-
+  const [isExporting, setIsExporting] = useState(false);
+  
   const exportCommentImage = async () => {
     if (!previewRef.current) return;
     try {
+      setIsExporting(true);
       await document.fonts.ready;
+      await new Promise(resolve => setTimeout(resolve, 150));
       const dataUrl = await toPng(previewRef.current, { cacheBust: true, pixelRatio: 3, backgroundColor: 'transparent' });
       const link = document.createElement('a');
       link.download = `tiktok-${commentMode}-${Date.now()}.png`;
       link.href = dataUrl; link.click();
-    } catch (err) { alert("Export gagal"); }
+    } catch (err) { alert("Export gagal"); } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -178,7 +183,7 @@ export default function FakeCommentTool() {
                   <img key={avatar} src={avatar} style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, marginTop: '2px' }} />
                   <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%', minWidth: 0 }}>
                     <p style={{ color: '#757575', fontSize: '16px', fontWeight: '600', margin: '0 0 6px 0', fontFamily: 'inherit', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Reply to {replyTo}'s comment</p>
-                    <p style={{ color: '#000000', fontSize: '24px', fontWeight: '800', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', wordBreak: 'break-word', overflowWrap: 'break-word', fontFamily: 'inherit', letterSpacing: '-0.02em' }}>{renderWithHighlights(commentText)}</p>
+                    <p style={{ color: '#000000', fontSize: '24px', fontWeight: '800', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', wordBreak: 'break-word', overflowWrap: 'break-word', fontFamily: 'inherit', letterSpacing: '-0.02em' }}>{isExporting ? commentText : renderWithHighlights(commentText)}</p>
                   </div>
                 </div>
                 <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style={{ display: 'block', alignSelf: 'flex-start', marginTop: '-1px' }} xmlns="http://www.w3.org/2000/svg"><path d="M0 0H28L5.5 24.5C3.5 27.5 0 26 0 22V0Z" fill="white" /></svg>
@@ -208,7 +213,7 @@ export default function FakeCommentTool() {
                   <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
                     <p style={{ color: '#8A8B91', fontSize: '14px', fontWeight: 600, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{username}</p>
                     <p style={{ color: threadTheme === 'dark' ? '#E1E1E1' : '#161823', fontSize: '15px', fontWeight: 400, margin: '4px 0 0 0', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
-                      {renderWithHighlights(commentText)}
+                      {isExporting ? commentText : renderWithHighlights(commentText)}
                     </p>
 
                     {commentImage && (
@@ -247,7 +252,7 @@ export default function FakeCommentTool() {
                       </div>
                       
                       <p style={{ color: threadTheme === 'dark' ? '#E1E1E1' : '#161823', fontSize: '15px', fontWeight: 400, margin: '4px 0 0 0', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
-                        {renderWithHighlights(replyText)}
+                        {isExporting ? replyText : renderWithHighlights(replyText)}
                       </p>
 
                       {replyImage && (
