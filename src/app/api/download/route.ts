@@ -118,7 +118,7 @@ export async function POST(request: Request) {
     }
 
     // ==========================================
-    // 3. TIKTOK DOWNLOADER (AGGRESSIVE FALLBACK)
+    // 4. TIKTOK DOWNLOADER (AGGRESSIVE FALLBACK)
     // ==========================================
     if (url.includes('/music/')) {
       const match = url.match(/-(\d+)(?:\?|$)/);
@@ -137,6 +137,45 @@ export async function POST(request: Request) {
     let finalTitle = 'TikTok Media';
     let finalCover = '';
     let finalMusic = '';
+    let finalPlay = '';
+
+    // ENGINE 0: DIRECT TIKTOK API (Internal Force Bypass)
+    // Sangat ampuh untuk melewati block dari public API
+    try {
+      // Ekstrak ID dari URL (contoh: video/7642641084979367 atau photo/123)
+      const idMatch = url.match(/(?:video|photo)\/(\d+)/);
+      if (idMatch && idMatch[1]) {
+        const awemeId = idMatch[1];
+        const res = await fetch(`https://api16-normal-c-useast1a.tiktokv.com/aweme/v1/feed/?aweme_id=${awemeId}`, {
+          headers: { 
+            'User-Agent': 'TikTok 26.2.0 rv:262018 (iPhone; iOS 14.4.2; en_US) Cronet',
+            'Accept': 'application/json'
+          }
+        });
+        const data = await res.json();
+        const aweme = data?.aweme_list?.[0];
+        if (aweme) {
+          finalTitle = aweme.desc || finalTitle;
+          finalCover = aweme.video?.cover?.url_list?.[0] || aweme.video?.origin_cover?.url_list?.[0] || finalCover;
+          
+          // Cari URL Video tanpa watermark
+          const playAddr = aweme.video?.play_addr?.url_list;
+          const downloadAddr = aweme.video?.download_addr?.url_list;
+          if (playAddr && playAddr.length > 0) {
+            finalPlay = playAddr[0];
+          } else if (downloadAddr && downloadAddr.length > 0) {
+            finalPlay = downloadAddr[0];
+          }
+
+          // Cari musik
+          finalMusic = aweme.music?.play_url?.url_list?.[0] || finalMusic;
+
+          if (finalPlay || finalMusic || finalCover) {
+             return NextResponse.json({ title: finalTitle, cover: finalCover, play: finalPlay, music: finalMusic });
+          }
+        }
+      }
+    } catch (e) { console.log("❌ TikTok Direct Engine Error"); }
 
     // Engine 1: TikWM
     try {
