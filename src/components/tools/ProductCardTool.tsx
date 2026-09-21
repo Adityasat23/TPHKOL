@@ -15,6 +15,7 @@ export interface CatalogItem {
 
 export default function ProductCardTool() {
   const [productLayout, setProductLayout] = useState<'tiktok-portrait' | 'tiktok-landscape' | 'shopee' | 'shopee-horizontal'>('tiktok-landscape');
+  const [tkPortraitDesign, setTkPortraitDesign] = useState<1 | 2>(1);
   const [productImage, setProductImage] = useState(SAFE_IMAGE); // Base64 — hanya untuk export
   const [productImageUrl, setProductImageUrl] = useState(''); // URL asli — untuk preview (instant)
   const [productTitle, setProductTitle] = useState("ALTERA BLURRING LIP TINT + LIP MATTE");
@@ -344,28 +345,103 @@ const exportProductImage = async () => {
 
             {/* RENDER: TIKTOK PORTRAIT (Terpisah) */}
             {productLayout === 'tiktok-portrait' && (
-              <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: '300px', minWidth: '300px', display: 'flex', flexDirection: 'column', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
-                <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
-                  <img key={productImageUrl || productImage} src={productImageUrl || productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { 
-  e.currentTarget.onerror = null; // Wajib ditambahkan agar tidak infinite loop
-  e.currentTarget.src = SAFE_IMAGE; 
-}} />
-                  {autoDiscountBadge && ( <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#fe2c55', color: '#fff', padding: '4px 8px', fontSize: '14px', fontWeight: 'bold', borderBottomLeftRadius: '8px', zIndex: 10 }}>{autoDiscountBadge}</div> )}
-                </div>
-                <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#ffffff', boxSizing: 'border-box', minWidth: 0 }}>
-                  <div style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#222', lineHeight: '20px', maxHeight: '40px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', wordWrap: 'break-word', whiteSpace: 'normal' }}>[MALL] TIMEPHORIA - {productTitle}</div>
-                  <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                   {autoDiscountTagText && ( <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>{autoDiscountTagText}</span> )}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#888', marginBottom: '12px' }}>
-                    <StarYellow />
-                    <span style={{ color: '#fabb05', fontWeight: 'bold', marginLeft: '2px' }}>{productRating}</span><span style={{ color: '#ccc', margin: '0 4px' }}>|</span><span>{productSold}</span>
-                  </div>
-                  
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: 'auto', flexWrap: 'wrap' }}>
-                    <span style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: tiktokPtMainFontSize, fontWeight: 'bold', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>{displayPrice}{productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}</span>
-                    {rawOrigPrice && ( <div style={{ color: '#999999', fontSize: '14px', fontFamily: 'Arial, sans-serif' }}><del>{rawOrigPrice}</del>{productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}</div> )}
-                  </div>
+              <div className="flex flex-col items-center gap-6">
+                <h3 className="text-2xl font-black tracking-widest text-[#564821] drop-shadow-sm uppercase">Desain {tkPortraitDesign}</h3>
+                
+                <div className="flex items-center gap-6">
+                  {/* Left Arrow */}
+                  <button type="button" onClick={() => setTkPortraitDesign(1)} className={`p-2 rounded-full transition-all ${tkPortraitDesign === 1 ? 'opacity-30 cursor-not-allowed' : 'opacity-100 hover:bg-black/5'}`}>
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                  </button>
+
+                  {/* PREVIEW CONTAINER (ONLY THIS IS DOWNLOADED) */}
+                  {tkPortraitDesign === 1 ? (
+                    <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: '300px', minWidth: '300px', display: 'flex', flexDirection: 'column', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
+                      <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#a3a3a3', overflow: 'hidden' }}>
+                        <img key={productImageUrl || productImage} src={productImageUrl || productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { 
+        e.currentTarget.onerror = null; 
+        e.currentTarget.src = SAFE_IMAGE; 
+      }} />
+                        {autoDiscountBadge && ( <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#fe2c55', color: '#fff', padding: '4px 8px', fontSize: '14px', fontWeight: 'bold', borderBottomLeftRadius: '8px', zIndex: 10 }}>{autoDiscountBadge}</div> )}
+                      </div>
+                      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#ffffff', boxSizing: 'border-box', minWidth: 0 }}>
+                        <div style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#222', lineHeight: '20px', maxHeight: '40px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', wordWrap: 'break-word', whiteSpace: 'normal' }}>[MALL] TIMEPHORIA - {productTitle}</div>
+                        <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                         {autoDiscountTagText && ( <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>{autoDiscountTagText}</span> )}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', color: '#888', marginBottom: '12px' }}>
+                          <StarYellow />
+                          <span style={{ color: '#fabb05', fontWeight: 'bold', marginLeft: '2px' }}>{productRating}</span><span style={{ color: '#ccc', margin: '0 4px' }}>|</span><span>{productSold}</span>
+                        </div>
+                        
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: 'auto', flexWrap: 'wrap' }}>
+                          <span style={{ color: priceColor === 'black' ? '#161823' : '#fe2c55', fontSize: tiktokPtMainFontSize, fontWeight: 'bold', fontFamily: 'Arial, sans-serif', whiteSpace: 'nowrap' }}>{displayPrice}{productUnit && <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '2px' }}>{productUnit}</span>}</span>
+                          {rawOrigPrice && ( <div style={{ color: '#999999', fontSize: '14px', fontFamily: 'Arial, sans-serif' }}><del>{rawOrigPrice}</del>{productUnit && <span style={{ fontSize: '12px', marginLeft: '2px' }}>{productUnit}</span>}</div> )}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '16px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: '300px', minWidth: '300px', display: 'flex', flexDirection: 'column', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
+                      <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#a3a3a3', overflow: 'hidden' }}>
+                        <img key={productImageUrl || productImage} src={productImageUrl || productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { 
+        e.currentTarget.onerror = null; 
+        e.currentTarget.src = SAFE_IMAGE; 
+      }} />
+                      </div>
+                      
+                      {/* Price Banner */}
+                      <div style={{ background: 'linear-gradient(90deg, #ff2a2a, #ff7b00)', padding: '6px 16px', color: '#ffffff', display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                        <span style={{ fontSize: '16px', fontWeight: '700', fontStyle: 'italic', lineHeight: '1' }}>{currency}</span>
+                        <span style={{ fontSize: '36px', fontWeight: '900', fontStyle: 'italic', letterSpacing: '-0.5px', lineHeight: '1' }}>{displayPrice.replace(currency, '').trim()}</span>
+                      </div>
+
+                      {/* Bottom Info */}
+                      <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', backgroundColor: '#ffffff' }}>
+                        <div style={{ fontSize: '16px', fontWeight: 800, color: '#111', lineHeight: '1.2', maxHeight: '38px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', textTransform: 'uppercase', marginBottom: '12px' }}>
+                          {productTitle}
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#333' }}>
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M3 9h18v2H3z"/>
+                                <path d="M3 9l2-4h14l2 4"/>
+                                <path d="M4 11v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                              </svg>
+                              <span style={{ fontSize: '10px', marginTop: '2px', fontWeight: 500 }}>Shop</span>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#333' }}>
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                              </svg>
+                              <span style={{ fontSize: '10px', marginTop: '2px', fontWeight: 500 }}>Chat</span>
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, justifyContent: 'flex-end' }}>
+                            <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#20b759', flexShrink: 0 }}>
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="9" cy="21" r="1"></circle>
+                                <circle cx="20" cy="21" r="1"></circle>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                <line x1="12" y1="9" x2="18" y2="9"></line>
+                                <line x1="15" y1="6" x2="15" y2="12"></line>
+                              </svg>
+                            </div>
+                            <div style={{ backgroundColor: '#20b759', color: '#ffffff', fontSize: '14px', fontWeight: 700, padding: '8px 16px', borderRadius: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, whiteSpace: 'nowrap' }}>
+                              BUY NOW
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Right Arrow */}
+                  <button type="button" onClick={() => setTkPortraitDesign(2)} className={`p-2 rounded-full transition-all ${tkPortraitDesign === 2 ? 'opacity-30 cursor-not-allowed' : 'opacity-100 hover:bg-black/5'}`}>
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                  </button>
                 </div>
               </div>
             )}
