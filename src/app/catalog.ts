@@ -183,6 +183,11 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
     name: "Lip Matte & Skintint Stick",
     image: "/products/lip-matte-skintint-stick.png",
     category: "Combo"
+  },
+  {
+    name: "Eyes Makeup Set-COSMIC ULTRA HOLD VOLUME MASCARA + Navi Eyeshadow Palette",
+    image: "/products/eyeshadow-mascara.jpeg",
+    category: "Combo"
   }
 
 
