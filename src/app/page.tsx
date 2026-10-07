@@ -43,7 +43,7 @@ export default function Home() {
             className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap capitalize ${activeTab === tab ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}
           >
             {/* Bersihkan logika ai-prompt */}
-            {tab === 'wa' ? 'WA Chat' : tab === 'retro' ? 'Retro UI' : tab.replace('-', ' ')}
+            {tab === 'wa' ? 'WA Chat' : tab === 'retro' ? 'UI & UX Template' : tab.replace('-', ' ')}
           </button>
         ))}
       </div>
