@@ -282,7 +282,7 @@ export default function RetroUITool() {
                </div>
                
                {/* BOTTOM SHEET PART */}
-               <div style={{ backgroundColor: '#1c1c1e', borderTopLeftRadius: '24px', borderTopRightRadius: '24px', zIndex: 3, position: 'relative', display: 'flex', flexDirection: 'column', paddingTop: '18px', flexShrink: 0 }}>
+               <div style={{ backgroundColor: '#1c1c1e', borderTopLeftRadius: '24px', borderTopRightRadius: '24px', zIndex: 3, position: 'relative', display: 'flex', flexDirection: 'column', paddingTop: '18px', paddingBottom: '24px', flexShrink: 0 }}>
                   
                   {/* Handle */}
                   <div style={{ width: '40px', height: '5px', backgroundColor: '#4c4c4e', borderRadius: '100px', margin: '0 auto 18px' }}></div>
@@ -307,7 +307,7 @@ export default function RetroUITool() {
                   </div>
 
                   {/* Reply Input */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '0 20px', marginTop: '10px', marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '0 20px', marginTop: '10px' }}>
                      <div style={{ flex: 1, backgroundColor: '#3a3a3c', borderRadius: '30px', height: '52px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px' }}>
                         <span style={{ color: '#8e8e93', fontSize: '16px', fontFamily: 'system-ui, -apple-system, sans-serif', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Reply to {igUsername}</span>
                         <span style={{ fontSize: '20px', flexShrink: 0 }}>😍 🎀 🥀</span>
@@ -319,7 +319,7 @@ export default function RetroUITool() {
                </div>
 
                {/* KEYBOARD PART */}
-               <div style={{ height: '434px', position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
+               <div style={{ height: '400px', position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
                   <img src="/bg/ignotes_bg.jpg" alt="bg keyboard" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '1024px', zIndex: 1, objectFit: 'cover', objectPosition: 'bottom' }} />
                </div>
             </div>
