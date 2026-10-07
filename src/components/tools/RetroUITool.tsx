@@ -273,52 +273,54 @@ export default function RetroUITool() {
               </div>
             </div>
           ) : (
-            <div ref={previewRef} style={{ width: '472px', height: '1024px', position: 'relative', overflow: 'hidden', backgroundColor: '#000', borderRadius: '40px', transform: 'scale(0.6)', transformOrigin: 'center', margin: '-200px 0', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}>
-               {/* Background Image */}
-               <img src="/bg/ignotes_bg.jpg" alt="bg" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1, objectFit: 'cover' }} />
+            <div ref={previewRef} style={{ width: '472px', height: '1024px', position: 'relative', overflow: 'hidden', backgroundColor: '#000', borderRadius: '40px', transform: 'scale(0.6)', transformOrigin: 'center', margin: '-200px 0', boxShadow: '0 20px 50px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column' }}>
                
-               {/* Blur overlay for the top section (akun akun lain) */}
-               <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '375px', backdropFilter: 'blur(8px)', backgroundColor: 'rgba(28,28,30,0.2)', zIndex: 2 }}></div>
+               {/* TOP PART: The original background (blurred) */}
+               <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+                  <img src="/bg/ignotes_bg.jpg" alt="bg" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '1024px', zIndex: 1, objectFit: 'cover' }} />
+                  <div style={{ position: 'absolute', inset: 0, backdropFilter: 'blur(8px)', backgroundColor: 'rgba(28,28,30,0.2)', zIndex: 2 }}></div>
+               </div>
                
-               {/* Cover the original bottom sheet header/bubble area */}
-               <div style={{ position: 'absolute', top: '375px', left: 0, right: 0, height: '240px', backgroundColor: '#1c1c1e', zIndex: 3 }}></div>
-               
-               {/* Custom UI rendering over the background */}
-               <div style={{ position: 'absolute', top: '382px', left: 0, right: 0, zIndex: 4, display: 'flex', flexDirection: 'column' }}>
-                 
-                 {/* Handle */}
-                 <div style={{ width: '40px', height: '5px', backgroundColor: '#4c4c4e', borderRadius: '100px', margin: '0 auto 18px' }}></div>
-                 
-                 {/* Header: username and time */}
-                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', color: '#ffffff', fontSize: '15px', fontWeight: 600, fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-                    <span style={{ fontStyle: 'italic', letterSpacing: '0.5px' }}>{igUsername}</span>
-                    <span style={{ color: '#8e8e93', fontWeight: 400, fontSize: '12px' }}>●</span>
-                    <span style={{ color: '#8e8e93', fontWeight: 400 }}>{igTime}</span>
-                 </div>
-                 
-                 {/* Avatar and Bubble row */}
-                 <div style={{ display: 'flex', padding: '24px 20px', gap: '12px', alignItems: 'flex-start' }}>
-                    <div style={{ width: '60px', height: '60px', borderRadius: '50%', flexShrink: 0, overflow: 'hidden', backgroundColor: '#333' }}>
-                       <img src={igAvatar || "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk8A8AAQsAzQ/8/GkAAAAASUVORK5CYII="} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </div>
-                    
-                    {/* Bubble */}
-                    <div style={{ backgroundColor: '#3a3a3c', borderRadius: '24px', padding: '16px 20px', color: '#ffffff', fontSize: '17px', fontFamily: 'system-ui, -apple-system, sans-serif', lineHeight: 1.4, maxWidth: '340px', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
-                       {igNoteText}
-                    </div>
-                 </div>
+               {/* BOTTOM SHEET PART */}
+               <div style={{ backgroundColor: '#1c1c1e', borderTopLeftRadius: '24px', borderTopRightRadius: '24px', zIndex: 3, position: 'relative', display: 'flex', flexDirection: 'column', paddingTop: '18px', flexShrink: 0 }}>
+                  
+                  {/* Handle */}
+                  <div style={{ width: '40px', height: '5px', backgroundColor: '#4c4c4e', borderRadius: '100px', margin: '0 auto 18px' }}></div>
+                  
+                  {/* Header: username and time */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', color: '#ffffff', fontSize: '15px', fontWeight: 600, fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+                     <span style={{ letterSpacing: '0.5px' }}>{igUsername}</span>
+                     <span style={{ color: '#8e8e93', fontWeight: 400, fontSize: '12px' }}>●</span>
+                     <span style={{ color: '#8e8e93', fontWeight: 400 }}>{igTime}</span>
+                  </div>
+                  
+                  {/* Avatar and Bubble row */}
+                  <div style={{ display: 'flex', padding: '24px 20px', gap: '12px', alignItems: 'flex-start' }}>
+                     <div style={{ width: '60px', height: '60px', borderRadius: '50%', flexShrink: 0, overflow: 'hidden', backgroundColor: '#333' }}>
+                        <img src={igAvatar || "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk8A8AAQsAzQ/8/GkAAAAASUVORK5CYII="} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                     </div>
+                     
+                     {/* Bubble */}
+                     <div style={{ backgroundColor: '#3a3a3c', borderRadius: '24px', padding: '16px 20px', color: '#ffffff', fontSize: '17px', fontFamily: 'system-ui, -apple-system, sans-serif', lineHeight: 1.4, maxWidth: '340px', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
+                        {igNoteText}
+                     </div>
+                  </div>
 
-                 {/* Reply Input */}
-                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '0 20px', marginTop: '10px' }}>
-                    <div style={{ flex: 1, backgroundColor: '#3a3a3c', borderRadius: '30px', height: '52px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px' }}>
-                       <span style={{ color: '#8e8e93', fontSize: '16px', fontFamily: 'system-ui, -apple-system, sans-serif' }}>Reply to {igUsername}</span>
-                       <span style={{ fontSize: '20px' }}>😍 🎀 🥀</span>
-                    </div>
-                    <div style={{ color: '#ffffff' }}>
-                       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                    </div>
-                 </div>
+                  {/* Reply Input */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '0 20px', marginTop: '10px', marginBottom: '16px' }}>
+                     <div style={{ flex: 1, backgroundColor: '#3a3a3c', borderRadius: '30px', height: '52px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px' }}>
+                        <span style={{ color: '#8e8e93', fontSize: '16px', fontFamily: 'system-ui, -apple-system, sans-serif', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Reply to {igUsername}</span>
+                        <span style={{ fontSize: '20px', flexShrink: 0 }}>😍 🎀 🥀</span>
+                     </div>
+                     <div style={{ color: '#ffffff', flexShrink: 0 }}>
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                     </div>
+                  </div>
+               </div>
 
+               {/* KEYBOARD PART */}
+               <div style={{ height: '434px', position: 'relative', overflow: 'hidden', flexShrink: 0 }}>
+                  <img src="/bg/ignotes_bg.jpg" alt="bg keyboard" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '1024px', zIndex: 1, objectFit: 'cover', objectPosition: 'bottom' }} />
                </div>
             </div>
           )}
