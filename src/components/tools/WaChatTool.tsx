@@ -47,9 +47,111 @@ export default function WaChatTool() {
     if (file) { const reader = new FileReader(); reader.onloadend = () => setImgFn(reader.result as string); reader.readAsDataURL(file); }
   };
 
-  const addWaMessage = () => {
+  const [autoRandomTime, setAutoRandomTime] = useState(true);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
+  // Interval acak dalam menit: 1, 2, atau 5 menit (sesuai request)
+  const RANDOM_INTERVALS = [1, 2, 5, 1, 2, 5];
+
+  const getRandomInterval = () => {
+    return RANDOM_INTERVALS[Math.floor(Math.random() * RANDOM_INTERVALS.length)];
+  };
+
+  const parseTimeToMinutes = (timeStr: string): number => {
+    if (!timeStr || !timeStr.includes(':')) return 16 * 60 + 50;
+    const [h, m] = timeStr.split(':').map(Number);
+    return (isNaN(h) ? 12 : h) * 60 + (isNaN(m) ? 0 : m);
+  };
+
+  const formatMinutesToTime = (totalMinutes: number): string => {
+    const normalized = ((totalMinutes % 1440) + 1440) % 1440;
+    const h = Math.floor(normalized / 60);
+    const m = normalized % 60;
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+  };
+
+  const applyRandomSequentialTimes = (msgs: WaMessage[]): WaMessage[] => {
+    if (msgs.length === 0) return msgs;
+    let currentMinutes = parseTimeToMinutes(msgs[0].time || '16:49');
+    return msgs.map((msg, idx) => {
+      if (idx === 0) return msg;
+      currentMinutes += getRandomInterval();
+      return { ...msg, time: formatMinutesToTime(currentMinutes) };
+    });
+  };
+
+  const randomizeAllTimes = () => {
+    setWaMessages(applyRandomSequentialTimes(waMessages));
+  };
+
+  const addWaMessage = (type: 'text' | 'image' = 'text') => {
     const randomColor = WA_COLORS[Math.floor(Math.random() * WA_COLORS.length)];
-    setWaMessages([...waMessages, { id: Date.now(), sender: 'me', name: 'User', color: randomColor, text: 'Isi pesan baru...', image: '', time: '17:00' }]);
+    const lastTime = waMessages.length > 0 ? waMessages[waMessages.length - 1].time : '16:49';
+    const nextTime = formatMinutesToTime(parseTimeToMinutes(lastTime) + getRandomInterval());
+
+    setWaMessages([
+      ...waMessages, 
+      { 
+        id: Date.now(), 
+        sender: 'me', 
+        name: 'User', 
+        color: randomColor, 
+        text: type === 'image' ? '' : 'Isi pesan baru...', 
+        image: '', 
+        time: nextTime 
+      }
+    ]);
+  };
+
+  const moveMessage = (index: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= waMessages.length) return;
+    const newMessages = [...waMessages];
+    const [removed] = newMessages.splice(index, 1);
+    newMessages.splice(targetIndex, 0, removed);
+    if (autoRandomTime) {
+      setWaMessages(applyRandomSequentialTimes(newMessages));
+    } else {
+      setWaMessages(newMessages);
+    }
+  };
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (dragOverIndex !== index) {
+      setDragOverIndex(index);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+    const newMessages = [...waMessages];
+    const [removed] = newMessages.splice(draggedIndex, 1);
+    newMessages.splice(dropIndex, 0, removed);
+    if (autoRandomTime) {
+      setWaMessages(applyRandomSequentialTimes(newMessages));
+    } else {
+      setWaMessages(newMessages);
+    }
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
   };
 
   const updateWaMessage = (id: number, field: keyof WaMessage, value: any) => {
@@ -58,7 +160,11 @@ export default function WaChatTool() {
 
   const handleWaMessageImage = (id: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) { const reader = new FileReader(); reader.onloadend = () => updateWaMessage(id, 'image', reader.result as string); reader.readAsDataURL(file); }
+    if (file) { 
+      const reader = new FileReader(); 
+      reader.onloadend = () => updateWaMessage(id, 'image', reader.result as string); 
+      reader.readAsDataURL(file); 
+    }
   };
 
   const removeWaMessage = (id: number) => setWaMessages(waMessages.filter(msg => msg.id !== id));
@@ -111,15 +217,125 @@ export default function WaChatTool() {
         <hr className="border-gray-200" />
 
         <div className="space-y-4">
-          <div className="flex justify-between items-center">
-             <h3 className="font-bold text-gray-900 uppercase text-xs tracking-widest flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-[#007AFF]"></span> Daftar Chat</h3>
-             <button onClick={addWaMessage} className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-900 px-4 py-2 rounded-lg font-bold transition-all active:scale-95">+ Tambah Chat</button>
+          <div className="flex flex-wrap justify-between items-center gap-2">
+             <h3 className="font-bold text-gray-900 uppercase text-xs tracking-widest flex items-center gap-2">
+               <span className="w-2 h-2 rounded-full bg-[#007AFF]"></span> Daftar Chat ({waMessages.length})
+             </h3>
+             <div className="flex items-center gap-2">
+               <button 
+                 type="button" 
+                 onClick={randomizeAllTimes} 
+                 title="Acak semua jeda waktu antar chat (1, 2, atau 5 menit)" 
+                 className="text-xs bg-blue-50 hover:bg-blue-100 text-[#007AFF] px-3 py-1.5 rounded-lg font-bold transition-all active:scale-95 flex items-center gap-1 border border-blue-200"
+               >
+                 🎲 Acak Waktu
+               </button>
+               <button 
+                 type="button" 
+                 onClick={() => addWaMessage('image')} 
+                 className="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-lg font-bold transition-all active:scale-95 flex items-center gap-1 border border-emerald-200"
+               >
+                 📷 + Gambar
+               </button>
+               <button 
+                 type="button" 
+                 onClick={() => addWaMessage('text')} 
+                 className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-900 px-3 py-1.5 rounded-lg font-bold transition-all active:scale-95 flex items-center gap-1 border border-gray-200"
+               >
+                 + Chat Teks
+               </button>
+             </div>
+          </div>
+
+          <div className="flex items-center justify-between bg-blue-50/50 p-2.5 rounded-xl border border-blue-100 text-xs text-gray-600">
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input 
+                type="checkbox" 
+                checked={autoRandomTime} 
+                onChange={(e) => setAutoRandomTime(e.target.checked)} 
+                className="rounded accent-[#007AFF] w-4 h-4 cursor-pointer" 
+              />
+              <span className="font-medium text-gray-700">Auto jeda acak (1, 2, 5 mnt) saat ubah urutan / tambah chat</span>
+            </label>
           </div>
           
-          <div className="space-y-4 max-h-[400px] overflow-y-auto pr-3 custom-scrollbar">
+          <div className="space-y-4 max-h-[460px] overflow-y-auto pr-2 custom-scrollbar">
             {waMessages.map((msg, index) => (
-              <div key={msg.id} className="p-5 bg-white border border-gray-200 rounded-2xl relative group shadow-sm transition-all">
-                <button onClick={() => removeWaMessage(msg.id)} className="absolute -top-2 -right-2 text-[#FF3B30] text-xs font-bold bg-white shadow-md border border-gray-200 w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-50">✕</button>
+              <div 
+                key={msg.id} 
+                draggable
+                onDragStart={(e) => {
+                  const target = e.target as HTMLElement;
+                  if (['input', 'textarea', 'select', 'button', 'label'].includes(target.tagName.toLowerCase()) || target.closest('button') || target.closest('label')) {
+                    e.preventDefault();
+                    return;
+                  }
+                  handleDragStart(e, index);
+                }}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDrop={(e) => handleDrop(e, index)}
+                onDragEnd={handleDragEnd}
+                className={`p-4 bg-white border rounded-2xl relative shadow-sm transition-all ${
+                  draggedIndex === index ? 'opacity-40 border-[#007AFF] scale-[0.98] bg-blue-50/20' : 'border-gray-200'
+                } ${
+                  dragOverIndex === index && draggedIndex !== index ? 'ring-2 ring-[#007AFF] border-[#007AFF] bg-blue-50/30' : ''
+                }`}
+              >
+                {/* BARIS HEADER CHAT: DRAG HANDLE, BADGE, ARROW ATAS/BAWAH, & HAPUS */}
+                <div className="flex items-center justify-between pb-2.5 mb-3 border-b border-gray-100">
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-[#007AFF] p-1 rounded hover:bg-gray-100 transition-colors" 
+                      title="Tahan & geser untuk memindahkan urutan chat"
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <circle cx="8" cy="5" r="1.5" fill="currentColor" />
+                        <circle cx="16" cy="5" r="1.5" fill="currentColor" />
+                        <circle cx="8" cy="12" r="1.5" fill="currentColor" />
+                        <circle cx="16" cy="12" r="1.5" fill="currentColor" />
+                        <circle cx="8" cy="19" r="1.5" fill="currentColor" />
+                        <circle cx="16" cy="19" r="1.5" fill="currentColor" />
+                      </svg>
+                    </div>
+                    <span className="text-xs font-bold text-gray-400">#{index + 1}</span>
+                    {msg.image && !msg.text && (
+                      <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-200">
+                        📷 Gambar Saja
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center gap-1">
+                    <button 
+                      type="button" 
+                      disabled={index === 0} 
+                      onClick={() => moveMessage(index, 'up')}
+                      className="w-6 h-6 flex items-center justify-center rounded text-xs text-gray-500 hover:text-[#007AFF] hover:bg-blue-50 disabled:opacity-20 disabled:hover:bg-transparent"
+                      title="Pindah ke atas"
+                    >
+                      ▲
+                    </button>
+                    <button 
+                      type="button" 
+                      disabled={index === waMessages.length - 1} 
+                      onClick={() => moveMessage(index, 'down')}
+                      className="w-6 h-6 flex items-center justify-center rounded text-xs text-gray-500 hover:text-[#007AFF] hover:bg-blue-50 disabled:opacity-20 disabled:hover:bg-transparent"
+                      title="Pindah ke bawah"
+                    >
+                      ▼
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => removeWaMessage(msg.id)} 
+                      className="w-6 h-6 flex items-center justify-center rounded text-xs text-red-500 hover:text-red-700 hover:bg-red-50 ml-1"
+                      title="Hapus chat"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+
+                {/* PILIHAN SENDER */}
                 <div className="grid grid-cols-2 gap-3 mb-3">
                   <select value={msg.sender} onChange={(e) => updateWaMessage(msg.id, 'sender', e.target.value)} className="p-2.5 bg-white border border-gray-200 text-gray-900 rounded-xl text-sm font-medium focus:outline-none focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/20">
                     <option value="other">Orang Lain (Kiri)</option>
@@ -130,8 +346,41 @@ export default function WaChatTool() {
                   ) : ( <div className="p-2.5 text-sm font-medium text-gray-400 bg-gray-50 border border-transparent rounded-xl text-center cursor-not-allowed">{msg.sender === 'me' ? 'Anda' : 'Nama Sembunyi (Personal)'}</div> )}
                 </div>
 
+                {/* GAMBAR ATTACHMENT JIKA ADA */}
+                {msg.image ? (
+                  <div className="flex items-center gap-3 p-2.5 bg-gray-50 border border-gray-200 rounded-xl mb-3">
+                    <img src={msg.image} alt="Attachment" className="w-14 h-14 object-cover rounded-lg border border-gray-200 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <span className="text-xs font-bold text-gray-700 block truncate">Gambar Terpasang</span>
+                      <div className="flex items-center gap-3 mt-1.5">
+                        <label className="text-xs font-semibold text-[#007AFF] hover:underline cursor-pointer">
+                          Ganti
+                          <input type="file" accept="image/*" onChange={(e) => handleWaMessageImage(msg.id, e)} className="hidden" />
+                        </label>
+                        <span className="text-gray-300">•</span>
+                        <button type="button" onClick={() => updateWaMessage(msg.id, 'image', '')} className="text-xs font-semibold text-[#FF3B30] hover:underline">
+                          Hapus Gambar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : !msg.text ? (
+                  <label className="flex flex-col items-center justify-center p-3 border-2 border-dashed border-[#007AFF]/40 hover:border-[#007AFF] bg-blue-50/40 rounded-xl cursor-pointer transition-colors mb-3">
+                    <span className="text-xl">📷</span>
+                    <span className="text-xs font-semibold text-[#007AFF] mt-1">Pilih Gambar Pesan</span>
+                    <span className="text-[10px] text-gray-400">Klik untuk upload foto/gambar</span>
+                    <input type="file" accept="image/*" onChange={(e) => handleWaMessageImage(msg.id, e)} className="hidden" />
+                  </label>
+                ) : null}
+
+                {/* TEXTAREA PESAN / CAPTION */}
                 <div className="relative mb-3">
-                  <textarea value={msg.text} onChange={(e) => updateWaMessage(msg.id, 'text', e.target.value)} placeholder="Isi pesan..." className="w-full p-3 bg-white border border-gray-200 text-gray-900 placeholder-gray-400 rounded-xl text-sm min-h-[60px] focus:outline-none focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/20 font-medium leading-[1.6]" />
+                  <textarea 
+                    value={msg.text} 
+                    onChange={(e) => updateWaMessage(msg.id, 'text', e.target.value)} 
+                    placeholder={msg.image ? "Caption gambar (bisa dikosongkan jika hanya gambar)..." : "Isi pesan..."} 
+                    className="w-full p-3 bg-white border border-gray-200 text-gray-900 placeholder-gray-400 rounded-xl text-sm min-h-[55px] focus:outline-none focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/20 font-medium leading-[1.6]" 
+                  />
                   {getDetectedBannedWords(msg.text).length > 0 && (
                     <div className="mt-2 p-2 bg-[#FF3B30]/10 border border-[#FF3B30]/20 rounded-lg space-y-1">
                       <p className="text-[11px] text-[#FF3B30] font-bold flex gap-1 items-center">⚠️ Mengandung Banned Word:</p>
@@ -144,11 +393,19 @@ export default function WaChatTool() {
                   )}
                 </div>
                 
+                {/* WAKTU DAN OPSI ATTACH GAMBAR JIKA BELUM ADA */}
                 <div className="grid grid-cols-2 gap-3 items-center">
-                  <input type="time" value={msg.time} onChange={(e) => updateWaMessage(msg.id, 'time', e.target.value)} className="p-2.5 bg-white border border-gray-200 text-gray-900 rounded-xl text-sm font-medium focus:outline-none focus:border-[#007AFF]" />
-                  <input type="file" onChange={(e) => handleWaMessageImage(msg.id, e)} className="text-[10px] p-2 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:bg-gray-100 file:text-gray-600 cursor-pointer text-gray-500" />
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Jam Kirim</label>
+                    <input type="time" value={msg.time} onChange={(e) => updateWaMessage(msg.id, 'time', e.target.value)} className="w-full p-2.5 bg-white border border-gray-200 text-gray-900 rounded-xl text-sm font-medium focus:outline-none focus:border-[#007AFF]" />
+                  </div>
+                  {!msg.image && msg.text && (
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Lampirkan Gambar</label>
+                      <input type="file" accept="image/*" onChange={(e) => handleWaMessageImage(msg.id, e)} className="text-[10px] w-full p-1.5 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:bg-gray-100 file:text-gray-600 cursor-pointer text-gray-500 border border-gray-200 rounded-xl" />
+                    </div>
+                  )}
                 </div>
-                {msg.image && ( <button onClick={() => updateWaMessage(msg.id, 'image', '')} className="mt-3 text-[11px] font-bold text-[#FF3B30] hover:text-red-700 transition-colors flex items-center gap-1">✕ Hapus Gambar Terlampir</button> )}
               </div>
             ))}
           </div>
@@ -220,6 +477,7 @@ export default function WaChatTool() {
                         display: 'flex', flexDirection: 'column', 
                         alignSelf: isMe ? 'flex-end' : 'flex-start', 
                         maxWidth: '78%', 
+                        width: msg.image ? '220px' : 'auto', 
                         // Tambahkan margin bawah jika sequence ganti orang, agar ada jarak
                         marginBottom: (index === waMessages.length - 1 || waMessages[index + 1].sender !== msg.sender) ? '8px' : '2px',
                         position: 'relative' 
@@ -227,12 +485,13 @@ export default function WaChatTool() {
                        <div style={{ 
                            backgroundColor: bubbleBg, 
                            // Padding super tipis (2px) jika ada gambar
-                           padding: msg.image && !msg.text ? '2px' : msg.image ? '2px 2px 6px 2px' : '6px 10px 8px 10px', 
+                           padding: msg.image && !msg.text ? '3px' : msg.image ? '3px 3px 6px 3px' : '6px 10px 8px 10px',
                            borderRadius: radius, 
                            borderTopLeftRadius: borderTopLeft, 
                            borderTopRightRadius: borderTopRight, 
                            boxShadow: isDark ? 'none' : '0 1px 1px rgba(0,0,0,0.1)', 
-                           position: 'relative' 
+                           position: 'relative',
+                           width: '100%'
                        }}>
                           
                           {/* TAIL SVG IOS STYLE */}
@@ -254,9 +513,16 @@ export default function WaChatTool() {
 
                           {/* GAMBAR */}
                           {msg.image && ( 
-                              <img src={msg.image} style={{ width: '100%', borderRadius: '14px', marginBottom: msg.text ? '2px' : '0', maxHeight: '250px', objectFit: 'cover' }} /> 
+                              <img src={msg.image} style={{ width: '100%', borderRadius: msg.text ? '13px 13px 0 0' : '13px', marginBottom: msg.text ? '4px' : '0', maxHeight: '250px', objectFit: 'cover', display: 'block' }} /> 
                           )}
                           
+                          {/* PLACEHOLDER JIKA GAMBAR BELUM DIUNGGAH */}
+                          {!msg.image && !msg.text && (
+                              <div style={{ padding: '10px 14px', fontSize: '12px', color: isDark ? '#8E8E93' : '#8E8E93', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  <span>📷</span> <span>(Pilih gambar...)</span>
+                              </div>
+                          )}
+
                           {/* TEKS & WAKTU */}
                           {msg.text && ( 
                               <div style={{ 
@@ -276,10 +542,12 @@ export default function WaChatTool() {
                           {/* INDIKATOR WAKTU DI POJOK KANAN BAWAH */}
                           <div style={{ 
                               display: 'flex', alignItems: 'center', gap: '3px', 
-                              position: 'absolute', bottom: msg.image && !msg.text ? '6px' : '4px', right: msg.image && !msg.text ? '8px' : '8px',
-                              backgroundColor: msg.image && !msg.text ? 'rgba(0,0,0,0.4)' : 'transparent',
+                              position: 'absolute', bottom: msg.image && !msg.text ? '8px' : '4px', right: msg.image && !msg.text ? '8px' : '8px',
+                              backgroundColor: msg.image && !msg.text ? 'rgba(0,0,0,0.5)' : 'transparent',
                               padding: msg.image && !msg.text ? '2px 6px' : '0',
-                              borderRadius: '10px'
+                              borderRadius: '10px',
+                              backdropFilter: msg.image && !msg.text ? 'blur(4px)' : 'none',
+                              zIndex: 2,
                           }}>
                               <span style={{ fontSize: '11px', color: msg.image && !msg.text ? '#FFF' : (isDark ? 'rgba(255,255,255,0.6)' : '#8E8E93') }}>{msg.time}</span>
                               {isMe && <WaTickIcon />}
