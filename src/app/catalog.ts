@@ -188,9 +188,10 @@ export const TIMEPHORIA_CATALOG: CatalogItem[] = [
     name: "Eyes Makeup Set-COSMIC ULTRA HOLD VOLUME MASCARA + Navi Eyeshadow Palette",
     image: "/products/eyeshadow-mascara.jpeg",
     category: "Combo"
+  },
+  {
+    name: "Timeless Aura Soft-Focus Skin Perfection Loose Powder",
+    image: "/products/loose-powder.jpg",
+    category: "Face"
   }
-
-
-
-
 ].sort((a, b) => a.name.localeCompare(b.name));

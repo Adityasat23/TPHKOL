@@ -390,9 +390,14 @@ const exportProductImage = async () => {
                       </div>
                       
                       {/* Price Banner */}
-                      <div style={{ background: 'linear-gradient(90deg, #ff2a2a, #ff7b00)', padding: '6px 16px', color: '#ffffff', display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                        <span style={{ fontSize: '16px', fontWeight: '700', fontStyle: 'italic', lineHeight: '1' }}>{currency}</span>
-                        <span style={{ fontSize: '36px', fontWeight: '900', fontStyle: 'italic', letterSpacing: '-0.5px', lineHeight: '1' }}>{displayPrice.replace(currency, '').trim()}</span>
+                      <div style={{ background: 'linear-gradient(90deg, #ff2a2a, #ff7b00)', padding: '6px 16px', color: '#ffffff', display: 'flex', alignItems: 'baseline', gap: '4px', flexWrap: 'nowrap', overflow: 'hidden' }}>
+                        <span style={{ fontSize: '16px', fontWeight: '700', fontStyle: 'italic', lineHeight: '1', flexShrink: 0 }}>{currency}</span>
+                        <span style={{ fontSize: displayPrice.replace(currency, '').trim().length > 7 ? '30px' : '36px', fontWeight: '900', fontStyle: 'italic', letterSpacing: '-0.5px', lineHeight: '1', whiteSpace: 'nowrap' }}>{displayPrice.replace(currency, '').trim()}</span>
+                        {productUnit && (
+                          <span style={{ fontSize: '12px', fontWeight: '600', fontStyle: 'normal', lineHeight: '1', marginLeft: '2px', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                            {productUnit}
+                          </span>
+                        )}
                       </div>
 
                       {/* Bottom Info */}
