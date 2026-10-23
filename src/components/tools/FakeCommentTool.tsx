@@ -70,8 +70,8 @@ export default function FakeCommentTool() {
   const [threadTheme, setThreadTheme] = useState<'dark' | 'light'>('light');
 
   // State Komentar Utama
-  const [username, setUsername] = useState('nadiasptnn');
-  const [commentText, setCommentText] = useState("ALHAMDULILLAH GAJI MAGANGHUB BATCH 1 2026 !! 😭😭✨");
+  const [username, setUsername] = useState('yeftajethro');
+  const [commentText, setCommentText] = useState("timephoria kapan diskon kak?");
   const [likes, setLikes] = useState('9,4K');
   const [date, setDate] = useState(getTodayDate());
   const [avatar, setAvatar] = useState(DEFAULT_AVATAR);
@@ -86,11 +86,9 @@ export default function FakeCommentTool() {
   const [mainVerified, setMainVerified] = useState(false);
   const [showThreadsLogo, setShowThreadsLogo] = useState(true);
 
-  // State Balasan (TikTok Brand / Threads Reply)
+  // State Balasan Brand (TikTok & Threads)
   const [brandName, setBrandName] = useState('Timephoria.id');
-  const [threadsReplyUsername, setThreadsReplyUsername] = useState('gitapratiwi23');
-  const [threadsReplyAvatar, setThreadsReplyAvatar] = useState(TIMEPHORIA_LOGO);
-  const [replyText, setReplyText] = useState('gedean gaji maganghub dibanding gaji kartap gue 😂');
+  const [replyText, setReplyText] = useState('sekarang kakkk!');
   const [replyLikes, setReplyLikes] = useState('804');
   const [replyDate, setReplyDate] = useState(getTodayDate());
   const [threadsReplyTime, setThreadsReplyTime] = useState('8h');
@@ -100,7 +98,7 @@ export default function FakeCommentTool() {
   const [replyVerified, setReplyVerified] = useState(false);
   const [likedByAuthor, setLikedByAuthor] = useState(true);
 
-  // State Komentar ke-2 (Khusus Threads Page View seperti referensi gambar 2)
+  // State Komentar ke-2 (Khusus Threads Page View)
   const [showSecondComment, setShowSecondComment] = useState(true);
   const [secondUsername, setSecondUsername] = useState('elibrooks');
   const [secondAvatar, setSecondAvatar] = useState(DEFAULT_AVATAR);
@@ -166,8 +164,8 @@ export default function FakeCommentTool() {
 
         {(commentMode === 'thread' || commentMode === 'threads') && (
           <div className="flex bg-white/50 p-1.5 rounded-xl border border-white/60 shadow-sm">
-            <button onClick={() => setThreadTheme('light')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${threadTheme === 'light' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>☀️ Light Preview</button>
-            <button onClick={() => setThreadTheme('dark')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${threadTheme === 'dark' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>🌙 Dark Preview</button>
+            <button onClick={() => setThreadTheme('light')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${threadTheme === 'light' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>Light Preview</button>
+            <button onClick={() => setThreadTheme('dark')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${threadTheme === 'dark' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>Dark Preview</button>
           </div>
         )}
 
@@ -198,31 +196,31 @@ export default function FakeCommentTool() {
           {commentMode === 'threads' && (
             <>
               <div className="grid grid-cols-2 gap-3">
-                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username (contoh: nadiasptnn)" className="w-full p-3 bg-white/60 border border-gray-200/60 rounded-xl text-sm font-medium text-gray-900" />
+                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" className="w-full p-3 bg-white/60 border border-gray-200/60 rounded-xl text-sm font-medium text-gray-900" />
                 <input type="text" value={threadsTime} onChange={(e) => setThreadsTime(e.target.value)} placeholder="Waktu (contoh: 23h / 58m)" className="w-full p-3 bg-white/60 border border-gray-200/60 rounded-xl text-sm font-medium text-gray-900" />
               </div>
               <div className="grid grid-cols-4 gap-2">
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 mb-1 uppercase">❤️ Likes</label>
+                  <label className="block text-[10px] font-bold text-gray-500 mb-1 uppercase">Likes</label>
                   <input type="text" value={likes} onChange={(e) => setLikes(e.target.value)} placeholder="9,4K" className="w-full p-2.5 bg-white/60 border border-gray-200/60 rounded-xl text-xs font-medium text-gray-900" />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 mb-1 uppercase">💬 Replies</label>
+                  <label className="block text-[10px] font-bold text-gray-500 mb-1 uppercase">Replies</label>
                   <input type="text" value={threadsCommentsCount} onChange={(e) => setThreadsCommentsCount(e.target.value)} placeholder="651" className="w-full p-2.5 bg-white/60 border border-gray-200/60 rounded-xl text-xs font-medium text-gray-900" />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 mb-1 uppercase">🔁 Repost</label>
+                  <label className="block text-[10px] font-bold text-gray-500 mb-1 uppercase">Repost</label>
                   <input type="text" value={threadsRepostsCount} onChange={(e) => setThreadsRepostsCount(e.target.value)} placeholder="141" className="w-full p-2.5 bg-white/60 border border-gray-200/60 rounded-xl text-xs font-medium text-gray-900" />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-500 mb-1 uppercase">✈️ Share</label>
+                  <label className="block text-[10px] font-bold text-gray-500 mb-1 uppercase">Share</label>
                   <input type="text" value={threadsSharesCount} onChange={(e) => setThreadsSharesCount(e.target.value)} placeholder="578" className="w-full p-2.5 bg-white/60 border border-gray-200/60 rounded-xl text-xs font-medium text-gray-900" />
                 </div>
               </div>
               <div className="flex flex-wrap gap-4 pt-1">
                 <label className="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer">
                   <input type="checkbox" checked={mainVerified} onChange={(e) => setMainVerified(e.target.checked)} className="rounded accent-black" />
-                  Verified Badge (✓)
+                  Verified Badge
                 </label>
                 {threadsStyle === 'card' && (
                   <label className="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer">
@@ -261,12 +259,12 @@ export default function FakeCommentTool() {
           )}
         </div>
 
-        {/* PENGATURAN BALASAN (TIKTOK ATAU THREADS) */}
+        {/* PENGATURAN BALASAN BRAND (TIKTOK & THREADS) */}
         {(commentMode === 'thread' || commentMode === 'threads') && (
           <div className="space-y-4 pt-5 border-t border-gray-200/60">
             <div className="flex justify-between items-center">
               <h3 className="font-semibold text-gray-900 text-sm tracking-wide flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#0071E3]"></span> {commentMode === 'threads' ? 'Balasan Komentar (Reply)' : 'Balasan Brand'}
+                <span className="w-2 h-2 rounded-full bg-[#0071E3]"></span> Balasan Brand
               </h3>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" checked={showReply} onChange={() => setShowReply(!showReply)} className="sr-only peer" />
@@ -276,61 +274,44 @@ export default function FakeCommentTool() {
 
             {showReply && (
               <div className="animate-in fade-in slide-in-from-top-2 duration-300 space-y-3">
+                <div className="w-full">
+                  <select
+                    value={brandName}
+                    onChange={(e) => setBrandName(e.target.value)}
+                    className="w-full p-3.5 bg-white/60 border border-gray-200/60 rounded-xl text-sm font-medium text-gray-900 focus:outline-none cursor-pointer"
+                  >
+                    <option value="Timephoria.id">Timephoria.id</option>
+                    <option value="timephoria.basemakeup">timephoria.basemakeup</option>
+                  </select>
+                </div>
+
                 {commentMode === 'thread' ? (
-                  <>
-                    <div className="w-full">
-                      <select
-                        value={brandName}
-                        onChange={(e) => setBrandName(e.target.value)}
-                        className="w-full p-3.5 bg-white/60 border border-gray-200/60 rounded-xl text-sm font-medium text-gray-900 focus:outline-none cursor-pointer"
-                      >
-                        <option value="Timephoria.id">Timephoria.id</option>
-                        <option value="timephoria.basemakeup">timephoria.basemakeup</option>
-                      </select>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="Likes Balasan" className="w-full p-3.5 bg-white/60 border border-gray-200/60 rounded-xl text-sm font-medium text-gray-900" />
-                      <input type="date" value={replyDate} onChange={(e) => setReplyDate(e.target.value)} className="w-full p-3.5 bg-white/60 border border-gray-200/60 rounded-xl text-sm font-medium text-gray-700" />
-                    </div>
-                  </>
+                  <div className="grid grid-cols-2 gap-3">
+                    <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="Likes Balasan" className="w-full p-3.5 bg-white/60 border border-gray-200/60 rounded-xl text-sm font-medium text-gray-900" />
+                    <input type="date" value={replyDate} onChange={(e) => setReplyDate(e.target.value)} className="w-full p-3.5 bg-white/60 border border-gray-200/60 rounded-xl text-sm font-medium text-gray-700" />
+                  </div>
                 ) : (
                   <>
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex-1">
-                        <label className="block text-xs font-semibold text-gray-500 mb-1.5">Avatar Reply</label>
-                        <input type="file" onChange={(e) => handleImageUpload(e, setThreadsReplyAvatar)} className="text-xs block w-full file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-medium file:bg-blue-50/50 file:text-[#0071E3] hover:file:bg-blue-100 transition-all cursor-pointer text-gray-500" />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setThreadsReplyUsername('timephoriaid');
-                          setThreadsReplyAvatar(TIMEPHORIA_LOGO);
-                        }}
-                        className="text-[11px] bg-black text-white px-3 py-2 rounded-xl font-semibold hover:bg-gray-800 transition-all whitespace-nowrap mt-4"
-                      >
-                        Pakai Akun Timephoria
-                      </button>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <input type="text" value={threadsReplyUsername} onChange={(e) => setThreadsReplyUsername(e.target.value)} placeholder="Username Reply" className="w-full p-3 bg-white/60 border border-gray-200/60 rounded-xl text-sm font-medium text-gray-900" />
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-500 mb-1 uppercase">Waktu Balasan</label>
                       <input type="text" value={threadsReplyTime} onChange={(e) => setThreadsReplyTime(e.target.value)} placeholder="Waktu Reply (contoh: 8h / 51m)" className="w-full p-3 bg-white/60 border border-gray-200/60 rounded-xl text-sm font-medium text-gray-900" />
                     </div>
                     {threadsStyle === 'card' && (
                       <div className="grid grid-cols-4 gap-2">
                         <div>
-                          <label className="block text-[10px] font-bold text-gray-500 mb-1 uppercase">❤️ Likes</label>
+                          <label className="block text-[10px] font-bold text-gray-500 mb-1 uppercase">Likes</label>
                           <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="804" className="w-full p-2.5 bg-white/60 border border-gray-200/60 rounded-xl text-xs font-medium text-gray-900" />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-bold text-gray-500 mb-1 uppercase">💬 Replies</label>
+                          <label className="block text-[10px] font-bold text-gray-500 mb-1 uppercase">Replies</label>
                           <input type="text" value={threadsReplyCommentsCount} onChange={(e) => setThreadsReplyCommentsCount(e.target.value)} placeholder="13" className="w-full p-2.5 bg-white/60 border border-gray-200/60 rounded-xl text-xs font-medium text-gray-900" />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-bold text-gray-500 mb-1 uppercase">🔁 Repost</label>
+                          <label className="block text-[10px] font-bold text-gray-500 mb-1 uppercase">Repost</label>
                           <input type="text" value={threadsReplyRepostsCount} onChange={(e) => setThreadsReplyRepostsCount(e.target.value)} placeholder="18" className="w-full p-2.5 bg-white/60 border border-gray-200/60 rounded-xl text-xs font-medium text-gray-900" />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-bold text-gray-500 mb-1 uppercase">✈️ Share</label>
+                          <label className="block text-[10px] font-bold text-gray-500 mb-1 uppercase">Share</label>
                           <input type="text" value={threadsReplySharesCount} onChange={(e) => setThreadsReplySharesCount(e.target.value)} placeholder="21" className="w-full p-2.5 bg-white/60 border border-gray-200/60 rounded-xl text-xs font-medium text-gray-900" />
                         </div>
                       </div>
@@ -338,12 +319,12 @@ export default function FakeCommentTool() {
                     <div className="flex flex-wrap gap-4 pt-1">
                       <label className="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer">
                         <input type="checkbox" checked={replyVerified} onChange={(e) => setReplyVerified(e.target.checked)} className="rounded accent-black" />
-                        Verified Badge (✓)
+                        Verified Badge
                       </label>
                       {threadsStyle === 'card' && (
                         <label className="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer">
                           <input type="checkbox" checked={likedByAuthor} onChange={(e) => setLikedByAuthor(e.target.checked)} className="rounded accent-black" />
-                          ❤️ Disukai Pembuat Post
+                          Disukai Pembuat Post
                         </label>
                       )}
                     </div>
@@ -641,7 +622,7 @@ export default function FakeCommentTool() {
                   <div style={{ display: 'flex', gap: '12px', marginTop: '16px', marginLeft: '54px' }}>
                     {/* Avatar Reply */}
                     <div style={{ position: 'relative', width: '36px', height: '36px', flexShrink: 0 }}>
-                      <img src={threadsReplyAvatar} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', display: 'block' }} />
+                      <img src={TIMEPHORIA_LOGO} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', display: 'block' }} />
                       <div style={{
                         position: 'absolute',
                         bottom: '-2px',
@@ -665,7 +646,7 @@ export default function FakeCommentTool() {
                     <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '5px', minWidth: 0 }}>
-                          <span style={{ fontWeight: 700, fontSize: '15px', color: isDark ? '#F3F5F7' : '#000000', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{threadsReplyUsername}</span>
+                          <span style={{ fontWeight: 700, fontSize: '15px', color: isDark ? '#F3F5F7' : '#000000', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{brandName}</span>
                           {replyVerified && <ThreadsVerifiedBadge dark={isDark} />}
                           <span style={{ color: isDark ? '#777777' : '#999999', fontSize: '14.5px', fontWeight: 400, marginLeft: '2px' }}>{threadsReplyTime}</span>
                         </div>
@@ -816,11 +797,11 @@ export default function FakeCommentTool() {
                     {/* INDENTED REPLY */}
                     {showReply && (
                       <div style={{ display: 'flex', gap: '10px', marginTop: '14px' }}>
-                        <img src={threadsReplyAvatar} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                        <img src={TIMEPHORIA_LOGO} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                              <span style={{ fontWeight: 600, fontSize: '14.5px' }}>{threadsReplyUsername}</span>
+                              <span style={{ fontWeight: 600, fontSize: '14.5px' }}>{brandName}</span>
                               {replyVerified && <ThreadsVerifiedBadge dark={isDark} />}
                               <span style={{ color: '#999999', fontSize: '14px', marginLeft: '2px' }}>{threadsReplyTime}</span>
                             </div>
@@ -906,7 +887,7 @@ export default function FakeCommentTool() {
                   alignItems: 'center',
                   gap: '10px'
                 }}>
-                  <img src={threadsReplyAvatar} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                  <img src={TIMEPHORIA_LOGO} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                   <div style={{
                     flex: 1,
                     backgroundColor: isDark ? '#1E1E1E' : '#F3F4F6',
