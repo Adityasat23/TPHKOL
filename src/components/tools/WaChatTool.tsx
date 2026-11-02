@@ -425,7 +425,7 @@ export default function WaChatTool() {
             width: '375px', height: '812px', // Ukuran rasio asli iPhone
             display: 'flex', flexDirection: 'column', 
             fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', 
-            overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.15)' 
+            overflow: 'hidden' 
           }}>
             
             {/* HEADER IOS */}

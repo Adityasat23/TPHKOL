@@ -221,7 +221,6 @@ export default function RetroUITool() {
                 position: 'relative', 
                 display: 'inline-block',
                 lineHeight: 0, 
-                boxShadow: '0 20px 50px rgba(0,0,0,0.25)', 
                 borderRadius: activeTemplate.includes('phone') ? '30px' : '6px',
                 overflow: 'hidden'
             }}>
@@ -274,7 +273,7 @@ export default function RetroUITool() {
             </div>
           ) : (
             <div style={{ transform: 'scale(0.6)', transformOrigin: 'center', margin: '-200px 0' }}>
-               <div ref={previewRef} style={{ width: '472px', height: '1024px', position: 'relative', overflow: 'hidden', backgroundColor: '#000', borderRadius: '40px', boxShadow: '0 20px 50px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column' }}>
+               <div ref={previewRef} style={{ width: '472px', height: '1024px', position: 'relative', overflow: 'hidden', backgroundColor: '#000', borderRadius: '40px', display: 'flex', flexDirection: 'column' }}>
                   
                   {/* TOP PART: The original background (blurred) */}
                   <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>

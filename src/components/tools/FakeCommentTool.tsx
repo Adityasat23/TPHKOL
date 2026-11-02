@@ -399,13 +399,13 @@ export default function FakeCommentTool() {
       {/* PANEL PREVIEW */}
       <div className="bg-[#E5E5EA] border border-gray-200 rounded-[2rem] p-6 sm:p-10 flex items-center justify-center min-h-[500px] overflow-x-auto shadow-inner relative">
         <div className="absolute inset-0 opacity-40 bg-[radial-gradient(#C7C7CC_1px,transparent_1px)] [background-size:16px_16px]"></div>
-        <div style={{ display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
-          <div ref={previewRef} style={{ padding: '24px', display: 'inline-flex', flexDirection: 'column', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', userSelect: 'none' }}>
+        <div style={{ padding: '24px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
+          <div ref={previewRef} style={{ display: 'inline-flex', flexDirection: 'column', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', userSelect: 'none' }}>
             
             {/* 1. PRATINJAU STICKER BUBBLE */}
             {commentMode === 'sticker' && (
               <div style={{ display: 'inline-flex', flexDirection: 'column', isolation: 'isolate', transform: 'translateZ(0)' }}>
-                <div style={{ backgroundColor: 'white', borderRadius: '16px 16px 16px 0px', padding: '24px 28px', display: 'flex', width: '100%', maxWidth: '480px', gap: '16px', alignItems: 'flex-start', border: '1px solid transparent', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.1)' }}>
+                <div style={{ backgroundColor: 'white', borderRadius: '16px 16px 16px 0px', padding: '24px 28px', display: 'flex', width: '100%', maxWidth: '480px', gap: '16px', alignItems: 'flex-start', border: '1px solid transparent' }}>
                   <img key={avatar} src={avatar} style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, marginTop: '2px' }} />
                   <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%', minWidth: 0 }}>
                     <p style={{ color: '#757575', fontSize: '16px', fontWeight: '600', margin: '0 0 6px 0', fontFamily: 'inherit', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Reply to {replyTo}'s comment</p>
@@ -425,7 +425,6 @@ export default function FakeCommentTool() {
                 flexDirection: 'column',
                 gap: '20px',
                 width: '500px',
-                boxShadow: !isDark ? '0 10px 40px -10px rgba(0,0,0,0.1)' : '0 10px 40px -10px rgba(0,0,0,0.5)',
                 borderRadius: '16px',
                 fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
               }}>
@@ -499,7 +498,6 @@ export default function FakeCommentTool() {
                 padding: '20px 22px',
                 width: '500px',
                 borderRadius: '18px',
-                boxShadow: isDark ? '0 12px 40px rgba(0,0,0,0.6)' : '0 12px 36px rgba(0,0,0,0.12)',
                 display: 'flex',
                 flexDirection: 'column',
                 fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
@@ -727,7 +725,6 @@ export default function FakeCommentTool() {
                 width: '480px',
                 borderRadius: '18px',
                 overflow: 'hidden',
-                boxShadow: isDark ? '0 12px 40px rgba(0,0,0,0.6)' : '0 12px 36px rgba(0,0,0,0.12)',
                 display: 'flex',
                 flexDirection: 'column',
                 fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'

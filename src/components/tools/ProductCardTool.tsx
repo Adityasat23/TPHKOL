@@ -276,7 +276,7 @@ const exportProductImage = async () => {
             
             {/* RENDER: SHOPEE SQUARE */}
             {productLayout === 'shopee' && (
-               <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '4px', width: '300px', minWidth: '300px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontFamily: 'Arial, sans-serif' }}>
+               <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '4px', width: '300px', minWidth: '300px', overflow: 'hidden', fontFamily: 'Arial, sans-serif' }}>
                   <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#ffffff', overflow: 'hidden' }}>
                      <img src={productImageUrl || productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { 
   e.currentTarget.onerror = null; // Wajib ditambahkan agar tidak infinite loop
@@ -356,7 +356,7 @@ const exportProductImage = async () => {
 
                   {/* PREVIEW CONTAINER (ONLY THIS IS DOWNLOADED) */}
                   {tkPortraitDesign === 1 ? (
-                    <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: '300px', minWidth: '300px', display: 'flex', flexDirection: 'column', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
+                    <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: '300px', minWidth: '300px', display: 'flex', flexDirection: 'column' }}>
                       <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#a3a3a3', overflow: 'hidden' }}>
                         <img key={productImageUrl || productImage} src={productImageUrl || productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { 
         e.currentTarget.onerror = null; 
@@ -381,7 +381,7 @@ const exportProductImage = async () => {
                       </div>
                     </div>
                   ) : (
-                    <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '16px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: '300px', minWidth: '300px', display: 'flex', flexDirection: 'column', boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}>
+                    <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '16px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: '300px', minWidth: '300px', display: 'flex', flexDirection: 'column' }}>
                       <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#a3a3a3', overflow: 'hidden' }}>
                         <img key={productImageUrl || productImage} src={productImageUrl || productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { 
         e.currentTarget.onerror = null; 
@@ -454,7 +454,7 @@ const exportProductImage = async () => {
             {/* RENDER: TIKTOK LANDSCAPE (ULTIMATE FIX) */}
             {productLayout === 'tiktok-landscape' && (
               // FIX: Kunci width di 540px, tambahkan minWidth agar tidak bisa digencet oleh layar kecil.
-              <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: '540px', minWidth: '540px', display: 'flex', flexDirection: 'row', boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}>
+              <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '12px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: '540px', minWidth: '540px', display: 'flex', flexDirection: 'row' }}>
                 {/* Bagian Kiri: Kunci lebar gambar di 220px, jangan izinkan menyusut (flexShrink: 0) */}
                 <div style={{ position: 'relative', width: '220px', minWidth: '220px', flexShrink: 0, backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'stretch' }}>
                   <img key={productImageUrl || productImage} src={productImageUrl || productImage} style={{ width: '100%', height: '100%', minHeight: '220px', objectFit: 'cover', display: 'block' }} onError={(e) => { 
