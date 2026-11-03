@@ -54,12 +54,12 @@ export default function DownloaderTool() {
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto bg-[#FFFFFF] rounded-2xl p-6 border border-[#18181A]/[0.08]">
+    <div className="w-full max-w-3xl mx-auto lg-panel p-6">
       <div className="mb-4">
-        <h3 className="text-base font-semibold text-[#18181A] tracking-[-0.015em]">
-          Pengunduh referensi media
+        <h3 className="text-base font-semibold text-[var(--label)] tracking-[-0.015em]">
+          Media Downloader
         </h3>
-        <p className="text-xs text-[#575551] mt-0.5">
+        <p className="text-xs text-[var(--label-2)] mt-0.5">
           Tempel tautan TikTok, Instagram, YouTube, atau Pinterest untuk mengunduh video maupun audio tanpa watermark.
         </p>
       </div>
@@ -69,7 +69,7 @@ export default function DownloaderTool() {
           <input 
             type="text" 
             placeholder="https://www.tiktok.com/@..." 
-            className="flex-1 px-4 py-3 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-xl focus:outline-none focus:border-[#18181A]/30 focus:bg-white text-sm text-[#18181A] transition-colors placeholder-[#85827C]" 
+            className="flex-1 px-4 py-3 text-sm lg-input" 
             value={url} 
             onChange={(e) => setUrl(e.target.value)} 
             required 
@@ -77,7 +77,7 @@ export default function DownloaderTool() {
           <button 
             type="submit" 
             disabled={loading} 
-            className="bg-[#18181A] hover:bg-[#2C2C2F] text-white font-medium text-sm px-6 py-3 rounded-xl disabled:opacity-50 transition-colors whitespace-nowrap"
+            className="lg-btn-primary font-semibold text-sm px-6 py-3 disabled:opacity-50 whitespace-nowrap"
           >
             {loading ? 'Memproses...' : 'Ambil Media'}
           </button>
@@ -85,16 +85,16 @@ export default function DownloaderTool() {
       </form>
 
       {error && (
-        <div className="mt-4 p-3.5 bg-[#C83E2B]/[0.06] border border-[#C83E2B]/20 text-[#C83E2B] rounded-xl text-xs font-medium">
+        <div className="mt-4 p-3.5 bg-[#FF453A]/[0.10] border border-[#FF453A]/30 text-[#FF453A] rounded-2xl text-xs font-medium">
           {error}
         </div>
       )}
       
       {result && (
-        <div className="mt-6 flex flex-col md:flex-row gap-6 items-center md:items-start bg-[#F6F5F2] p-5 rounded-xl border border-[#18181A]/[0.08]">
+        <div className="mt-6 flex flex-col md:flex-row gap-6 items-center md:items-start lg-subcard p-5">
           
           {/* TIKTOK VIEWER / VIDEO PLAYER */}
-          <div className="w-full md:w-60 flex-shrink-0 flex justify-center bg-[#18181A]/5 rounded-xl overflow-hidden border border-[#18181A]/[0.08]">
+          <div className="w-full md:w-60 flex-shrink-0 flex justify-center bg-black/10 rounded-xl overflow-hidden border border-[var(--separator)]">
             {result.play ? (
               <video 
                 src={result.play} 
@@ -115,10 +115,10 @@ export default function DownloaderTool() {
 
           <div className="flex-1 text-left w-full flex flex-col justify-between">
             <div>
-              <h4 className="font-semibold text-[#18181A] text-base mb-1.5 line-clamp-3 leading-snug">
+              <h4 className="font-semibold text-[var(--label)] text-base mb-1.5 line-clamp-3 leading-snug">
                 {result.title || 'Media tanpa judul'}
               </h4>
-              <p className="text-xs text-[#575551] mb-5 leading-relaxed">
+              <p className="text-xs text-[var(--label-2)] mb-5 leading-relaxed">
                 {result.play 
                   ? "Pratinjau video siap diputar atau diunduh langsung ke perangkat."
                   : "Konten berupa slide foto atau audio. Silakan unduh berkas audionya."}
@@ -131,7 +131,7 @@ export default function DownloaderTool() {
                   href={result.play} 
                   target="_blank" 
                   rel="noreferrer" 
-                  className="flex-1 bg-[#18181A] hover:bg-[#2C2C2F] text-white font-medium text-xs py-2.5 px-4 rounded-xl text-center transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 lg-btn-primary font-semibold text-xs py-2.5 px-4 text-center flex items-center justify-center gap-2"
                 >
                   <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                   Unduh Video (HD)
@@ -142,7 +142,7 @@ export default function DownloaderTool() {
                   href={result.music} 
                   target="_blank" 
                   rel="noreferrer" 
-                  className="flex-1 bg-white border border-[#18181A]/[0.12] text-[#18181A] hover:bg-[#F0EFEA] font-medium text-xs py-2.5 px-4 rounded-xl text-center transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 liquid-glass-chip text-[var(--label)] hover:text-[var(--tint)] font-medium text-xs py-2.5 px-4 rounded-xl text-center transition-all flex items-center justify-center gap-2"
                 >
                   <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
                   Unduh Audio (MP3)

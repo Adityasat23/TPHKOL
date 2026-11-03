@@ -68,6 +68,7 @@ export default function FakeCommentTool() {
   const [commentMode, setCommentMode] = useState<'sticker' | 'thread' | 'threads'>('sticker');
   const [threadsStyle, setThreadsStyle] = useState<'card' | 'page'>('card');
   const [threadTheme, setThreadTheme] = useState<'dark' | 'light'>('light');
+  const [commentEdge, setCommentEdge] = useState<'rounded' | 'sharp'>('rounded');
 
   // State Komentar Utama
   const [username, setUsername] = useState('yeftajethro');
@@ -151,60 +152,60 @@ export default function FakeCommentTool() {
       : `500 × auto px · Threads (${threadsStyle}) · 3× PNG`;
 
   return (
-    <div className="w-full grid grid-cols-1 lg:grid-cols-[440px_1fr] gap-6 items-start">
-      <div className="bg-[#FFFFFF] rounded-2xl p-6 border border-[#18181A]/[0.08] space-y-5 h-fit">
+    <div className="w-full grid grid-cols-1 lg:grid-cols-[440px_1fr] gap-5 sm:gap-6 items-start">
+      <div className="lg-panel p-4 sm:p-6 space-y-5 h-fit min-w-0">
         
         {/* PILIHAN MODE KOMENTAR */}
         <div>
-          <span className="block text-xs font-medium text-[#575551] mb-2">Format komentar</span>
-          <div className="grid grid-cols-3 bg-[#F0EFEA] p-1 rounded-xl gap-1">
-            <button onClick={() => setCommentMode('sticker')} className={`py-2 px-2 rounded-lg text-xs font-medium transition-colors ${commentMode === 'sticker' ? 'bg-white text-[#18181A] shadow-[0_1px_2px_rgba(24,24,26,0.06)]' : 'text-[#575551] hover:text-[#18181A]'}`}>Sticker Bubble</button>
-            <button onClick={() => setCommentMode('thread')} className={`py-2 px-2 rounded-lg text-xs font-medium transition-colors ${commentMode === 'thread' ? 'bg-white text-[#18181A] shadow-[0_1px_2px_rgba(24,24,26,0.06)]' : 'text-[#575551] hover:text-[#18181A]'}`}>TikTok</button>
-            <button onClick={() => setCommentMode('threads')} className={`py-2 px-2 rounded-lg text-xs font-medium transition-colors ${commentMode === 'threads' ? 'bg-white text-[#18181A] shadow-[0_1px_2px_rgba(24,24,26,0.06)]' : 'text-[#575551] hover:text-[#18181A]'}`}>Threads</button>
+          <span className="block text-xs font-medium text-[var(--label-2)] mb-2">Format komentar</span>
+          <div className="lg-segmented grid-cols-3 gap-1">
+            <button onClick={() => setCommentMode('sticker')} data-active={commentMode === 'sticker'} className="lg-segment-btn py-2 px-2 text-xs">Sticker Bubble</button>
+            <button onClick={() => setCommentMode('thread')} data-active={commentMode === 'thread'} className="lg-segment-btn py-2 px-2 text-xs">TikTok</button>
+            <button onClick={() => setCommentMode('threads')} data-active={commentMode === 'threads'} className="lg-segment-btn py-2 px-2 text-xs">Threads</button>
           </div>
         </div>
 
         {/* SUB-STYLE UNTUK THREADS */}
         {commentMode === 'threads' && (
           <div>
-            <span className="block text-xs font-medium text-[#575551] mb-2">Tampilan Threads</span>
-            <div className="grid grid-cols-2 bg-[#F0EFEA] p-1 rounded-xl gap-1">
-              <button onClick={() => setThreadsStyle('card')} className={`py-1.5 rounded-lg text-xs font-medium transition-colors ${threadsStyle === 'card' ? 'bg-white text-[#18181A] shadow-[0_1px_2px_rgba(24,24,26,0.06)]' : 'text-[#575551] hover:text-[#18181A]'}`}>Post + Reply Card</button>
-              <button onClick={() => setThreadsStyle('page')} className={`py-1.5 rounded-lg text-xs font-medium transition-colors ${threadsStyle === 'page' ? 'bg-white text-[#18181A] shadow-[0_1px_2px_rgba(24,24,26,0.06)]' : 'text-[#575551] hover:text-[#18181A]'}`}>Full Thread View</button>
+            <span className="block text-xs font-medium text-[var(--label-2)] mb-2">Tampilan Threads</span>
+            <div className="lg-segmented grid-cols-2 gap-1">
+              <button onClick={() => setThreadsStyle('card')} data-active={threadsStyle === 'card'} className="lg-segment-btn py-1.5 text-xs">Post + Reply Card</button>
+              <button onClick={() => setThreadsStyle('page')} data-active={threadsStyle === 'page'} className="lg-segment-btn py-1.5 text-xs">Full Thread View</button>
             </div>
           </div>
         )}
 
         {(commentMode === 'thread' || commentMode === 'threads') && (
           <div>
-            <span className="block text-xs font-medium text-[#575551] mb-2">Tema latar</span>
-            <div className="grid grid-cols-2 bg-[#F0EFEA] p-1 rounded-xl gap-1">
-              <button onClick={() => setThreadTheme('light')} className={`py-1.5 rounded-lg text-xs font-medium transition-colors ${threadTheme === 'light' ? 'bg-white text-[#18181A] shadow-[0_1px_2px_rgba(24,24,26,0.06)]' : 'text-[#575551] hover:text-[#18181A]'}`}>Light mode</button>
-              <button onClick={() => setThreadTheme('dark')} className={`py-1.5 rounded-lg text-xs font-medium transition-colors ${threadTheme === 'dark' ? 'bg-white text-[#18181A] shadow-[0_1px_2px_rgba(24,24,26,0.06)]' : 'text-[#575551] hover:text-[#18181A]'}`}>Dark mode</button>
+            <span className="block text-xs font-medium text-[var(--label-2)] mb-2">Tema latar</span>
+            <div className="lg-segmented grid-cols-2 gap-1">
+              <button onClick={() => setThreadTheme('light')} data-active={threadTheme === 'light'} className="lg-segment-btn py-1.5 text-xs">Light mode</button>
+              <button onClick={() => setThreadTheme('dark')} data-active={threadTheme === 'dark'} className="lg-segment-btn py-1.5 text-xs">Dark mode</button>
             </div>
           </div>
         )}
 
         {/* PENGATURAN KOMENTAR UTAMA */}
-        <div className="space-y-3.5 pt-4 border-t border-[#18181A]/[0.08]">
-          <h3 className="font-semibold text-[#18181A] text-sm tracking-[-0.01em]">
+        <div className="space-y-3.5 pt-4 border-t border-[var(--separator)]">
+          <h3 className="font-semibold text-[var(--label)] text-sm tracking-[-0.01em]">
             Komentar / Post utama
           </h3>
           <div>
-            <label className="block text-xs font-medium text-[#575551] mb-1.5">Avatar profil utama</label>
-            <input type="file" onChange={(e) => handleImageUpload(e, setAvatar)} className="text-xs block w-full file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border file:border-[#18181A]/[0.08] file:text-xs file:font-medium file:bg-[#F0EFEA] file:text-[#18181A] hover:file:bg-[#EAE8E1] transition-colors cursor-pointer text-[#575551]" />
+            <label className="block text-xs font-medium text-[var(--label-2)] mb-1.5">Avatar profil utama</label>
+            <input type="file" onChange={(e) => handleImageUpload(e, setAvatar)} className="text-xs block w-full file:mr-3 file:py-1.5 file:px-3.5 file:rounded-full file:border file:border-white/50 file:text-xs file:font-medium file:bg-white/60 file:text-[var(--label)] hover:file:bg-white/80 transition-colors cursor-pointer text-[var(--label-2)]" />
           </div>
 
           {commentMode === 'sticker' && (
-            <input type="text" value={replyTo} onChange={(e) => setReplyTo(e.target.value)} placeholder="Reply to username..." className="w-full px-3 py-2.5 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-sm text-[#18181A] focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
+            <input type="text" value={replyTo} onChange={(e) => setReplyTo(e.target.value)} placeholder="Reply to username..." className="w-full px-3 py-2.5 lg-input text-sm" />
           )}
 
           {commentMode === 'thread' && (
             <>
-              <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" className="w-full px-3 py-2.5 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-sm text-[#18181A] focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
+              <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" className="w-full px-3 py-2.5 lg-input text-sm" />
               <div className="grid grid-cols-2 gap-3">
-                <input type="text" value={likes} onChange={(e) => setLikes(e.target.value)} placeholder="Jumlah likes" className="w-full px-3 py-2.5 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-sm text-[#18181A] tabular-nums focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
-                <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full px-3 py-2.5 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-sm text-[#575551] tabular-nums focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
+                <input type="text" value={likes} onChange={(e) => setLikes(e.target.value)} placeholder="Jumlah likes" className="w-full px-3 py-2.5 lg-input text-sm tabular-nums" />
+                <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full px-3 py-2.5 lg-input text-sm tabular-nums" />
               </div>
             </>
           )}
@@ -213,40 +214,40 @@ export default function FakeCommentTool() {
             <>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-[#575551] mb-1">Username</label>
-                  <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" className="w-full px-3 py-2 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-sm text-[#18181A] focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
+                  <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Username</label>
+                  <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" className="w-full px-3 py-2 lg-input text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#575551] mb-1">Waktu</label>
-                  <input type="text" value={threadsTime} onChange={(e) => setThreadsTime(e.target.value)} placeholder="23h / 58m" className="w-full px-3 py-2 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-sm text-[#18181A] tabular-nums focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
+                  <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Waktu</label>
+                  <input type="text" value={threadsTime} onChange={(e) => setThreadsTime(e.target.value)} placeholder="23h / 58m" className="w-full px-3 py-2 lg-input text-sm tabular-nums" />
                 </div>
               </div>
               <div className="grid grid-cols-4 gap-2">
                 <div>
-                  <label className="block text-xs font-medium text-[#575551] mb-1">Likes</label>
-                  <input type="text" value={likes} onChange={(e) => setLikes(e.target.value)} placeholder="9,4K" className="w-full px-2.5 py-2 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-xs text-[#18181A] tabular-nums focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
+                  <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Likes</label>
+                  <input type="text" value={likes} onChange={(e) => setLikes(e.target.value)} placeholder="9,4K" className="w-full px-2.5 py-2 lg-input text-xs tabular-nums" />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#575551] mb-1">Replies</label>
-                  <input type="text" value={threadsCommentsCount} onChange={(e) => setThreadsCommentsCount(e.target.value)} placeholder="651" className="w-full px-2.5 py-2 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-xs text-[#18181A] tabular-nums focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
+                  <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Replies</label>
+                  <input type="text" value={threadsCommentsCount} onChange={(e) => setThreadsCommentsCount(e.target.value)} placeholder="651" className="w-full px-2.5 py-2 lg-input text-xs tabular-nums" />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#575551] mb-1">Repost</label>
-                  <input type="text" value={threadsRepostsCount} onChange={(e) => setThreadsRepostsCount(e.target.value)} placeholder="141" className="w-full px-2.5 py-2 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-xs text-[#18181A] tabular-nums focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
+                  <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Repost</label>
+                  <input type="text" value={threadsRepostsCount} onChange={(e) => setThreadsRepostsCount(e.target.value)} placeholder="141" className="w-full px-2.5 py-2 lg-input text-xs tabular-nums" />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#575551] mb-1">Share</label>
-                  <input type="text" value={threadsSharesCount} onChange={(e) => setThreadsSharesCount(e.target.value)} placeholder="578" className="w-full px-2.5 py-2 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-xs text-[#18181A] tabular-nums focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
+                  <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Share</label>
+                  <input type="text" value={threadsSharesCount} onChange={(e) => setThreadsSharesCount(e.target.value)} placeholder="578" className="w-full px-2.5 py-2 lg-input text-xs tabular-nums" />
                 </div>
               </div>
               <div className="flex flex-wrap gap-4 pt-1">
-                <label className="flex items-center gap-2 text-xs font-medium text-[#575551] cursor-pointer">
-                  <input type="checkbox" checked={mainVerified} onChange={(e) => setMainVerified(e.target.checked)} className="rounded accent-[#18181A]" />
+                <label className="flex items-center gap-2 text-xs font-medium text-[var(--label-2)] cursor-pointer">
+                  <input type="checkbox" checked={mainVerified} onChange={(e) => setMainVerified(e.target.checked)} className="rounded accent-[#0088FF]" />
                   Verified badge
                 </label>
                 {threadsStyle === 'card' && (
-                  <label className="flex items-center gap-2 text-xs font-medium text-[#575551] cursor-pointer">
-                    <input type="checkbox" checked={showThreadsLogo} onChange={(e) => setShowThreadsLogo(e.target.checked)} className="rounded accent-[#18181A]" />
+                  <label className="flex items-center gap-2 text-xs font-medium text-[var(--label-2)] cursor-pointer">
+                    <input type="checkbox" checked={showThreadsLogo} onChange={(e) => setShowThreadsLogo(e.target.checked)} className="rounded accent-[#0088FF]" />
                     Logo Threads di kanan atas
                   </label>
                 )}
@@ -255,13 +256,13 @@ export default function FakeCommentTool() {
           )}
 
           <div className="relative">
-            <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} className="w-full px-3 py-2.5 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-sm min-h-[84px] resize-y text-[#18181A] focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" placeholder="Isi komentar..." />
+            <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} className="w-full px-3 py-2.5 lg-input text-sm min-h-[84px] resize-y" placeholder="Isi komentar..." />
             {getDetectedBannedWords(commentText).length > 0 && (
-              <div className="mt-2.5 p-3 bg-[#C83E2B]/[0.06] border border-[#C83E2B]/20 rounded-lg space-y-1.5">
-                <p className="text-xs text-[#C83E2B] font-semibold">Terdeteksi kata sensitif:</p>
-                <ul className="text-xs text-[#575551] list-disc pl-4 space-y-1">
+              <div className="mt-2.5 p-3 bg-[#FF383C]/10 border border-[#FF383C]/25 rounded-xl space-y-1.5">
+                <p className="text-xs text-[#FF383C] font-semibold">Terdeteksi kata sensitif:</p>
+                <ul className="text-xs text-[var(--label-2)] list-disc pl-4 space-y-1">
                   {getDetectedBannedWords(commentText).map((d: BannedItem, i: number) => (
-                    <li key={i}><span className="font-semibold text-white bg-[#C83E2B] px-1.5 py-0.5 rounded">{d.word}</span> — gunakan: <span className="font-medium text-[#1F7A3E]">{d.suggestion}</span></li>
+                    <li key={i}><span className="font-semibold text-white bg-[#FF383C] px-1.5 py-0.5 rounded">{d.word}</span>, gunakan: <span className="font-medium text-[#34C759]">{d.suggestion}</span></li>
                   ))}
                 </ul>
               </div>
@@ -270,10 +271,10 @@ export default function FakeCommentTool() {
 
           {(commentMode === 'thread' || commentMode === 'threads') && (
             <div>
-              <label className="block text-xs font-medium text-[#575551] mb-1.5">Lampiran gambar di post utama (opsional)</label>
-              <input type="file" onChange={(e) => handleImageUpload(e, setCommentImage)} className="text-xs block w-full file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border file:border-[#18181A]/[0.08] file:text-xs file:font-medium file:bg-[#F0EFEA] file:text-[#18181A] hover:file:bg-[#EAE8E1] transition-colors cursor-pointer text-[#575551]" />
+              <label className="block text-xs font-medium text-[var(--label-2)] mb-1.5">Lampiran gambar di post utama (opsional)</label>
+              <input type="file" onChange={(e) => handleImageUpload(e, setCommentImage)} className="text-xs block w-full file:mr-3 file:py-1.5 file:px-3.5 file:rounded-full file:border file:border-white/50 file:text-xs file:font-medium file:bg-white/60 file:text-[var(--label)] hover:file:bg-white/80 transition-colors cursor-pointer text-[var(--label-2)]" />
               {commentImage && (
-                <button onClick={() => setCommentImage('')} className="mt-2 text-xs font-medium text-[#C83E2B] hover:underline">
+                <button onClick={() => setCommentImage('')} className="mt-2 text-xs font-medium text-[#FF383C] hover:underline">
                   Hapus gambar komentar
                 </button>
               )}
@@ -283,25 +284,25 @@ export default function FakeCommentTool() {
 
         {/* PENGATURAN BALASAN BRAND (TIKTOK & THREADS) */}
         {(commentMode === 'thread' || commentMode === 'threads') && (
-          <div className="space-y-3.5 pt-4 border-t border-[#18181A]/[0.08]">
+          <div className="space-y-3.5 pt-4 border-t border-[var(--separator)]">
             <div className="flex justify-between items-center">
-              <h3 className="font-semibold text-[#18181A] text-sm tracking-[-0.01em]">
+              <h3 className="font-semibold text-[var(--label)] text-sm tracking-[-0.01em]">
                 Balasan brand
               </h3>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" checked={showReply} onChange={() => setShowReply(!showReply)} className="sr-only peer" />
-                <div className="w-9 h-5 bg-[#EAE8E1] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#18181A]"></div>
+                <div className="w-9 h-5 bg-[var(--fill)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#34C759]"></div>
               </label>
             </div>
 
             {showReply && (
               <div className="space-y-3">
                 <div className="w-full">
-                  <label className="block text-xs font-medium text-[#575551] mb-1">Akun brand</label>
+                  <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Akun brand</label>
                   <select
                     value={brandName}
                     onChange={(e) => setBrandName(e.target.value)}
-                    className="w-full px-3 py-2 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-sm font-medium text-[#18181A] focus:outline-none focus:border-[#18181A]/30 cursor-pointer"
+                    className="w-full px-3 py-2 lg-input text-sm font-medium cursor-pointer"
                   >
                     <option value="Timephoria.id">Timephoria.id</option>
                     <option value="timephoria.basemakeup">timephoria.basemakeup</option>
@@ -310,43 +311,43 @@ export default function FakeCommentTool() {
 
                 {commentMode === 'thread' ? (
                   <div className="grid grid-cols-2 gap-3">
-                    <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="Likes balasan" className="w-full px-3 py-2 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-sm text-[#18181A] tabular-nums focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
-                    <input type="date" value={replyDate} onChange={(e) => setReplyDate(e.target.value)} className="w-full px-3 py-2 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-sm text-[#575551] tabular-nums focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
+                    <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="Likes balasan" className="w-full px-3 py-2 lg-input text-sm tabular-nums" />
+                    <input type="date" value={replyDate} onChange={(e) => setReplyDate(e.target.value)} className="w-full px-3 py-2 lg-input text-sm tabular-nums" />
                   </div>
                 ) : (
                   <>
                     <div>
-                      <label className="block text-xs font-medium text-[#575551] mb-1">Waktu balasan</label>
-                      <input type="text" value={threadsReplyTime} onChange={(e) => setThreadsReplyTime(e.target.value)} placeholder="8h / 51m" className="w-full px-3 py-2 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-sm text-[#18181A] tabular-nums focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
+                      <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Waktu balasan</label>
+                      <input type="text" value={threadsReplyTime} onChange={(e) => setThreadsReplyTime(e.target.value)} placeholder="8h / 51m" className="w-full px-3 py-2 lg-input text-sm tabular-nums" />
                     </div>
                     {threadsStyle === 'card' && (
                       <div className="grid grid-cols-4 gap-2">
                         <div>
-                          <label className="block text-xs font-medium text-[#575551] mb-1">Likes</label>
-                          <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="804" className="w-full px-2.5 py-2 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-xs text-[#18181A] tabular-nums focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
+                          <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Likes</label>
+                          <input type="text" value={replyLikes} onChange={(e) => setReplyLikes(e.target.value)} placeholder="804" className="w-full px-2.5 py-2 lg-input text-xs tabular-nums" />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-[#575551] mb-1">Replies</label>
-                          <input type="text" value={threadsReplyCommentsCount} onChange={(e) => setThreadsReplyCommentsCount(e.target.value)} placeholder="13" className="w-full px-2.5 py-2 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-xs text-[#18181A] tabular-nums focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
+                          <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Replies</label>
+                          <input type="text" value={threadsReplyCommentsCount} onChange={(e) => setThreadsReplyCommentsCount(e.target.value)} placeholder="13" className="w-full px-2.5 py-2 lg-input text-xs tabular-nums" />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-[#575551] mb-1">Repost</label>
-                          <input type="text" value={threadsReplyRepostsCount} onChange={(e) => setThreadsReplyRepostsCount(e.target.value)} placeholder="18" className="w-full px-2.5 py-2 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-xs text-[#18181A] tabular-nums focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
+                          <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Repost</label>
+                          <input type="text" value={threadsReplyRepostsCount} onChange={(e) => setThreadsReplyRepostsCount(e.target.value)} placeholder="18" className="w-full px-2.5 py-2 lg-input text-xs tabular-nums" />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-[#575551] mb-1">Share</label>
-                          <input type="text" value={threadsReplySharesCount} onChange={(e) => setThreadsReplySharesCount(e.target.value)} placeholder="21" className="w-full px-2.5 py-2 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-xs text-[#18181A] tabular-nums focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
+                          <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Share</label>
+                          <input type="text" value={threadsReplySharesCount} onChange={(e) => setThreadsReplySharesCount(e.target.value)} placeholder="21" className="w-full px-2.5 py-2 lg-input text-xs tabular-nums" />
                         </div>
                       </div>
                     )}
                     <div className="flex flex-wrap gap-4 pt-1">
-                      <label className="flex items-center gap-2 text-xs font-medium text-[#575551] cursor-pointer">
-                        <input type="checkbox" checked={replyVerified} onChange={(e) => setReplyVerified(e.target.checked)} className="rounded accent-[#18181A]" />
+                      <label className="flex items-center gap-2 text-xs font-medium text-[var(--label-2)] cursor-pointer">
+                        <input type="checkbox" checked={replyVerified} onChange={(e) => setReplyVerified(e.target.checked)} className="rounded accent-[#0088FF]" />
                         Verified badge
                       </label>
                       {threadsStyle === 'card' && (
-                        <label className="flex items-center gap-2 text-xs font-medium text-[#575551] cursor-pointer">
-                          <input type="checkbox" checked={likedByAuthor} onChange={(e) => setLikedByAuthor(e.target.checked)} className="rounded accent-[#18181A]" />
+                        <label className="flex items-center gap-2 text-xs font-medium text-[var(--label-2)] cursor-pointer">
+                          <input type="checkbox" checked={likedByAuthor} onChange={(e) => setLikedByAuthor(e.target.checked)} className="rounded accent-[#0088FF]" />
                           Disukai pembuat post
                         </label>
                       )}
@@ -355,13 +356,13 @@ export default function FakeCommentTool() {
                 )}
 
                 <div className="relative">
-                  <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full px-3 py-2.5 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-sm min-h-[72px] text-[#18181A] focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" placeholder="Teks balasan..." />
+                  <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full px-3 py-2.5 lg-input text-sm min-h-[72px]" placeholder="Teks balasan..." />
                   {getDetectedBannedWords(replyText).length > 0 && (
-                    <div className="mt-2 p-2.5 bg-[#C83E2B]/[0.06] border border-[#C83E2B]/20 rounded-lg space-y-1">
-                      <p className="text-xs text-[#C83E2B] font-semibold">Terdeteksi kata sensitif:</p>
-                      <ul className="text-xs text-[#575551] list-disc pl-4 space-y-1">
+                    <div className="mt-2 p-2.5 bg-[#FF383C]/10 border border-[#FF383C]/25 rounded-xl space-y-1">
+                      <p className="text-xs text-[#FF383C] font-semibold">Terdeteksi kata sensitif:</p>
+                      <ul className="text-xs text-[var(--label-2)] list-disc pl-4 space-y-1">
                         {getDetectedBannedWords(replyText).map((d: BannedItem, i: number) => (
-                          <li key={i}><span className="font-semibold text-white bg-[#C83E2B] px-1.5 py-0.5 rounded">{d.word}</span> — gunakan: <span className="font-medium text-[#1F7A3E]">{d.suggestion}</span></li>
+                          <li key={i}><span className="font-semibold text-white bg-[#FF383C] px-1.5 py-0.5 rounded">{d.word}</span>, gunakan: <span className="font-medium text-[#34C759]">{d.suggestion}</span></li>
                         ))}
                       </ul>
                     </div>
@@ -369,10 +370,10 @@ export default function FakeCommentTool() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-[#575551] mb-1.5">Lampiran gambar di balasan (opsional)</label>
-                  <input type="file" onChange={(e) => handleImageUpload(e, setReplyImage)} className="text-xs block w-full file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border file:border-[#18181A]/[0.08] file:text-xs file:font-medium file:bg-[#F0EFEA] file:text-[#18181A] hover:file:bg-[#EAE8E1] transition-colors cursor-pointer text-[#575551]" />
+                  <label className="block text-xs font-medium text-[var(--label-2)] mb-1.5">Lampiran gambar di balasan (opsional)</label>
+                  <input type="file" onChange={(e) => handleImageUpload(e, setReplyImage)} className="text-xs block w-full file:mr-3 file:py-1.5 file:px-3.5 file:rounded-full file:border file:border-white/50 file:text-xs file:font-medium file:bg-white/60 file:text-[var(--label)] hover:file:bg-white/80 transition-colors cursor-pointer text-[var(--label-2)]" />
                   {replyImage && (
-                    <button onClick={() => setReplyImage('')} className="mt-2 text-xs font-medium text-[#C83E2B] hover:underline">
+                    <button onClick={() => setReplyImage('')} className="mt-2 text-xs font-medium text-[#FF383C] hover:underline">
                       Hapus gambar balasan
                     </button>
                   )}
@@ -384,51 +385,88 @@ export default function FakeCommentTool() {
 
         {/* KOMENTAR KEDUA (KHUSUS THREADS FULL PAGE VIEW) */}
         {commentMode === 'threads' && threadsStyle === 'page' && (
-          <div className="space-y-3.5 pt-4 border-t border-[#18181A]/[0.08]">
+          <div className="space-y-3.5 pt-4 border-t border-[var(--separator)]">
             <div className="flex justify-between items-center">
-              <h3 className="font-semibold text-[#18181A] text-sm tracking-[-0.01em]">
+              <h3 className="font-semibold text-[var(--label)] text-sm tracking-[-0.01em]">
                 Komentar kedua (opsional)
               </h3>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" checked={showSecondComment} onChange={() => setShowSecondComment(!showSecondComment)} className="sr-only peer" />
-                <div className="w-9 h-5 bg-[#EAE8E1] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#18181A]"></div>
+                <div className="w-9 h-5 bg-[var(--fill)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#34C759]"></div>
               </label>
             </div>
             {showSecondComment && (
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-medium text-[#575551] mb-1.5">Avatar komentar kedua</label>
-                  <input type="file" onChange={(e) => handleImageUpload(e, setSecondAvatar)} className="text-xs block w-full file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border file:border-[#18181A]/[0.08] file:text-xs file:font-medium file:bg-[#F0EFEA] file:text-[#18181A] hover:file:bg-[#EAE8E1] transition-colors cursor-pointer text-[#575551]" />
+                  <label className="block text-xs font-medium text-[var(--label-2)] mb-1.5">Avatar komentar kedua</label>
+                  <input type="file" onChange={(e) => handleImageUpload(e, setSecondAvatar)} className="text-xs block w-full file:mr-3 file:py-1.5 file:px-3.5 file:rounded-full file:border file:border-white/50 file:text-xs file:font-medium file:bg-white/60 file:text-[var(--label)] hover:file:bg-white/80 transition-colors cursor-pointer text-[var(--label-2)]" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <input type="text" value={secondUsername} onChange={(e) => setSecondUsername(e.target.value)} placeholder="Username 2" className="w-full px-3 py-2 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-sm text-[#18181A] focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
-                  <input type="text" value={secondTime} onChange={(e) => setSecondTime(e.target.value)} placeholder="37m" className="w-full px-3 py-2 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-sm text-[#18181A] tabular-nums focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
+                  <input type="text" value={secondUsername} onChange={(e) => setSecondUsername(e.target.value)} placeholder="Username 2" className="w-full px-3 py-2 lg-input text-sm" />
+                  <input type="text" value={secondTime} onChange={(e) => setSecondTime(e.target.value)} placeholder="37m" className="w-full px-3 py-2 lg-input text-sm tabular-nums" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <input type="text" value={secondRepliesCount} onChange={(e) => setSecondRepliesCount(e.target.value)} placeholder="Replies (1)" className="w-full px-2.5 py-2 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-xs text-[#18181A] tabular-nums focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
-                  <input type="text" value={secondLikesCount} onChange={(e) => setSecondLikesCount(e.target.value)} placeholder="Likes (92)" className="w-full px-2.5 py-2 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-xs text-[#18181A] tabular-nums focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
+                  <input type="text" value={secondRepliesCount} onChange={(e) => setSecondRepliesCount(e.target.value)} placeholder="Replies (1)" className="w-full px-2.5 py-2 lg-input text-xs tabular-nums" />
+                  <input type="text" value={secondLikesCount} onChange={(e) => setSecondLikesCount(e.target.value)} placeholder="Likes (92)" className="w-full px-2.5 py-2 lg-input text-xs tabular-nums" />
                 </div>
-                <textarea value={secondText} onChange={(e) => setSecondText(e.target.value)} className="w-full px-3 py-2 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-sm min-h-[60px] text-[#18181A] focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" placeholder="Isi komentar kedua..." />
+                <textarea value={secondText} onChange={(e) => setSecondText(e.target.value)} className="w-full px-3 py-2 lg-input text-sm min-h-[60px]" placeholder="Isi komentar kedua..." />
               </div>
             )}
           </div>
         )}
 
-        <button onClick={exportCommentImage} className="w-full bg-[#18181A] hover:bg-[#2C2C2F] text-white font-medium text-sm py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <button onClick={exportCommentImage} className="w-full h-11 lg-btn-primary text-sm flex items-center justify-center gap-2">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Export Comment PNG
         </button>
       </div>
 
       {/* PANEL PREVIEW */}
-      <div className="bg-[#EAE8E1] border border-[#18181A]/[0.08] rounded-2xl flex flex-col min-h-[580px] overflow-hidden relative">
-        <div className="h-10 px-4 border-b border-[#18181A]/[0.06] bg-[#F0EFEA]/70 flex items-center justify-between text-xs text-[#85827C]">
-          <span className="font-medium text-[#575551]">Canvas Preview</span>
-          <span className="font-mono tabular-nums">{specLabel}</span>
+      <div className="lg-panel flex flex-col min-h-[460px] sm:min-h-[580px] overflow-hidden relative min-w-0">
+        <div className="h-11 px-4 sm:px-5 border-b border-[var(--separator)] flex items-center justify-between text-xs text-[var(--label-2)] gap-2">
+          <span className="font-medium text-[var(--label)] truncate">Live Canvas Preview</span>
+          <span className="liquid-glass-chip px-2.5 py-0.5 text-[11px] text-[var(--label-2)] tabular-nums shrink-0">{specLabel}</span>
         </div>
-        <div className="flex-1 flex items-center justify-center overflow-x-auto p-6 sm:p-10 relative">
-          <div style={{ padding: '24px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
-            <div ref={previewRef} style={{ display: 'inline-flex', flexDirection: 'column', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', userSelect: 'none' }}>
+        <div className="flex-1 flex flex-col items-center justify-center overflow-x-auto p-3 sm:p-10 relative gap-3 sm:gap-4">
+          {(commentMode === 'thread' || commentMode === 'threads') && (
+            <div className="lg-segmented grid-cols-2 gap-1 w-48 z-10">
+              <button
+                type="button"
+                onClick={() => setCommentEdge('rounded')}
+                data-active={commentEdge === 'rounded'}
+                className="lg-segment-btn py-1.5 px-3 text-xs"
+              >
+                Rounded
+              </button>
+              <button
+                type="button"
+                onClick={() => setCommentEdge('sharp')}
+                data-active={commentEdge === 'sharp'}
+                className="lg-segment-btn py-1.5 px-3 text-xs"
+              >
+                Sharp
+              </button>
+            </div>
+          )}
+
+          <div className="flex items-center gap-2 sm:gap-4 z-10 max-w-full justify-center">
+            {(commentMode === 'thread' || commentMode === 'threads') && (
+              <button
+                type="button"
+                onClick={() => setCommentEdge('rounded')}
+                aria-label="Sudut Rounded"
+                className={`hidden sm:flex liquid-glass-chip w-9 h-9 items-center justify-center rounded-full shrink-0 ${
+                  commentEdge === 'rounded' ? 'opacity-30 cursor-not-allowed' : ''
+                }`}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
+            )}
+
+            <div className="max-sm:scale-[0.62] sm:max-md:scale-[0.82] origin-center transition-transform" style={{ padding: '12px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
+              <div ref={previewRef} style={{ display: 'inline-flex', flexDirection: 'column', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', userSelect: 'none' }}>
             
             {/* 1. PRATINJAU STICKER BUBBLE */}
             {commentMode === 'sticker' && (
@@ -453,7 +491,7 @@ export default function FakeCommentTool() {
                 flexDirection: 'column',
                 gap: '20px',
                 width: '500px',
-                borderRadius: '16px',
+                borderRadius: commentEdge === 'rounded' ? '16px' : '0px',
                 fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
               }}>
                 {/* KOMENTAR UTAMA */}
@@ -525,7 +563,7 @@ export default function FakeCommentTool() {
                 color: isDark ? '#F3F5F7' : '#000000',
                 padding: '20px 22px',
                 width: '500px',
-                borderRadius: '18px',
+                borderRadius: commentEdge === 'rounded' ? '18px' : '0px',
                 display: 'flex',
                 flexDirection: 'column',
                 fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
@@ -751,7 +789,7 @@ export default function FakeCommentTool() {
                 backgroundColor: isDark ? '#101010' : '#FFFFFF',
                 color: isDark ? '#F3F5F7' : '#000000',
                 width: '480px',
-                borderRadius: '18px',
+                borderRadius: commentEdge === 'rounded' ? '18px' : '0px',
                 overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
@@ -928,7 +966,23 @@ export default function FakeCommentTool() {
               </div>
             )}
 
+              </div>
             </div>
+
+            {(commentMode === 'thread' || commentMode === 'threads') && (
+              <button
+                type="button"
+                onClick={() => setCommentEdge('sharp')}
+                aria-label="Sudut Sharp"
+                className={`hidden sm:flex liquid-glass-chip w-9 h-9 items-center justify-center rounded-full shrink-0 ${
+                  commentEdge === 'sharp' ? 'opacity-30 cursor-not-allowed' : ''
+                }`}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
       </div>
