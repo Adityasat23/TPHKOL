@@ -84,136 +84,142 @@ export default function RetroUITool() {
     return '"Segoe UI", Tahoma, Arial, sans-serif';
   };
 
+  const specLabel =
+    uiMode === 'retro'
+      ? `Retro Frame (${activeTemplate.toUpperCase()}) · 2× PNG`
+      : '472 × 1024 px · IG Notes · 2× PNG';
+
   return (
-    <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-[45%_55%] gap-8 z-10 animate-in fade-in zoom-in-95">
+    <div className="w-full grid grid-cols-1 lg:grid-cols-[440px_1fr] gap-6 items-start">
       
       {/* ==========================================
           PANEL KONTROL KIRI
       ========================================== */}
-      <div className="bg-white/40 backdrop-blur-2xl shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-500 rounded-[2rem] p-8 border border-white/80 space-y-8 h-fit max-h-[85vh] overflow-y-auto custom-scrollbar">
+      <div className="bg-[#FFFFFF] rounded-2xl p-6 border border-[#18181A]/[0.08] space-y-5 h-fit">
         
         {/* MODE SWITCHER */}
-        <div className="flex bg-gray-100 p-1.5 rounded-xl border border-gray-200/50 mb-6">
-          <button onClick={() => setUiMode('retro')} className={`flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${uiMode === 'retro' ? 'bg-white shadow text-[#0071E3]' : 'text-gray-500 hover:text-gray-700'}`}>Retro HP</button>
-          <button onClick={() => setUiMode('ignotes')} className={`flex-1 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${uiMode === 'ignotes' ? 'bg-white shadow text-[#E1306C]' : 'text-gray-500 hover:text-gray-700'}`}>IG Notes Reply</button>
+        <div>
+          <span className="block text-xs font-medium text-[#575551] mb-2">Mode template</span>
+          <div className="grid grid-cols-2 bg-[#F0EFEA] p-1 rounded-xl gap-1">
+            <button onClick={() => setUiMode('retro')} className={`py-2 rounded-lg text-xs font-medium transition-colors ${uiMode === 'retro' ? 'bg-white text-[#18181A] shadow-[0_1px_2px_rgba(24,24,26,0.06)]' : 'text-[#575551] hover:text-[#18181A]'}`}>Retro HP & WMP</button>
+            <button onClick={() => setUiMode('ignotes')} className={`py-2 rounded-lg text-xs font-medium transition-colors ${uiMode === 'ignotes' ? 'bg-white text-[#18181A] shadow-[0_1px_2px_rgba(24,24,26,0.06)]' : 'text-[#575551] hover:text-[#18181A]'}`}>IG Notes Reply</button>
+          </div>
         </div>
 
         {uiMode === 'retro' ? (
           <>
             {/* 1. PILIH TEMPLATE */}
-            <div className="space-y-3">
-              <h3 className="font-bold text-gray-900 uppercase text-xs tracking-widest flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#0071E3]"></span> 1. Pilih Template
+            <div className="space-y-2.5 pt-4 border-t border-[#18181A]/[0.08]">
+              <h3 className="font-semibold text-[#18181A] text-sm tracking-[-0.01em]">
+                Pilih bingkai perangkat
               </h3>
-              <div className="grid grid-cols-2 gap-3">
-                <button onClick={() => handleTemplateChange('wmp2')} className={`py-3 rounded-xl text-xs font-bold transition-all ${activeTemplate === 'wmp2' ? 'bg-[#0071E3] text-white shadow-md scale-100' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 scale-95'}`}>WMP Biru</button>
-                <button onClick={() => handleTemplateChange('wmp1')} className={`py-3 rounded-xl text-xs font-bold transition-all ${activeTemplate === 'wmp1' ? 'bg-[#EFA0BE] text-white shadow-md scale-100' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 scale-95'}`}>WMP Pink</button>
-                <button onClick={() => handleTemplateChange('phone1')} className={`py-3 rounded-xl text-xs font-bold transition-all ${activeTemplate === 'phone1' ? 'bg-[#EAA6C1] text-white shadow-md scale-100' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 scale-95'}`}>Nokia Pink</button>
-                <button onClick={() => handleTemplateChange('phone2')} className={`py-3 rounded-xl text-xs font-bold transition-all ${activeTemplate === 'phone2' ? 'bg-[#4B5E78] text-white shadow-md scale-100' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 scale-95'}`}>Nokia Biru</button>
+              <div className="grid grid-cols-2 gap-2">
+                <button onClick={() => handleTemplateChange('wmp2')} className={`py-2.5 px-3 rounded-lg text-xs font-medium border transition-colors ${activeTemplate === 'wmp2' ? 'bg-[#18181A] text-white border-[#18181A]' : 'bg-[#F6F5F2] text-[#575551] border-[#18181A]/[0.08] hover:text-[#18181A]'}`}>WMP Biru</button>
+                <button onClick={() => handleTemplateChange('wmp1')} className={`py-2.5 px-3 rounded-lg text-xs font-medium border transition-colors ${activeTemplate === 'wmp1' ? 'bg-[#18181A] text-white border-[#18181A]' : 'bg-[#F6F5F2] text-[#575551] border-[#18181A]/[0.08] hover:text-[#18181A]'}`}>WMP Pink</button>
+                <button onClick={() => handleTemplateChange('phone1')} className={`py-2.5 px-3 rounded-lg text-xs font-medium border transition-colors ${activeTemplate === 'phone1' ? 'bg-[#18181A] text-white border-[#18181A]' : 'bg-[#F6F5F2] text-[#575551] border-[#18181A]/[0.08] hover:text-[#18181A]'}`}>Nokia Pink</button>
+                <button onClick={() => handleTemplateChange('phone2')} className={`py-2.5 px-3 rounded-lg text-xs font-medium border transition-colors ${activeTemplate === 'phone2' ? 'bg-[#18181A] text-white border-[#18181A]' : 'bg-[#F6F5F2] text-[#575551] border-[#18181A]/[0.08] hover:text-[#18181A]'}`}>Nokia Biru</button>
               </div>
             </div>
 
             {/* 2. SETTING VISUAL LAYAR */}
-            <div className="space-y-4 pt-4 border-t border-gray-200/60">
-              <h3 className="font-bold text-gray-900 uppercase text-xs tracking-widest flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#FF9500]"></span> 2. Gaya Tampilan Layar
+            <div className="space-y-3.5 pt-4 border-t border-[#18181A]/[0.08]">
+              <h3 className="font-semibold text-[#18181A] text-sm tracking-[-0.01em]">
+                Gaya layar & tipografi
               </h3>
                <div className="grid grid-cols-3 gap-3">
-                 <div className="col-span-3 flex bg-gray-100 p-1.5 rounded-xl border border-gray-200/50">
-                    <button onClick={() => setFontFamily('impact')} className={`flex-1 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${fontFamily === 'impact' ? 'bg-white shadow text-[#FF9500]' : 'text-gray-500'}`} style={{fontFamily: 'Impact'}}>WMP / Meme</button>
-                    <button onClick={() => setFontFamily('pixel')} className={`flex-1 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${fontFamily === 'pixel' ? 'bg-white shadow text-[#FF9500]' : 'text-gray-500'}`} style={{fontFamily: '"Courier New"'}}>HP Pixel</button>
-                    <button onClick={() => setFontFamily('arial')} className={`flex-1 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${fontFamily === 'arial' ? 'bg-white shadow text-[#FF9500]' : 'text-gray-500'}`} style={{fontFamily: 'Arial'}}>Modern</button>
+                 <div className="col-span-3 grid grid-cols-3 bg-[#F0EFEA] p-1 rounded-xl gap-1">
+                    <button onClick={() => setFontFamily('impact')} className={`py-1.5 rounded-lg text-xs font-medium transition-colors ${fontFamily === 'impact' ? 'bg-white text-[#18181A] shadow-[0_1px_2px_rgba(24,24,26,0.06)]' : 'text-[#575551] hover:text-[#18181A]'}`}>Impact</button>
+                    <button onClick={() => setFontFamily('pixel')} className={`py-1.5 rounded-lg text-xs font-medium transition-colors ${fontFamily === 'pixel' ? 'bg-white text-[#18181A] shadow-[0_1px_2px_rgba(24,24,26,0.06)]' : 'text-[#575551] hover:text-[#18181A]'}`}>Monospace</button>
+                    <button onClick={() => setFontFamily('arial')} className={`py-1.5 rounded-lg text-xs font-medium transition-colors ${fontFamily === 'arial' ? 'bg-white text-[#18181A] shadow-[0_1px_2px_rgba(24,24,26,0.06)]' : 'text-[#575551] hover:text-[#18181A]'}`}>Sans</button>
                  </div>
                  
                  <div className="col-span-1">
-                   <label className="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase">Bg Layar</label>
-                   <input type="color" value={screenBg} onChange={(e) => setScreenBg(e.target.value)} className="w-full h-10 rounded-lg cursor-pointer border-0 p-0" />
+                   <label className="block text-xs font-medium text-[#575551] mb-1">Latar layar</label>
+                   <input type="color" value={screenBg} onChange={(e) => setScreenBg(e.target.value)} className="w-full h-9 rounded-lg cursor-pointer border border-[#18181A]/[0.1] bg-[#F6F5F2] p-0.5" />
                  </div>
                  <div className="col-span-1">
-                   <label className="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase">Warna Teks</label>
-                   <input type="color" value={textColor} onChange={(e) => setTextColor(e.target.value)} className="w-full h-10 rounded-lg cursor-pointer border-0 p-0" />
+                   <label className="block text-xs font-medium text-[#575551] mb-1">Warna teks</label>
+                   <input type="color" value={textColor} onChange={(e) => setTextColor(e.target.value)} className="w-full h-9 rounded-lg cursor-pointer border border-[#18181A]/[0.1] bg-[#F6F5F2] p-0.5" />
                  </div>
-                 <div className="col-span-1 flex items-center justify-center pt-5">
-                    <label className="flex items-center gap-2 cursor-pointer bg-white/60 p-2 rounded-lg border border-gray-200 w-full justify-center">
-                      <input type="checkbox" checked={showGrid} onChange={() => setShowGrid(!showGrid)} className="w-4 h-4 accent-[#FF9500]" />
-                      <span className="text-[10px] font-bold text-gray-700 uppercase">Efek LCD</span>
+                 <div className="col-span-1 flex items-end">
+                    <label className="flex items-center gap-2 cursor-pointer bg-[#F6F5F2] h-9 px-2.5 rounded-lg border border-[#18181A]/[0.1] w-full justify-center">
+                      <input type="checkbox" checked={showGrid} onChange={() => setShowGrid(!showGrid)} className="w-3.5 h-3.5 accent-[#18181A]" />
+                      <span className="text-xs font-medium text-[#18181A]">Grid LCD</span>
                     </label>
                  </div>
                </div>
             </div>
 
             {/* 3. EDITOR TEKS (HEADER & BODY) */}
-            <div className="space-y-4 pt-4 border-t border-gray-200/60">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold text-gray-900 uppercase text-xs tracking-widest flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#34C759]"></span> 3. Edit Konten Teks
+            <div className="space-y-3.5 pt-4 border-t border-[#18181A]/[0.08]">
+              <div className="flex justify-between items-center">
+                <h3 className="font-semibold text-[#18181A] text-sm tracking-[-0.01em]">
+                  Konten teks layar
                 </h3>
                 {/* ALIGNMENT GLOBAL */}
-                <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200/50">
-                  <button onClick={() => setTextAlign('left')} className={`px-3 py-1.5 rounded-md text-xs font-semibold ${textAlign === 'left' ? 'bg-white shadow text-black' : 'text-gray-500'}`}>Left</button>
-                  <button onClick={() => setTextAlign('center')} className={`px-3 py-1.5 rounded-md text-xs font-semibold ${textAlign === 'center' ? 'bg-white shadow text-black' : 'text-gray-500'}`}>Center</button>
-                  <button onClick={() => setTextAlign('right')} className={`px-3 py-1.5 rounded-md text-xs font-semibold ${textAlign === 'right' ? 'bg-white shadow text-black' : 'text-gray-500'}`}>Right</button>
+                <div className="flex bg-[#F0EFEA] p-1 rounded-lg gap-0.5">
+                  <button onClick={() => setTextAlign('left')} className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${textAlign === 'left' ? 'bg-white text-[#18181A] shadow-[0_1px_2px_rgba(24,24,26,0.06)]' : 'text-[#575551]'}`}>Kiri</button>
+                  <button onClick={() => setTextAlign('center')} className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${textAlign === 'center' ? 'bg-white text-[#18181A] shadow-[0_1px_2px_rgba(24,24,26,0.06)]' : 'text-[#575551]'}`}>Tengah</button>
+                  <button onClick={() => setTextAlign('right')} className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${textAlign === 'right' ? 'bg-white text-[#18181A] shadow-[0_1px_2px_rgba(24,24,26,0.06)]' : 'text-[#575551]'}`}>Kanan</button>
                 </div>
               </div>
 
-              <div className="bg-white/60 p-5 rounded-2xl border border-gray-200/60 space-y-4 shadow-sm">
+              <div className="bg-[#F6F5F2] p-4 rounded-xl border border-[#18181A]/[0.08] space-y-3">
                  <div className="flex justify-between items-center">
-                    <label className="text-xs font-bold text-gray-700 uppercase tracking-wide">Teks Header</label>
-                    <div className="flex items-center gap-3">
-                      <button onClick={() => setIsHeaderBold(!isHeaderBold)} className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold transition-all ${isHeaderBold ? 'bg-[#34C759] text-white shadow-sm' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`}>B</button>
-                      <span className="text-[11px] font-bold text-[#34C759] bg-[#34C759]/10 px-2 py-1.5 rounded-md">Size: {headerSize}px</span>
+                    <label className="text-xs font-medium text-[#575551]">Teks header</label>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => setIsHeaderBold(!isHeaderBold)} className={`w-7 h-7 rounded-md flex items-center justify-center text-xs font-bold transition-colors ${isHeaderBold ? 'bg-[#18181A] text-white' : 'bg-[#EAE8E1] text-[#575551] hover:text-[#18181A]'}`}>B</button>
+                      <span className="font-mono text-xs font-medium text-[#575551] bg-white border border-[#18181A]/[0.08] px-2 py-1 rounded-md tabular-nums">{headerSize}px</span>
                     </div>
                  </div>
-                 <input type="range" min="0" max="100" value={headerSize} onChange={(e) => setHeaderSize(Number(e.target.value))} className="w-full accent-[#34C759]" />
-                 <input type="text" value={headerText} onChange={(e) => setHeaderText(e.target.value)} placeholder="Teks Header" className="w-full p-3.5 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#34C759]/30 focus:border-[#34C759]" />
+                 <input type="range" min="0" max="100" value={headerSize} onChange={(e) => setHeaderSize(Number(e.target.value))} className="w-full accent-[#18181A]" />
+                 <input type="text" value={headerText} onChange={(e) => setHeaderText(e.target.value)} placeholder="Teks header" className="w-full px-3 py-2 bg-white border border-[#18181A]/[0.1] rounded-lg text-sm text-[#18181A] focus:outline-none focus:border-[#18181A]/30" />
               </div>
 
-              <div className="bg-white/60 p-5 rounded-2xl border border-gray-200/60 space-y-4 shadow-sm">
+              <div className="bg-[#F6F5F2] p-4 rounded-xl border border-[#18181A]/[0.08] space-y-3">
                  <div className="flex justify-between items-center">
-                    <label className="text-xs font-bold text-gray-700 uppercase tracking-wide">Teks Utama (Body)</label>
-                    <div className="flex items-center gap-3">
-                      <button onClick={() => setIsBodyBold(!isBodyBold)} className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold transition-all ${isBodyBold ? 'bg-[#34C759] text-white shadow-sm' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`}>B</button>
-                      <span className="text-[11px] font-bold text-[#34C759] bg-[#34C759]/10 px-2 py-1.5 rounded-md">Size: {bodySize}px</span>
+                    <label className="text-xs font-medium text-[#575551]">Teks utama (body)</label>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => setIsBodyBold(!isBodyBold)} className={`w-7 h-7 rounded-md flex items-center justify-center text-xs font-bold transition-colors ${isBodyBold ? 'bg-[#18181A] text-white' : 'bg-[#EAE8E1] text-[#575551] hover:text-[#18181A]'}`}>B</button>
+                      <span className="font-mono text-xs font-medium text-[#575551] bg-white border border-[#18181A]/[0.08] px-2 py-1 rounded-md tabular-nums">{bodySize}px</span>
                     </div>
                  </div>
-                 <input type="range" min="0" max="100" value={bodySize} onChange={(e) => setBodySize(Number(e.target.value))} className="w-full accent-[#34C759]" />
-                 <textarea value={bodyText} onChange={(e) => setBodyText(e.target.value)} placeholder="Teks Utama..." className="w-full p-3.5 bg-white border border-gray-200 rounded-xl text-sm font-medium min-h-[100px] resize-y text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#34C759]/30 focus:border-[#34C759]" />
+                 <input type="range" min="0" max="100" value={bodySize} onChange={(e) => setBodySize(Number(e.target.value))} className="w-full accent-[#18181A]" />
+                 <textarea value={bodyText} onChange={(e) => setBodyText(e.target.value)} placeholder="Teks utama..." className="w-full px-3 py-2 bg-white border border-[#18181A]/[0.1] rounded-lg text-sm min-h-[88px] resize-y text-[#18181A] focus:outline-none focus:border-[#18181A]/30" />
               </div>
             </div>
           </>
         ) : (
-          <div className="space-y-6">
-            <div className="space-y-4">
-              <h3 className="font-bold text-gray-900 uppercase text-xs tracking-widest flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#E1306C]"></span> 1. Info Akun
-              </h3>
-              <div>
-                <label className="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase">Waktu (contoh: 20h)</label>
-                <input type="text" value={igTime} onChange={(e) => setIgTime(e.target.value)} className="w-full p-3.5 bg-white border border-gray-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#E1306C]/30 focus:border-[#E1306C]" />
-              </div>
+          <div className="space-y-4 pt-4 border-t border-[#18181A]/[0.08]">
+            <div>
+              <label className="block text-xs font-medium text-[#575551] mb-1.5">Waktu tampil (contoh: 20h)</label>
+              <input type="text" value={igTime} onChange={(e) => setIgTime(e.target.value)} className="w-full px-3 py-2 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-sm text-[#18181A] tabular-nums focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
             </div>
 
-            <div className="space-y-4 pt-4 border-t border-gray-200/60">
-              <h3 className="font-bold text-gray-900 uppercase text-xs tracking-widest flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#E1306C]"></span> 2. Teks Notes
-              </h3>
-              <textarea value={igNoteText} onChange={(e) => setIgNoteText(e.target.value)} placeholder="Tulis catatan notes..." className="w-full p-3.5 bg-white border border-gray-200 rounded-xl text-sm font-medium h-28 resize-y focus:outline-none focus:ring-2 focus:ring-[#E1306C]/30 focus:border-[#E1306C]"></textarea>
+            <div>
+              <label className="block text-xs font-medium text-[#575551] mb-1.5">Isi catatan IG Notes</label>
+              <textarea value={igNoteText} onChange={(e) => setIgNoteText(e.target.value)} placeholder="Tulis catatan notes..." className="w-full px-3 py-2.5 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-sm h-28 resize-y text-[#18181A] focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors"></textarea>
             </div>
           </div>
         )}
 
-        <button onClick={exportImage} className="w-full bg-[#1D1D1F] hover:bg-black text-white font-semibold py-4 rounded-xl shadow-lg shadow-black/10 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98] mt-4">
-          Download Hasil Mockup
+        <button onClick={exportImage} className="w-full bg-[#18181A] hover:bg-[#2C2C2F] text-white font-medium text-sm py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export Mockup PNG
         </button>
       </div>
 
       {/* ==========================================
           PANEL PREVIEW KANAN
       ========================================== */}
-      <div className="bg-[#E5E5EA] border border-gray-200 rounded-[2rem] p-6 flex flex-col items-center justify-center min-h-[500px] overflow-hidden shadow-inner relative">
-        <div className="absolute inset-0 opacity-40 bg-[radial-gradient(#C7C7CC_1px,transparent_1px)] [background-size:16px_16px]"></div>
+      <div className="bg-[#EAE8E1] border border-[#18181A]/[0.08] rounded-2xl flex flex-col min-h-[580px] overflow-hidden relative">
+        <div className="h-10 px-4 border-b border-[#18181A]/[0.06] bg-[#F0EFEA]/70 flex items-center justify-between text-xs text-[#85827C]">
+          <span className="font-medium text-[#575551]">Canvas Preview</span>
+          <span className="font-mono tabular-nums">{specLabel}</span>
+        </div>
 
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', position: 'relative', zIndex: 10 }}>
+        <div className="flex-1 flex items-center justify-center p-6 relative">
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', position: 'relative', zIndex: 10 }}>
           
           {uiMode === 'retro' ? (
             <div ref={previewRef} style={{ 
@@ -325,6 +331,7 @@ export default function RetroUITool() {
                </div>
             </div>
           )}
+          </div>
         </div>
       </div>
     </div>

@@ -184,82 +184,92 @@ export default function WaChatTool() {
     }
   };
 
+  const specLabel = `375 × 812 px · iOS (${waTheme}) · 3× PNG`;
+
   return (
-    <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 z-10 animate-in fade-in zoom-in-95">
+    <div className="w-full grid grid-cols-1 lg:grid-cols-[440px_1fr] gap-6 items-start">
       
       {/* KOTAK KONTROL / PENGATURAN */}
-      <div className="bg-white/70 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-500 rounded-[2rem] p-8 border border-white/60 space-y-8 h-fit">
+      <div className="bg-[#FFFFFF] rounded-2xl p-6 border border-[#18181A]/[0.08] space-y-5 h-fit">
         
-        <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200/50">
-            <button onClick={() => setWaTheme('light')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${waTheme === 'light' ? 'bg-white shadow text-[#007AFF]' : 'text-gray-500 hover:text-gray-700'}`}>☀️ MODE TERANG</button>
-            <button onClick={() => setWaTheme('dark')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${waTheme === 'dark' ? 'bg-white shadow text-[#007AFF]' : 'text-gray-500 hover:text-gray-700'}`}>🌙 MODE MALAM</button>
-        </div>
-
-        <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200/50">
-            <button onClick={() => setChatType('personal')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${chatType === 'personal' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>👤 PERSONAL CHAT</button>
-            <button onClick={() => setChatType('group')} className={`flex-1 py-2 rounded-md font-semibold text-xs tracking-wide transition-all ${chatType === 'group' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>👥 GROUP CHAT</button>
-        </div>
-
-        <div className="space-y-4">
-          <h3 className="font-bold text-gray-900 uppercase text-xs tracking-widest flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-[#007AFF]"></span> Header Settings</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-2">Nama Kontak / Grup</label>
-              <input type="text" value={chatName} onChange={(e) => setChatName(e.target.value)} className="w-full p-3.5 bg-white border border-gray-200 focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/20 rounded-xl font-medium text-sm text-gray-900 outline-none transition-all" />
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <span className="block text-xs font-medium text-[#575551] mb-1.5">Tema tampilan</span>
+            <div className="grid grid-cols-2 bg-[#F0EFEA] p-1 rounded-xl gap-1">
+              <button onClick={() => setWaTheme('light')} className={`py-1.5 rounded-lg text-xs font-medium transition-colors ${waTheme === 'light' ? 'bg-white text-[#18181A] shadow-[0_1px_2px_rgba(24,24,26,0.06)]' : 'text-[#575551] hover:text-[#18181A]'}`}>Terang</button>
+              <button onClick={() => setWaTheme('dark')} className={`py-1.5 rounded-lg text-xs font-medium transition-colors ${waTheme === 'dark' ? 'bg-white text-[#18181A] shadow-[0_1px_2px_rgba(24,24,26,0.06)]' : 'text-[#575551] hover:text-[#18181A]'}`}>Gelap</button>
             </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-2">Foto Profil (Avatar)</label>
-              <input type="file" onChange={(e) => handleImageUpload(e, setWaGroupAvatar)} className="text-sm block w-full file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#007AFF]/10 file:text-[#007AFF] hover:file:bg-[#007AFF]/20 transition-all cursor-pointer text-gray-500" />
+          </div>
+
+          <div>
+            <span className="block text-xs font-medium text-[#575551] mb-1.5">Tipe ruang chat</span>
+            <div className="grid grid-cols-2 bg-[#F0EFEA] p-1 rounded-xl gap-1">
+              <button onClick={() => setChatType('personal')} className={`py-1.5 rounded-lg text-xs font-medium transition-colors ${chatType === 'personal' ? 'bg-white text-[#18181A] shadow-[0_1px_2px_rgba(24,24,26,0.06)]' : 'text-[#575551] hover:text-[#18181A]'}`}>Personal</button>
+              <button onClick={() => setChatType('group')} className={`py-1.5 rounded-lg text-xs font-medium transition-colors ${chatType === 'group' ? 'bg-white text-[#18181A] shadow-[0_1px_2px_rgba(24,24,26,0.06)]' : 'text-[#575551] hover:text-[#18181A]'}`}>Grup</button>
             </div>
           </div>
         </div>
 
-        <hr className="border-gray-200" />
+        <div className="space-y-3.5 pt-4 border-t border-[#18181A]/[0.08]">
+          <h3 className="font-semibold text-[#18181A] text-sm tracking-[-0.01em]">Pengaturan header</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-[#575551] mb-1.5">Nama kontak / grup</label>
+              <input type="text" value={chatName} onChange={(e) => setChatName(e.target.value)} className="w-full px-3 py-2 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg text-sm text-[#18181A] focus:outline-none focus:border-[#18181A]/30 focus:bg-white transition-colors" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-[#575551] mb-1.5">Foto profil</label>
+              <input type="file" onChange={(e) => handleImageUpload(e, setWaGroupAvatar)} className="text-xs block w-full file:mr-2.5 file:py-1.5 file:px-3 file:rounded-lg file:border file:border-[#18181A]/[0.08] file:text-xs file:font-medium file:bg-[#F0EFEA] file:text-[#18181A] hover:file:bg-[#EAE8E1] transition-colors cursor-pointer text-[#575551]" />
+            </div>
+          </div>
+        </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3.5 pt-4 border-t border-[#18181A]/[0.08]">
           <div className="flex flex-wrap justify-between items-center gap-2">
-             <h3 className="font-bold text-gray-900 uppercase text-xs tracking-widest flex items-center gap-2">
-               <span className="w-2 h-2 rounded-full bg-[#007AFF]"></span> Daftar Chat ({waMessages.length})
+             <h3 className="font-semibold text-[#18181A] text-sm tracking-[-0.01em] flex items-center gap-1.5">
+               Daftar pesan <span className="font-mono text-xs text-[#85827C] tabular-nums">({waMessages.length})</span>
              </h3>
-             <div className="flex items-center gap-2">
+             <div className="flex items-center gap-1.5">
                <button 
                  type="button" 
                  onClick={randomizeAllTimes} 
                  title="Acak semua jeda waktu antar chat (1, 2, atau 5 menit)" 
-                 className="text-xs bg-blue-50 hover:bg-blue-100 text-[#007AFF] px-3 py-1.5 rounded-lg font-bold transition-all active:scale-95 flex items-center gap-1 border border-blue-200"
+                 className="text-xs bg-[#F0EFEA] hover:bg-[#EAE8E1] text-[#18181A] px-2.5 py-1.5 rounded-lg font-medium transition-colors flex items-center gap-1.5 border border-[#18181A]/[0.08]"
                >
-                 🎲 Acak Waktu
+                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+                 Acak waktu
                </button>
                <button 
                  type="button" 
                  onClick={() => addWaMessage('image')} 
-                 className="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-lg font-bold transition-all active:scale-95 flex items-center gap-1 border border-emerald-200"
+                 className="text-xs bg-[#F0EFEA] hover:bg-[#EAE8E1] text-[#18181A] px-2.5 py-1.5 rounded-lg font-medium transition-colors flex items-center gap-1.5 border border-[#18181A]/[0.08]"
                >
-                 📷 + Gambar
+                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                 + Gambar
                </button>
                <button 
                  type="button" 
                  onClick={() => addWaMessage('text')} 
-                 className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-900 px-3 py-1.5 rounded-lg font-bold transition-all active:scale-95 flex items-center gap-1 border border-gray-200"
+                 className="text-xs bg-[#18181A] hover:bg-[#2C2C2F] text-white px-2.5 py-1.5 rounded-lg font-medium transition-colors flex items-center gap-1"
                >
-                 + Chat Teks
+                 + Teks
                </button>
              </div>
           </div>
 
-          <div className="flex items-center justify-between bg-blue-50/50 p-2.5 rounded-xl border border-blue-100 text-xs text-gray-600">
+          <div className="flex items-center justify-between bg-[#F6F5F2] px-3 py-2 rounded-lg border border-[#18181A]/[0.08] text-xs text-[#575551]">
             <label className="flex items-center gap-2 cursor-pointer select-none">
               <input 
                 type="checkbox" 
                 checked={autoRandomTime} 
                 onChange={(e) => setAutoRandomTime(e.target.checked)} 
-                className="rounded accent-[#007AFF] w-4 h-4 cursor-pointer" 
+                className="rounded accent-[#18181A] w-3.5 h-3.5 cursor-pointer" 
               />
-              <span className="font-medium text-gray-700">Auto jeda acak (1, 2, 5 mnt) saat ubah urutan / tambah chat</span>
+              <span>Jeda waktu otomatis acak (1, 2, 5 mnt) saat geser urutan / tambah pesan</span>
             </label>
           </div>
           
-          <div className="space-y-4 max-h-[460px] overflow-y-auto pr-2 custom-scrollbar">
+          <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1 custom-scrollbar">
             {waMessages.map((msg, index) => (
               <div 
                 key={msg.id} 
@@ -275,20 +285,20 @@ export default function WaChatTool() {
                 onDragOver={(e) => handleDragOver(e, index)}
                 onDrop={(e) => handleDrop(e, index)}
                 onDragEnd={handleDragEnd}
-                className={`p-4 bg-white border rounded-2xl relative shadow-sm transition-all ${
-                  draggedIndex === index ? 'opacity-40 border-[#007AFF] scale-[0.98] bg-blue-50/20' : 'border-gray-200'
+                className={`p-3.5 bg-[#F6F5F2] border rounded-xl relative transition-colors ${
+                  draggedIndex === index ? 'opacity-40 border-[#18181A]/40' : 'border-[#18181A]/[0.08]'
                 } ${
-                  dragOverIndex === index && draggedIndex !== index ? 'ring-2 ring-[#007AFF] border-[#007AFF] bg-blue-50/30' : ''
+                  dragOverIndex === index && draggedIndex !== index ? 'ring-1 ring-[#18181A] border-[#18181A] bg-[#F0EFEA]' : ''
                 }`}
               >
                 {/* BARIS HEADER CHAT: DRAG HANDLE, BADGE, ARROW ATAS/BAWAH, & HAPUS */}
-                <div className="flex items-center justify-between pb-2.5 mb-3 border-b border-gray-100">
+                <div className="flex items-center justify-between pb-2.5 mb-3 border-b border-[#18181A]/[0.06]">
                   <div className="flex items-center gap-2">
                     <div 
-                      className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-[#007AFF] p-1 rounded hover:bg-gray-100 transition-colors" 
+                      className="cursor-grab active:cursor-grabbing text-[#85827C] hover:text-[#18181A] p-1 rounded hover:bg-[#EAE8E1] transition-colors" 
                       title="Tahan & geser untuk memindahkan urutan chat"
                     >
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                         <circle cx="8" cy="5" r="1.5" fill="currentColor" />
                         <circle cx="16" cy="5" r="1.5" fill="currentColor" />
                         <circle cx="8" cy="12" r="1.5" fill="currentColor" />
@@ -297,10 +307,10 @@ export default function WaChatTool() {
                         <circle cx="16" cy="19" r="1.5" fill="currentColor" />
                       </svg>
                     </div>
-                    <span className="text-xs font-bold text-gray-400">#{index + 1}</span>
+                    <span className="font-mono text-xs font-medium text-[#85827C] tabular-nums">#{index + 1}</span>
                     {msg.image && !msg.text && (
-                      <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-200">
-                        📷 Gambar Saja
+                      <span className="text-[11px] font-medium bg-white text-[#575551] px-2 py-0.5 rounded-md border border-[#18181A]/[0.08]">
+                        Gambar saja
                       </span>
                     )}
                   </div>
@@ -310,83 +320,82 @@ export default function WaChatTool() {
                       type="button" 
                       disabled={index === 0} 
                       onClick={() => moveMessage(index, 'up')}
-                      className="w-6 h-6 flex items-center justify-center rounded text-xs text-gray-500 hover:text-[#007AFF] hover:bg-blue-50 disabled:opacity-20 disabled:hover:bg-transparent"
+                      className="w-6 h-6 flex items-center justify-center rounded text-[#575551] hover:text-[#18181A] hover:bg-[#EAE8E1] disabled:opacity-25 disabled:hover:bg-transparent transition-colors"
                       title="Pindah ke atas"
                     >
-                      ▲
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
                     </button>
                     <button 
                       type="button" 
                       disabled={index === waMessages.length - 1} 
                       onClick={() => moveMessage(index, 'down')}
-                      className="w-6 h-6 flex items-center justify-center rounded text-xs text-gray-500 hover:text-[#007AFF] hover:bg-blue-50 disabled:opacity-20 disabled:hover:bg-transparent"
+                      className="w-6 h-6 flex items-center justify-center rounded text-[#575551] hover:text-[#18181A] hover:bg-[#EAE8E1] disabled:opacity-25 disabled:hover:bg-transparent transition-colors"
                       title="Pindah ke bawah"
                     >
-                      ▼
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                     </button>
                     <button 
                       type="button" 
                       onClick={() => removeWaMessage(msg.id)} 
-                      className="w-6 h-6 flex items-center justify-center rounded text-xs text-red-500 hover:text-red-700 hover:bg-red-50 ml-1"
+                      className="w-6 h-6 flex items-center justify-center rounded text-[#85827C] hover:text-[#C83E2B] hover:bg-[#C83E2B]/10 ml-0.5 transition-colors"
                       title="Hapus chat"
                     >
-                      ✕
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </button>
                   </div>
                 </div>
 
                 {/* PILIHAN SENDER */}
-                <div className="grid grid-cols-2 gap-3 mb-3">
-                  <select value={msg.sender} onChange={(e) => updateWaMessage(msg.id, 'sender', e.target.value)} className="p-2.5 bg-white border border-gray-200 text-gray-900 rounded-xl text-sm font-medium focus:outline-none focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/20">
-                    <option value="other">Orang Lain (Kiri)</option>
-                    <option value="me">Saya (Kanan)</option>
+                <div className="grid grid-cols-2 gap-2.5 mb-2.5">
+                  <select value={msg.sender} onChange={(e) => updateWaMessage(msg.id, 'sender', e.target.value)} className="px-2.5 py-2 bg-white border border-[#18181A]/[0.1] text-[#18181A] rounded-lg text-xs font-medium focus:outline-none focus:border-[#18181A]/30">
+                    <option value="other">Orang lain (kiri)</option>
+                    <option value="me">Saya (kanan)</option>
                   </select>
                   {msg.sender === 'other' && chatType === 'group' ? (
-                    <input type="text" value={msg.name} onChange={(e) => updateWaMessage(msg.id, 'name', e.target.value)} placeholder="Nama Pengirim" className="p-2.5 bg-white border border-gray-200 text-gray-900 placeholder-gray-400 rounded-xl text-sm font-medium focus:outline-none focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/20" />
-                  ) : ( <div className="p-2.5 text-sm font-medium text-gray-400 bg-gray-50 border border-transparent rounded-xl text-center cursor-not-allowed">{msg.sender === 'me' ? 'Anda' : 'Nama Sembunyi (Personal)'}</div> )}
+                    <input type="text" value={msg.name} onChange={(e) => updateWaMessage(msg.id, 'name', e.target.value)} placeholder="Nama pengirim" className="px-2.5 py-2 bg-white border border-[#18181A]/[0.1] text-[#18181A] placeholder-[#85827C] rounded-lg text-xs font-medium focus:outline-none focus:border-[#18181A]/30" />
+                  ) : ( <div className="px-2.5 py-2 text-xs text-[#85827C] bg-[#F0EFEA] border border-transparent rounded-lg text-center cursor-not-allowed">{msg.sender === 'me' ? 'Anda' : 'Personal'}</div> )}
                 </div>
 
                 {/* GAMBAR ATTACHMENT JIKA ADA */}
                 {msg.image ? (
-                  <div className="flex items-center gap-3 p-2.5 bg-gray-50 border border-gray-200 rounded-xl mb-3">
-                    <img src={msg.image} alt="Attachment" className="w-14 h-14 object-cover rounded-lg border border-gray-200 flex-shrink-0" />
+                  <div className="flex items-center gap-3 p-2.5 bg-white border border-[#18181A]/[0.08] rounded-lg mb-2.5">
+                    <img src={msg.image} alt="Attachment" className="w-12 h-12 object-cover rounded-md border border-[#18181A]/[0.08] flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <span className="text-xs font-bold text-gray-700 block truncate">Gambar Terpasang</span>
-                      <div className="flex items-center gap-3 mt-1.5">
-                        <label className="text-xs font-semibold text-[#007AFF] hover:underline cursor-pointer">
+                      <span className="text-xs font-medium text-[#18181A] block truncate">Gambar terpasang</span>
+                      <div className="flex items-center gap-3 mt-1">
+                        <label className="text-xs font-medium text-[#18181A] hover:underline cursor-pointer">
                           Ganti
                           <input type="file" accept="image/*" onChange={(e) => handleWaMessageImage(msg.id, e)} className="hidden" />
                         </label>
-                        <span className="text-gray-300">•</span>
-                        <button type="button" onClick={() => updateWaMessage(msg.id, 'image', '')} className="text-xs font-semibold text-[#FF3B30] hover:underline">
-                          Hapus Gambar
+                        <span className="text-[#85827C]">·</span>
+                        <button type="button" onClick={() => updateWaMessage(msg.id, 'image', '')} className="text-xs font-medium text-[#C83E2B] hover:underline">
+                          Hapus gambar
                         </button>
                       </div>
                     </div>
                   </div>
                 ) : !msg.text ? (
-                  <label className="flex flex-col items-center justify-center p-3 border-2 border-dashed border-[#007AFF]/40 hover:border-[#007AFF] bg-blue-50/40 rounded-xl cursor-pointer transition-colors mb-3">
-                    <span className="text-xl">📷</span>
-                    <span className="text-xs font-semibold text-[#007AFF] mt-1">Pilih Gambar Pesan</span>
-                    <span className="text-[10px] text-gray-400">Klik untuk upload foto/gambar</span>
+                  <label className="flex flex-col items-center justify-center p-3 border border-dashed border-[#18181A]/25 hover:border-[#18181A]/50 bg-white rounded-lg cursor-pointer transition-colors mb-2.5">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#575551" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <span className="text-xs font-medium text-[#18181A] mt-1">Pilih gambar pesan</span>
                     <input type="file" accept="image/*" onChange={(e) => handleWaMessageImage(msg.id, e)} className="hidden" />
                   </label>
                 ) : null}
 
                 {/* TEXTAREA PESAN / CAPTION */}
-                <div className="relative mb-3">
+                <div className="relative mb-2.5">
                   <textarea 
                     value={msg.text} 
                     onChange={(e) => updateWaMessage(msg.id, 'text', e.target.value)} 
-                    placeholder={msg.image ? "Caption gambar (bisa dikosongkan jika hanya gambar)..." : "Isi pesan..."} 
-                    className="w-full p-3 bg-white border border-gray-200 text-gray-900 placeholder-gray-400 rounded-xl text-sm min-h-[55px] focus:outline-none focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/20 font-medium leading-[1.6]" 
+                    placeholder={msg.image ? "Caption gambar (opsional)..." : "Tulis pesan..."} 
+                    className="w-full px-3 py-2 bg-white border border-[#18181A]/[0.1] text-[#18181A] placeholder-[#85827C] rounded-lg text-sm min-h-[52px] focus:outline-none focus:border-[#18181A]/30 leading-relaxed" 
                   />
                   {getDetectedBannedWords(msg.text).length > 0 && (
-                    <div className="mt-2 p-2 bg-[#FF3B30]/10 border border-[#FF3B30]/20 rounded-lg space-y-1">
-                      <p className="text-[11px] text-[#FF3B30] font-bold flex gap-1 items-center">⚠️ Mengandung Banned Word:</p>
-                      <ul className="text-[11px] text-gray-700 list-disc pl-4 space-y-2">
+                    <div className="mt-2 p-2.5 bg-[#C83E2B]/[0.06] border border-[#C83E2B]/20 rounded-lg space-y-1">
+                      <p className="text-xs text-[#C83E2B] font-semibold">Terdeteksi kata sensitif:</p>
+                      <ul className="text-xs text-[#575551] list-disc pl-4 space-y-1">
                         {getDetectedBannedWords(msg.text).map((d: BannedItem, i: number) => (
-                          <li key={i}>Hapus: <span className="font-bold text-white bg-[#FF3B30] px-1 rounded">{d.word}</span> <br/> Saran: <span className="italic text-green-600">{d.suggestion}</span></li>
+                          <li key={i}><span className="font-semibold text-white bg-[#C83E2B] px-1.5 py-0.5 rounded">{d.word}</span> — gunakan: <span className="font-medium text-[#1F7A3E]">{d.suggestion}</span></li>
                         ))}
                       </ul>
                     </div>
@@ -394,15 +403,15 @@ export default function WaChatTool() {
                 </div>
                 
                 {/* WAKTU DAN OPSI ATTACH GAMBAR JIKA BELUM ADA */}
-                <div className="grid grid-cols-2 gap-3 items-center">
+                <div className="grid grid-cols-2 gap-2.5 items-center">
                   <div>
-                    <label className="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Jam Kirim</label>
-                    <input type="time" value={msg.time} onChange={(e) => updateWaMessage(msg.id, 'time', e.target.value)} className="w-full p-2.5 bg-white border border-gray-200 text-gray-900 rounded-xl text-sm font-medium focus:outline-none focus:border-[#007AFF]" />
+                    <label className="block text-xs font-medium text-[#575551] mb-1">Jam kirim</label>
+                    <input type="time" value={msg.time} onChange={(e) => updateWaMessage(msg.id, 'time', e.target.value)} className="w-full px-2.5 py-1.5 bg-white border border-[#18181A]/[0.1] text-[#18181A] rounded-lg text-xs font-mono tabular-nums focus:outline-none focus:border-[#18181A]/30" />
                   </div>
                   {!msg.image && msg.text && (
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-400 mb-1 uppercase">Lampirkan Gambar</label>
-                      <input type="file" accept="image/*" onChange={(e) => handleWaMessageImage(msg.id, e)} className="text-[10px] w-full p-1.5 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:bg-gray-100 file:text-gray-600 cursor-pointer text-gray-500 border border-gray-200 rounded-xl" />
+                      <label className="block text-xs font-medium text-[#575551] mb-1">Lampirkan gambar</label>
+                      <input type="file" accept="image/*" onChange={(e) => handleWaMessageImage(msg.id, e)} className="text-[11px] w-full p-1 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-[#F0EFEA] file:text-[#18181A] cursor-pointer text-[#575551] bg-white border border-[#18181A]/[0.1] rounded-lg" />
                     </div>
                   )}
                 </div>
@@ -410,15 +419,22 @@ export default function WaChatTool() {
             ))}
           </div>
         </div>
-        <button onClick={exportWaImage} className="w-full bg-[#007AFF] hover:bg-[#005bb5] text-white font-semibold py-4 rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]">📸 Download WA Chat (iOS Style)</button>
+        <button onClick={exportWaImage} className="w-full bg-[#18181A] hover:bg-[#2C2C2F] text-white font-medium text-sm py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export WhatsApp PNG
+        </button>
       </div>
 
       {/* KOTAK PREVIEW */}
-      <div className="bg-[#E5E5EA] border border-gray-200 rounded-[2rem] p-6 flex items-center justify-center min-h-[500px] overflow-hidden shadow-inner relative">
-         <div className="absolute inset-0 opacity-40 bg-[radial-gradient(#C7C7CC_1px,transparent_1px)] [background-size:16px_16px]"></div>
-        <div style={{ padding: '20px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
-          
-          <div ref={waPreviewRef} style={{ 
+      <div className="bg-[#EAE8E1] border border-[#18181A]/[0.08] rounded-2xl flex flex-col min-h-[580px] overflow-hidden relative">
+        <div className="h-10 px-4 border-b border-[#18181A]/[0.06] bg-[#F0EFEA]/70 flex items-center justify-between text-xs text-[#85827C]">
+          <span className="font-medium text-[#575551]">Canvas Preview</span>
+          <span className="font-mono tabular-nums">{specLabel}</span>
+        </div>
+        <div className="flex-1 flex items-center justify-center overflow-x-auto p-6 relative">
+          <div style={{ padding: '20px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
+            
+            <div ref={waPreviewRef} style={{ 
             backgroundImage: waTheme === 'dark' ? 'url("/bg/wadark.jpg")' : 'url("/bg/wawhite.jpg")', 
             backgroundSize: 'cover', backgroundPosition: 'center', 
             backgroundColor: waTheme === 'dark' ? '#000000' : '#EFEFF4', // iOS base colors
@@ -584,6 +600,7 @@ export default function WaChatTool() {
                </div>
             </div>
 
+            </div>
           </div>
         </div>
       </div>

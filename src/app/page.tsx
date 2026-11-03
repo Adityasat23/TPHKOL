@@ -9,11 +9,20 @@ import WaChatTool from '../components/tools/WaChatTool';
 import DisclaimerTool from '../components/tools/DisclaimerTool';
 import RetroUITool from '../components/tools/RetroUITool';
 
-// Hapus 'ai-prompt' dan pastikan 'retro' ada di sini
-type TabType = 'downloader' | 'comment' | 'product' | 'disclaimer' | 'checker' | 'wa' | 'retro';
+type TabType = 'product' | 'comment' | 'wa' | 'retro' | 'disclaimer' | 'checker' | 'downloader';
+
+const TABS: { id: TabType; label: string; spec: string }[] = [
+  { id: 'product', label: 'Product Card', spec: 'TK · Shopee' },
+  { id: 'comment', label: 'Social Comment', spec: 'TikTok · Threads' },
+  { id: 'wa', label: 'WhatsApp Chat', spec: 'iOS 375×812' },
+  { id: 'retro', label: 'UI Template', spec: 'Retro · IG Notes' },
+  { id: 'disclaimer', label: 'Disclaimer', spec: 'Promo Copy' },
+  { id: 'checker', label: 'Word Checker', spec: 'Policy Scan' },
+  { id: 'downloader', label: 'Downloader', spec: 'Video · Audio' },
+];
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<TabType>('product'); // Default diubah ke downloader
+  const [activeTab, setActiveTab] = useState<TabType>('product');
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
@@ -22,52 +31,66 @@ export default function Home() {
 
   if (!isReady) return null;
 
+  const currentTab = TABS.find((t) => t.id === activeTab) || TABS[0];
+
   return (
-    <main className="min-h-screen bg-[#F5F5F7] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-50 via-[#F5F5F7] to-gray-200 flex flex-col items-center py-12 px-4 font-sans text-[#1D1D1F] relative overflow-hidden selection:bg-gray-300/50 selection:text-[#1D1D1F]">
-      
-      <div className="max-w-3xl w-full text-center mb-10 mt-6 relative z-10">
-        <h1 className="text-4xl md:text-5xl font-semibold text-transparent bg-clip-text bg-gradient-to-b from-black to-gray-600 mb-3 tracking-tight leading-tight">
-          Editor Tools
-        </h1>
-        <p className="text-gray-500 text-base font-medium tracking-wide max-w-xl mx-auto">
-          Semoga membantu, kalo bug Ding aja
-        </p>
-      </div>
+    <div className="min-h-screen bg-[#F6F5F2] text-[#18181A] flex flex-col font-sans antialiased selection:bg-[#18181A]/10 selection:text-[#18181A]">
+      {/* TOP STUDIO WORKBENCH BAR */}
+      <header className="sticky top-0 z-30 h-14 bg-[#F6F5F2]/95 backdrop-blur-sm border-b border-[#18181A]/[0.08] px-6 flex items-center justify-between gap-6">
+        <div className="flex items-center gap-3 shrink-0">
+          <span className="w-2 h-2 rounded-full bg-[#C83E2B]" />
+          <span className="text-[15px] font-medium tracking-tight text-[#18181A]">Timephoria Studio</span>
+          <span className="text-[#85827C] text-xs font-mono hidden sm:inline">/</span>
+          <span className="text-xs text-[#85827C] hidden sm:inline">Creative Production Workbench</span>
+        </div>
 
-      <div className="flex bg-white/50 backdrop-blur-3xl rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.1)] border-[1.5px] border-white p-1.5 mb-10 w-full max-w-5xl justify-center gap-2 z-10 overflow-x-auto custom-scrollbar">
-        {/* Hapus 'ai-prompt' dari array ini */}
-        {(['downloader', 'comment', 'product', 'disclaimer', 'checker', 'wa', 'retro'] as TabType[]).map((tab) => (
-          <button 
-            key={tab}
-            onClick={() => setActiveTab(tab)} 
-            className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap capitalize ${activeTab === tab ? 'bg-white text-black shadow-sm' : 'text-gray-500 hover:text-gray-900'}`}
-          >
-            {/* Bersihkan logika ai-prompt */}
-            {tab === 'wa' ? 'WA Chat' : tab === 'retro' ? 'UI & UX Template' : tab.replace('-', ' ')}
-          </button>
-        ))}
-      </div>
+        <nav className="flex items-center gap-1 overflow-x-auto custom-scrollbar py-1">
+          {TABS.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`h-8 px-3 rounded-lg text-[13px] transition-colors duration-150 whitespace-nowrap flex items-center gap-2 ${
+                  isActive
+                    ? 'bg-[#18181A] text-[#FFFFFF] font-medium'
+                    : 'text-[#575551] hover:text-[#18181A] hover:bg-[#18181A]/[0.04] font-normal'
+                }`}
+              >
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </nav>
 
-      {/* RENDER HARUS PRESISI, TIDAK BOLEH TERTUKAR */}
-      {activeTab === 'downloader' && <DownloaderTool />}
-      {activeTab === 'comment' && <FakeCommentTool />}
-      {activeTab === 'product' && <ProductCardTool />}
-      {activeTab === 'disclaimer' && <DisclaimerTool />}
-      {activeTab === 'checker' && <WordCheckerTool />}
-      {activeTab === 'wa' && <WaChatTool/>}
-      {activeTab === 'retro' && <RetroUITool />}
+        <div className="hidden xl:flex items-center gap-2 shrink-0 font-mono text-[11px] text-[#85827C] tabular-nums">
+          <span>{currentTab.spec}</span>
+        </div>
+      </header>
 
-      <footer style={{ marginTop: '60px', paddingTop: '30px', paddingBottom: '30px', textAlign: 'center', width: '100%', maxWidth: '1152px', borderTop: '1px solid rgba(0,0,0,0.05)', zIndex: 10 }}>
-        <p style={{ color: '#8E8E93', fontSize: '14px', fontWeight: 500 }}>
-          &copy; {new Date().getFullYear()} <span style={{ fontWeight: '600', color: '#1D1D1F' }}>Internal Tools</span>. All rights reserved.
-        </p>
+      {/* MAIN WORKBENCH CONTENT */}
+      <main className="flex-1 w-full max-w-[1440px] mx-auto px-6 py-8 flex flex-col items-center">
+        {activeTab === 'downloader' && <DownloaderTool />}
+        {activeTab === 'comment' && <FakeCommentTool />}
+        {activeTab === 'product' && <ProductCardTool />}
+        {activeTab === 'disclaimer' && <DisclaimerTool />}
+        {activeTab === 'checker' && <WordCheckerTool />}
+        {activeTab === 'wa' && <WaChatTool />}
+        {activeTab === 'retro' && <RetroUITool />}
+      </main>
+
+      {/* QUIET FOOTER */}
+      <footer className="w-full max-w-[1440px] mx-auto px-6 py-5 border-t border-[#18181A]/[0.08] flex items-center justify-between text-xs text-[#85827C]">
+        <span>Timephoria internal production suite</span>
+        <span className="font-mono tabular-nums">{new Date().getFullYear()} · v2.4</span>
       </footer>
-      <style dangerouslySetInnerHTML={{__html: `
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.15); border-radius: 20px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: rgba(0,0,0,0.25); }
-      `}} />
-    </main>
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(24,24,26,0.14); border-radius: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: rgba(24,24,26,0.24); }
+      ` }} />
+    </div>
   );
 }

@@ -177,102 +177,150 @@ const exportProductImage = async () => {
   const tiktokPtMainFontSize = priceStrLength > 12 ? '20px' : '24px';
   const shopeeMainFontSize = priceStrLength > 12 ? '17px' : '20px';
 
+  const canvasSpec =
+    productLayout === 'tiktok-portrait'
+      ? `300 × 420 px · Design ${tkPortraitDesign} · 3.5× PNG`
+      : productLayout === 'tiktok-landscape'
+      ? '540 × 220 px · Landscape · 3.5× PNG'
+      : productLayout === 'shopee'
+      ? '300 × 410 px · Square · 3.5× PNG'
+      : '400 × 132 px · Horizontal · 3.5× PNG';
+
   return (
-     <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 z-10 animate-in fade-in zoom-in-95">
-       <div className="bg-white/60 backdrop-blur-3xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-500 rounded-[2rem] p-8 border-[1.5px] border-white space-y-8 h-fit">
+     <div className="w-full grid grid-cols-1 lg:grid-cols-[440px_1fr] gap-6 items-start">
+       {/* LEFT CONTROL PANEL */}
+       <div className="bg-[#FFFFFF] rounded-2xl p-6 border border-[#18181A]/[0.08] space-y-6">
           
-          <div className="flex bg-white/60 p-1.5 rounded-xl border border-white shadow-sm flex-wrap gap-1">
-            <button onClick={() => setProductLayout('tiktok-portrait')} className={`flex-1 min-w-[100px] py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${productLayout === 'tiktok-portrait' ? 'bg-white shadow-sm text-pink-600' : 'text-gray-500 hover:text-gray-700'}`}>TK Portrait</button>
-            <button onClick={() => setProductLayout('tiktok-landscape')} className={`flex-1 min-w-[100px] py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${productLayout === 'tiktok-landscape' ? 'bg-white shadow-sm text-pink-600' : 'text-gray-500 hover:text-gray-700'}`}>TK Landscape</button>
-            <button onClick={() => setProductLayout('shopee')} className={`flex-1 min-w-[80px] py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${productLayout === 'shopee' ? 'bg-white shadow-sm text-orange-500' : 'text-gray-500 hover:text-gray-700'}`}>SP Square</button>
-            <button onClick={() => setProductLayout('shopee-horizontal')} className={`flex-1 min-w-[100px] py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${productLayout === 'shopee-horizontal' ? 'bg-white shadow-sm text-orange-500' : 'text-gray-500 hover:text-gray-700'}`}>SP Horizontal</button>
+          <div className="flex items-center justify-between border-b border-[#18181A]/[0.06] pb-4">
+            <div>
+              <h2 className="text-[15px] font-medium text-[#18181A]">Product Card</h2>
+              <p className="text-xs text-[#85827C] mt-0.5">Configure marketplace card layout and pricing</p>
+            </div>
+            <span className="font-mono text-xs text-[#85827C] tabular-nums bg-[#F0EFEA] px-2.5 py-1 rounded-md">
+              {discountPct > 0 ? `-${discountPct}%` : '0%'}
+            </span>
           </div>
 
-          <div className="flex bg-white/60 p-1.5 rounded-xl border border-white shadow-sm">
-            <button onClick={() => setPriceFormat('exact')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${priceFormat === 'exact' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>Harga Exact</button>
-            {currency === 'Rp' && <button onClick={() => setPriceFormat('k-an')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${priceFormat === 'k-an' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>Harga K-an</button>}
+          <div className="space-y-3">
+            <label className="block text-xs font-medium text-[#575551]">Layout format</label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 bg-[#F0EFEA] p-1 rounded-xl gap-1">
+              <button onClick={() => setProductLayout('tiktok-portrait')} className={`h-8 rounded-lg text-xs transition-colors duration-150 ${productLayout === 'tiktok-portrait' ? 'bg-[#FFFFFF] text-[#18181A] font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)]' : 'text-[#575551] hover:text-[#18181A]'}`}>TK Portrait</button>
+              <button onClick={() => setProductLayout('tiktok-landscape')} className={`h-8 rounded-lg text-xs transition-colors duration-150 ${productLayout === 'tiktok-landscape' ? 'bg-[#FFFFFF] text-[#18181A] font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)]' : 'text-[#575551] hover:text-[#18181A]'}`}>TK Landscape</button>
+              <button onClick={() => setProductLayout('shopee')} className={`h-8 rounded-lg text-xs transition-colors duration-150 ${productLayout === 'shopee' ? 'bg-[#FFFFFF] text-[#18181A] font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)]' : 'text-[#575551] hover:text-[#18181A]'}`}>SP Square</button>
+              <button onClick={() => setProductLayout('shopee-horizontal')} className={`h-8 rounded-lg text-xs transition-colors duration-150 ${productLayout === 'shopee-horizontal' ? 'bg-[#FFFFFF] text-[#18181A] font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)]' : 'text-[#575551] hover:text-[#18181A]'}`}>SP Horizontal</button>
+            </div>
           </div>
 
-          <div className="flex bg-white/60 p-1.5 rounded-xl border border-white shadow-sm">
-            <button onClick={() => setCurrency('Rp')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${currency === 'Rp' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>🇮🇩IDR (Rp)</button>
-            <button onClick={() => { setCurrency('RM'); setPriceFormat('exact'); }} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${currency === 'RM' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>🇲🇾MYR (RM)</button>
-            <button onClick={() => { setCurrency('$'); setPriceFormat('exact'); }} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${currency === '$' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>🇺🇸USD ($)</button>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-[#575551] mb-1.5">Price display</label>
+              <div className="flex bg-[#F0EFEA] p-1 rounded-xl gap-1">
+                <button onClick={() => setPriceFormat('exact')} className={`flex-1 h-8 rounded-lg text-xs transition-colors duration-150 ${priceFormat === 'exact' ? 'bg-[#FFFFFF] text-[#18181A] font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)]' : 'text-[#575551] hover:text-[#18181A]'}`}>Exact</button>
+                {currency === 'Rp' && <button onClick={() => setPriceFormat('k-an')} className={`flex-1 h-8 rounded-lg text-xs transition-colors duration-150 ${priceFormat === 'k-an' ? 'bg-[#FFFFFF] text-[#18181A] font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)]' : 'text-[#575551] hover:text-[#18181A]'}`}>K-an</button>}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-[#575551] mb-1.5">Currency</label>
+              <div className="flex bg-[#F0EFEA] p-1 rounded-xl gap-1 font-mono">
+                <button onClick={() => setCurrency('Rp')} className={`flex-1 h-8 rounded-lg text-xs transition-colors duration-150 ${currency === 'Rp' ? 'bg-[#FFFFFF] text-[#18181A] font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)]' : 'text-[#575551] hover:text-[#18181A]'}`}>IDR</button>
+                <button onClick={() => { setCurrency('RM'); setPriceFormat('exact'); }} className={`flex-1 h-8 rounded-lg text-xs transition-colors duration-150 ${currency === 'RM' ? 'bg-[#FFFFFF] text-[#18181A] font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)]' : 'text-[#575551] hover:text-[#18181A]'}`}>MYR</button>
+                <button onClick={() => { setCurrency('$'); setPriceFormat('exact'); }} className={`flex-1 h-8 rounded-lg text-xs transition-colors duration-150 ${currency === '$' ? 'bg-[#FFFFFF] text-[#18181A] font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)]' : 'text-[#575551] hover:text-[#18181A]'}`}>USD</button>
+              </div>
+            </div>
           </div>
 
           {(productLayout === 'tiktok-portrait' || productLayout === 'tiktok-landscape') && (
-            <div className="flex bg-white/60 p-1.5 rounded-xl border border-white shadow-sm animate-in fade-in">
-              <button onClick={() => setPriceColor('pink')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${priceColor === 'pink' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>Harga Pink</button>
-              <button onClick={() => setPriceColor('black')} className={`flex-1 py-2 rounded-lg font-medium text-xs tracking-wide transition-all ${priceColor === 'black' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-gray-700'}`}>Harga Hitam</button>
+            <div>
+              <label className="block text-xs font-medium text-[#575551] mb-1.5">Price color</label>
+              <div className="flex bg-[#F0EFEA] p-1 rounded-xl gap-1">
+                <button onClick={() => setPriceColor('pink')} className={`flex-1 h-8 rounded-lg text-xs transition-colors duration-150 ${priceColor === 'pink' ? 'bg-[#FFFFFF] text-[#18181A] font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)]' : 'text-[#575551] hover:text-[#18181A]'}`}>TikTok Pink</button>
+                <button onClick={() => setPriceColor('black')} className={`flex-1 h-8 rounded-lg text-xs transition-colors duration-150 ${priceColor === 'black' ? 'bg-[#FFFFFF] text-[#18181A] font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)]' : 'text-[#575551] hover:text-[#18181A]'}`}>Carbon Black</button>
+              </div>
             </div>
           )}
 
-          <div className="space-y-5">
-            <h3 className="font-semibold text-gray-900 text-sm tracking-wide flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-[#0071E3]"></span> Detail Produk</h3>
+          <div className="space-y-4 pt-2 border-t border-[#18181A]/[0.06]">
             <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-2">Foto Produk</label>
-              <input type="file" onChange={handleImageUpload} className="text-sm block w-full file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-medium file:bg-blue-50/50 file:text-[#0071E3] hover:file:bg-blue-100 transition-all cursor-pointer text-gray-500" />
+              <label className="block text-xs font-medium text-[#575551] mb-1.5">Custom product image</label>
+              <input type="file" onChange={handleImageUpload} className="text-xs block w-full file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-[#F0EFEA] file:text-[#18181A] hover:file:bg-[#E5E3DC] transition-colors cursor-pointer text-[#85827C]" />
             </div>
 
-            <div ref={searchContainerRef} className="relative flex w-full bg-white/80 border border-white rounded-xl overflow-visible focus-within:border-[#0071E3] focus-within:ring-4 focus-within:ring-[#0071E3]/10 transition-all shadow-sm">
-              <span className="p-3.5 bg-gray-50/50 text-gray-500 font-semibold text-sm items-center whitespace-nowrap border-r border-gray-200/60 rounded-l-xl hidden sm:flex">[MALL] TIMEPHORIA -</span>
-              <select value={selectedCategory} onChange={handleCategoryChange} className="p-3.5 bg-transparent border-r border-gray-200/60 text-sm font-semibold text-gray-900 focus:outline-none cursor-pointer appearance-none min-w-[100px]">
-                {categories.map((cat: any) => (<option key={cat} value={cat}>{cat}</option>))}
-              </select>
-              <input type="text" value={productTitle} onChange={handleTitleChange} onFocus={() => { if (productTitle.trim().length > 0 || selectedCategory !== "All") setShowSuggestions(true); }} placeholder="Varian Produk" className="w-full p-3.5 bg-transparent focus:outline-none text-sm font-medium text-gray-900 rounded-r-xl" />
-              {showSuggestions && filteredCatalog.length > 0 && (
-                <ul className="absolute top-full left-0 right-0 z-50 mt-2 bg-white/95 backdrop-blur-xl border border-white rounded-xl shadow-xl max-h-64 overflow-y-auto custom-scrollbar">
-                  {filteredCatalog.map((item: any, index: number) => (
-                    <li key={index} onMouseDown={(e) => { e.preventDefault(); handleSelectProduct(item); }} className="p-3 hover:bg-gray-100 cursor-pointer flex items-center gap-3 border-b border-gray-100/50 transition-colors">
-                      <img src={item.image} alt={item.name} className="w-10 h-10 rounded-lg object-cover border border-gray-200" onError={(e) => { 
-  e.currentTarget.onerror = null; // Wajib ditambahkan agar tidak infinite loop
-  e.currentTarget.src = SAFE_IMAGE; }} />
-                      <span className="text-sm font-medium text-gray-900 flex-1">{item.name}</span>
-                      <span className="text-xs font-semibold text-gray-500 bg-white shadow-sm px-2 py-1 rounded-md">{item.category}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
+            <div>
+              <label className="block text-xs font-medium text-[#575551] mb-1.5">Catalog product</label>
+              <div ref={searchContainerRef} className="relative flex w-full bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg overflow-visible focus-within:border-[#18181A] transition-colors">
+                <select value={selectedCategory} onChange={handleCategoryChange} className="px-3 h-10 bg-transparent border-r border-[#18181A]/[0.08] text-xs font-medium text-[#575551] focus:outline-none cursor-pointer">
+                  {categories.map((cat: any) => (<option key={cat} value={cat}>{cat}</option>))}
+                </select>
+                <input type="text" value={productTitle} onChange={handleTitleChange} onFocus={() => { if (productTitle.trim().length > 0 || selectedCategory !== "All") setShowSuggestions(true); }} placeholder="Search product catalog" className="w-full px-3 h-10 bg-transparent focus:outline-none text-sm text-[#18181A] rounded-r-lg" />
+                {showSuggestions && filteredCatalog.length > 0 && (
+                  <ul className="absolute top-full left-0 right-0 z-50 mt-1 bg-[#FFFFFF] border border-[#18181A]/[0.1] rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.08)] max-h-64 overflow-y-auto custom-scrollbar">
+                    {filteredCatalog.map((item: any, index: number) => (
+                      <li key={index} onMouseDown={(e) => { e.preventDefault(); handleSelectProduct(item); }} className="p-2.5 hover:bg-[#F6F5F2] cursor-pointer flex items-center gap-3 border-b border-[#18181A]/[0.05] last:border-0 transition-colors">
+                        <img src={item.image} alt={item.name} className="w-9 h-9 rounded-md object-cover border border-[#18181A]/[0.08]" onError={(e) => { 
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = SAFE_IMAGE;
+                        }} />
+                        <span className="text-xs font-medium text-[#18181A] flex-1">{item.name}</span>
+                        <span className="text-[11px] font-mono text-[#85827C] bg-[#F0EFEA] px-2 py-0.5 rounded">{item.category}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
             
             <div className="grid grid-cols-3 gap-3">
-              <input type="text" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} placeholder={`Baru`} className="w-full p-3.5 bg-white/80 border border-white shadow-sm rounded-xl font-semibold text-gray-900 focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm" />
-              <input type="text" value={productOriginalPrice} onChange={(e) => setProductOriginalPrice(e.target.value)} placeholder={`Coret`} className="w-full p-3.5 bg-white/80 border border-white shadow-sm rounded-xl text-gray-500 focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium" />
-              <input type="text" value={productUnit} onChange={(e) => setProductUnit(e.target.value)} placeholder="Unit" className="w-full p-3.5 bg-white/80 border border-white shadow-sm rounded-xl text-gray-700 focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-semibold" />
+              <div>
+                <label className="block text-xs font-medium text-[#575551] mb-1">Promo price</label>
+                <input type="text" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} placeholder="50.000" className="w-full h-10 px-3 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg font-mono tabular-nums text-sm text-[#18181A] focus:outline-none focus:border-[#18181A] transition-colors" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-[#575551] mb-1">Original price</label>
+                <input type="text" value={productOriginalPrice} onChange={(e) => setProductOriginalPrice(e.target.value)} placeholder="100.000" className="w-full h-10 px-3 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg font-mono tabular-nums text-sm text-[#575551] focus:outline-none focus:border-[#18181A] transition-colors" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-[#575551] mb-1">Unit</label>
+                <input type="text" value={productUnit} onChange={(e) => setProductUnit(e.target.value)} placeholder="/pcs" className="w-full h-10 px-3 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg font-mono text-sm text-[#18181A] focus:outline-none focus:border-[#18181A] transition-colors" />
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <input type="text" value={productRating} onChange={(e) => setProductRating(e.target.value)} placeholder="Rating" className="w-full p-3.5 bg-white/80 border border-white shadow-sm rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium" />
-              <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="Terjual" className="w-full p-3.5 bg-white/80 border border-white shadow-sm rounded-xl focus:outline-none focus:border-[#0071E3] focus:ring-4 focus:ring-[#0071E3]/10 transition-all text-sm font-medium" />
+              <div>
+                <label className="block text-xs font-medium text-[#575551] mb-1">Rating</label>
+                <input type="text" value={productRating} onChange={(e) => setProductRating(e.target.value)} placeholder="4.9" className="w-full h-10 px-3 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg font-mono tabular-nums text-sm text-[#18181A] focus:outline-none focus:border-[#18181A] transition-colors" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-[#575551] mb-1">Sold count</label>
+                <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="1.1K sold" className="w-full h-10 px-3 bg-[#F6F5F2] border border-[#18181A]/[0.1] rounded-lg font-mono tabular-nums text-sm text-[#18181A] focus:outline-none focus:border-[#18181A] transition-colors" />
+              </div>
             </div>
 
             {productLayout === 'shopee' && (
-              <div className="flex flex-col gap-3 mt-4 p-4 bg-white/60 rounded-xl border border-white shadow-sm">
-                  <label className="flex items-center gap-3 cursor-pointer group">
-                    <div className="relative flex items-center justify-center">
-                      <input type="checkbox" checked={showShopeeLive} onChange={e => setShowShopeeLive(e.target.checked)} className="peer sr-only" />
-                      <div className="w-5 h-5 border-[1.5px] border-gray-300 bg-white/80 rounded peer-checked:bg-[#0071E3] peer-checked:border-[#0071E3] transition-all"></div>
-                      <svg className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
-                    </div>
-                    <span className="text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">Tampilkan Label [LIVE]</span>
-                  </label>
+              <div className="pt-1">
+                <label className="flex items-center gap-2.5 cursor-pointer">
+                  <input type="checkbox" checked={showShopeeLive} onChange={e => setShowShopeeLive(e.target.checked)} className="w-4 h-4 rounded accent-[#18181A]" />
+                  <span className="text-xs text-[#575551]">Show Shopee Live badge</span>
+                </label>
               </div>
             )}
-            <p className="text-[11px] text-gray-500 font-medium italic mt-2">*Diskon & format mata uang otomatis dihitung.</p>
           </div>
 
-          <button onClick={exportProductImage} className="w-full bg-[#1D1D1F] hover:bg-black text-white font-medium py-4 rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]">
-              Download Product Card
+          <button onClick={exportProductImage} className="w-full h-11 bg-[#18181A] hover:bg-[#2C2C2E] text-[#FFFFFF] text-sm font-medium rounded-lg transition-colors duration-150 active:scale-[0.98]">
+            Export PNG
           </button>
        </div>
 
-       <div className="bg-[#E5E5EA] border border-gray-200 rounded-[2rem] p-10 flex items-center justify-center min-h-[500px] overflow-x-auto shadow-inner relative custom-scrollbar">
-          <div className="absolute inset-0 opacity-40 bg-[radial-gradient(#C7C7CC_1px,transparent_1px)] [background-size:16px_16px]"></div>
+       {/* RIGHT PREVIEW STAGE */}
+       <div className="bg-[#EAE8E1] border border-[#18181A]/[0.08] rounded-2xl flex flex-col min-h-[560px] overflow-hidden relative">
+          <div className="h-10 px-4 border-b border-[#18181A]/[0.06] flex items-center justify-between text-xs text-[#85827C] bg-[#F0EFEA]/60 z-10">
+            <span>Canvas preview</span>
+            <span className="font-mono tabular-nums">{canvasSpec}</span>
+          </div>
+          <div className="flex-1 flex items-center justify-center overflow-x-auto p-8 relative custom-scrollbar">
+            <div className="absolute inset-0 opacity-35 bg-[radial-gradient(#B8B4AA_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
           
-          {/* 
-            FIX UTAMA: Memastikan kontainer flex tidak menekan kanvas di dalamnya.
-            overflow-x-auto memungkinkan user men-scroll ke kanan jika layar kekecilan.
-          */}
-          <div style={{ padding: '40px', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'transparent', zIndex: 10, minWidth: 'min-content' }}>
+            <div style={{ padding: '24px', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'transparent', zIndex: 10, minWidth: 'min-content' }}>
             
             {/* RENDER: SHOPEE SQUARE */}
             {productLayout === 'shopee' && (
@@ -345,13 +393,36 @@ const exportProductImage = async () => {
 
             {/* RENDER: TIKTOK PORTRAIT (Terpisah) */}
             {productLayout === 'tiktok-portrait' && (
-              <div className="flex flex-col items-center gap-6">
-                <h3 className="text-2xl font-black tracking-widest text-[#564821] drop-shadow-sm uppercase">Desain {tkPortraitDesign}</h3>
+              <div className="flex flex-col items-center gap-4">
+                <div className="inline-flex items-center p-1 bg-[#FFFFFF]/80 border border-[#18181A]/[0.08] rounded-lg">
+                  <button
+                    type="button"
+                    onClick={() => setTkPortraitDesign(1)}
+                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                      tkPortraitDesign === 1
+                        ? 'bg-[#18181A] text-white'
+                        : 'text-[#575551] hover:text-[#18181A]'
+                    }`}
+                  >
+                    Design 1
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTkPortraitDesign(2)}
+                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                      tkPortraitDesign === 2
+                        ? 'bg-[#18181A] text-white'
+                        : 'text-[#575551] hover:text-[#18181A]'
+                    }`}
+                  >
+                    Design 2
+                  </button>
+                </div>
                 
-                <div className="flex items-center gap-6">
+                <div className="flex items-center gap-4">
                   {/* Left Arrow */}
-                  <button type="button" onClick={() => setTkPortraitDesign(1)} className={`p-2 rounded-full transition-all ${tkPortraitDesign === 1 ? 'opacity-30 cursor-not-allowed' : 'opacity-100 hover:bg-black/5'}`}>
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                  <button type="button" onClick={() => setTkPortraitDesign(1)} className={`w-9 h-9 flex items-center justify-center rounded-lg border border-[#18181A]/[0.08] bg-white/70 text-[#18181A] transition-colors ${tkPortraitDesign === 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-white'}`}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
                   </button>
 
                   {/* PREVIEW CONTAINER (ONLY THIS IS DOWNLOADED) */}
@@ -444,8 +515,8 @@ const exportProductImage = async () => {
                   )}
 
                   {/* Right Arrow */}
-                  <button type="button" onClick={() => setTkPortraitDesign(2)} className={`p-2 rounded-full transition-all ${tkPortraitDesign === 2 ? 'opacity-30 cursor-not-allowed' : 'opacity-100 hover:bg-black/5'}`}>
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                  <button type="button" onClick={() => setTkPortraitDesign(2)} className={`w-9 h-9 flex items-center justify-center rounded-lg border border-[#18181A]/[0.08] bg-white/70 text-[#18181A] transition-colors ${tkPortraitDesign === 2 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-white'}`}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
                   </button>
                 </div>
               </div>
@@ -525,6 +596,7 @@ const exportProductImage = async () => {
               </div>
             )}
             
+            </div>
           </div>
        </div>
      </div>
