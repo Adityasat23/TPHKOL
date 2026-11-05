@@ -146,7 +146,7 @@ export default function FakeCommentTool() {
 
   const specLabel =
     commentMode === 'sticker'
-      ? '480 × auto px · Sticker · 3× PNG'
+      ? `420 × auto px · Sticker (${threadTheme}) · 3× PNG`
       : commentMode === 'thread'
       ? `500 × auto px · TikTok (${threadTheme}) · 3× PNG`
       : `500 × auto px · Threads (${threadsStyle}) · 3× PNG`;
@@ -176,15 +176,13 @@ export default function FakeCommentTool() {
           </div>
         )}
 
-        {(commentMode === 'thread' || commentMode === 'threads') && (
-          <div>
-            <span className="block text-xs font-medium text-[var(--label-2)] mb-2">Tema latar</span>
-            <div className="lg-segmented grid-cols-2 gap-1">
-              <button onClick={() => setThreadTheme('light')} data-active={threadTheme === 'light'} className="lg-segment-btn py-1.5 text-xs">Light mode</button>
-              <button onClick={() => setThreadTheme('dark')} data-active={threadTheme === 'dark'} className="lg-segment-btn py-1.5 text-xs">Dark mode</button>
-            </div>
+        <div>
+          <span className="block text-xs font-medium text-[var(--label-2)] mb-2">Tema latar</span>
+          <div className="lg-segmented grid-cols-2 gap-1">
+            <button onClick={() => setThreadTheme('light')} data-active={threadTheme === 'light'} className="lg-segment-btn py-1.5 text-xs">Light mode</button>
+            <button onClick={() => setThreadTheme('dark')} data-active={threadTheme === 'dark'} className="lg-segment-btn py-1.5 text-xs">Dark mode</button>
           </div>
-        )}
+        </div>
 
         {/* PENGATURAN KOMENTAR UTAMA */}
         <div className="space-y-3.5 pt-4 border-t border-[var(--separator)]">
@@ -197,7 +195,15 @@ export default function FakeCommentTool() {
           </div>
 
           {commentMode === 'sticker' && (
-            <input type="text" value={replyTo} onChange={(e) => setReplyTo(e.target.value)} placeholder="Reply to username..." className="w-full px-3 py-2.5 lg-input text-sm" />
+            <>
+              <input type="text" value={replyTo} onChange={(e) => setReplyTo(e.target.value)} placeholder="Reply to username..." className="w-full px-3 py-2.5 lg-input text-sm" />
+              <div className="flex flex-wrap gap-4 pt-0.5">
+                <label className="flex items-center gap-2 text-xs font-medium text-[var(--label-2)] cursor-pointer">
+                  <input type="checkbox" checked={mainVerified} onChange={(e) => setMainVerified(e.target.checked)} className="rounded accent-[#20D5EC]" />
+                  Verified badge
+                </label>
+              </div>
+            </>
           )}
 
           {commentMode === 'thread' && (
@@ -468,17 +474,180 @@ export default function FakeCommentTool() {
             <div className="max-sm:scale-[0.62] sm:max-md:scale-[0.82] origin-center transition-transform" style={{ padding: '12px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
               <div ref={previewRef} style={{ display: 'inline-flex', flexDirection: 'column', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', userSelect: 'none' }}>
             
-            {/* 1. PRATINJAU STICKER BUBBLE */}
+            {/* 1. PRATINJAU STICKER BUBBLE (PERSIS TOKCOMMENT.COM) */}
             {commentMode === 'sticker' && (
-              <div style={{ display: 'inline-flex', flexDirection: 'column', isolation: 'isolate', transform: 'translateZ(0)' }}>
-                <div style={{ backgroundColor: 'white', borderRadius: '16px 16px 16px 0px', padding: '24px 28px', display: 'flex', width: '100%', maxWidth: '480px', gap: '16px', alignItems: 'flex-start', border: '1px solid transparent' }}>
-                  <img key={avatar} src={avatar} style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, marginTop: '2px' }} />
-                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%', minWidth: 0 }}>
-                    <p style={{ color: '#757575', fontSize: '16px', fontWeight: '600', margin: '0 0 6px 0', fontFamily: 'inherit', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Reply to {replyTo}'s comment</p>
-                    <p style={{ color: '#000000', fontSize: '24px', fontWeight: '800', margin: '0', lineHeight: 1.3, whiteSpace: 'pre-wrap', wordBreak: 'break-word', overflowWrap: 'break-word', fontFamily: 'inherit', letterSpacing: '-0.02em' }}>{isExporting ? commentText : renderWithHighlights(commentText)}</p>
+              <div
+                className="tiktok-reply-wrapper"
+                style={{
+                  maxWidth: '420px',
+                  width: '420px',
+                  height: 'fit-content',
+                  overflow: 'visible',
+                  paddingBottom: '40px',
+                  marginInline: 'auto',
+                  position: 'relative',
+                  isolation: 'isolate',
+                  fontFamily: "'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                }}
+              >
+                <div
+                  className="tiktok-reply-template"
+                  style={{
+                    position: 'relative',
+                    backgroundColor: isDark ? '#1e1e1e' : '#ffffff',
+                    width: '100%',
+                    height: 'fit-content',
+                    paddingTop: '18px',
+                    paddingBottom: '22px',
+                    paddingLeft: '18px',
+                    paddingRight: '18px',
+                    borderRadius: '10px 10px 10px 0px',
+                    fontFamily: "'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '14px',
+                      position: 'relative',
+                      zIndex: 10,
+                    }}
+                  >
+                    <img
+                      key={avatar}
+                      src={avatar}
+                      alt="Profile"
+                      style={{
+                        width: '50px',
+                        height: '50px',
+                        marginTop: '20px',
+                        borderRadius: '9999px',
+                        objectFit: 'cover',
+                        flexShrink: 0,
+                      }}
+                    />
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        minWidth: 0,
+                        flex: 1,
+                      }}
+                    >
+                      <p
+                        style={{
+                          width: '100%',
+                          fontSize: '20px',
+                          lineHeight: 1.35,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '2px',
+                          fontWeight: 600,
+                          flexWrap: 'wrap',
+                          color: isDark ? '#c0c0c0' : '#5a5a5a',
+                          margin: 0,
+                          fontFamily: "'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                        }}
+                      >
+                        <span>Reply to </span>
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            maxWidth: 'max-content',
+                            overflowWrap: 'break-word',
+                            wordBreak: 'break-word',
+                          }}
+                        >
+                          {replyTo || 'username'}
+                        </span>
+                        <span>{"'s "}</span>
+                        {mainVerified && (
+                          <span
+                            style={{
+                              backgroundColor: '#20D5EC',
+                              marginTop: '-2px',
+                              lineHeight: 1.1,
+                              borderRadius: '9999px',
+                              fontWeight: 500,
+                              padding: '1px',
+                              display: 'inline-flex',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              textAlign: 'center',
+                              marginRight: '4px',
+                              marginLeft: '2px',
+                            }}
+                          >
+                            <svg
+                              viewBox="0 0 16 16"
+                              fill="currentColor"
+                              style={{
+                                color: '#ffffff',
+                                width: '16px',
+                                height: '16px',
+                              }}
+                            >
+                              <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z" />
+                            </svg>
+                          </span>
+                        )}
+                        <span>comment</span>
+                      </p>
+                      <div
+                        style={{
+                          marginTop: '2px',
+                          color: isDark ? '#ffffff' : '#000000',
+                          fontSize: '31px',
+                          fontWeight: 700,
+                          letterSpacing: '-0.025em',
+                          lineHeight: 1.2,
+                          width: '100%',
+                          overflowWrap: 'break-word',
+                          wordWrap: 'break-word',
+                          wordBreak: 'break-word',
+                          whiteSpace: 'pre-wrap',
+                          fontFamily: "'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                        }}
+                      >
+                        {isExporting ? commentText : renderWithHighlights(commentText)}
+                      </div>
+                    </div>
                   </div>
+                  <div className="tokcomment-triangle" />
                 </div>
-                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style={{ display: 'block', alignSelf: 'flex-start', marginTop: '-1px' }} xmlns="http://www.w3.org/2000/svg"><path d="M0 0H28L5.5 24.5C3.5 27.5 0 26 0 22V0Z" fill="white" /></svg>
+                <style>{`
+                  .tokcomment-triangle {
+                    position: relative;
+                    background-color: ${isDark ? '#1e1e1e' : '#ffffff'};
+                    text-align: left;
+                  }
+                  .tokcomment-triangle::before,
+                  .tokcomment-triangle::after {
+                    content: '';
+                    position: absolute;
+                    background-color: inherit;
+                  }
+                  .tokcomment-triangle,
+                  .tokcomment-triangle::before,
+                  .tokcomment-triangle::after {
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 0% 33% 0 0;
+                    position: absolute;
+                    left: 8px;
+                    bottom: 13px;
+                    z-index: -1;
+                  }
+                  .tokcomment-triangle {
+                    transform: rotate(-89deg) skewX(4deg) scale(1, 0.866);
+                  }
+                  .tokcomment-triangle::before {
+                    transform: rotate(-136deg) skewX(-45deg) scale(1.414, 0.707) translate(0, -50%);
+                  }
+                  .tokcomment-triangle::after {
+                    transform: rotate(135deg) skewY(-45deg) scale(0.707, 1.414) translate(50%);
+                  }
+                `}</style>
               </div>
             )}
 
