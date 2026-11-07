@@ -471,7 +471,7 @@ export default function FakeCommentTool() {
               </button>
             )}
 
-            <div className="max-sm:scale-[0.62] sm:max-md:scale-[0.82] origin-center transition-transform" style={{ padding: '12px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
+            <div className="max-sm:scale-[0.62] sm:max-md:scale-[0.82] origin-center transition-transform drop-shadow-[0_14px_32px_rgba(0,0,0,0.12)]" style={{ padding: '12px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
               <div ref={previewRef} style={{ display: 'inline-flex', flexDirection: 'column', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', userSelect: 'none' }}>
             
             {/* 1. PRATINJAU STICKER BUBBLE (PERSIS TOKCOMMENT.COM) */}

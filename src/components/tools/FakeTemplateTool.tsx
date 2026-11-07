@@ -46,7 +46,7 @@ export default function FakeTemplateTool() {
                   <motion.span
                     layoutId="fake-template-active-pill"
                     transition={{ type: 'spring', stiffness: 400, damping: 32 }}
-                    className="absolute inset-0 rounded-full bg-[#F5F5F7] shadow-[0_2px_12px_rgba(255,255,255,0.22),inset_0_1px_0_#FFFFFF] -z-10 pointer-events-none"
+                    className="apple-nav-active-pill absolute inset-0 rounded-full -z-10 pointer-events-none"
                   />
                 )}
                 <span className="relative z-10">{item.label}</span>
