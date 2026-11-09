@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DownloaderTool from '../components/tools/DownloaderTool';
 import FakeTemplateTool from '../components/tools/FakeTemplateTool';
+import DesignTemplateTool from '../components/tools/DesignTemplateTool';
 import ProductCardTool from '../components/tools/ProductCardTool';
 import DisclaimerTool from '../components/tools/DisclaimerTool';
 import WordCheckerTool from '../components/tools/WordCheckerTool';
@@ -11,6 +12,7 @@ import WordCheckerTool from '../components/tools/WordCheckerTool';
 const TABS = [
   { id: 'product', label: 'Product SS' },
   { id: 'faketemplate', label: 'Fake Template' },
+  { id: 'designtemplate', label: 'Design Template' },
   { id: 'disclaimer', label: 'Disclaimer' },
   { id: 'checker', label: 'Banned Word Check' },
   { id: 'downloader', label: 'Downloader' },
@@ -160,6 +162,7 @@ export default function Home() {
           >
             {activeTab === 'product' && <ProductCardTool />}
             {activeTab === 'faketemplate' && <FakeTemplateTool />}
+            {activeTab === 'designtemplate' && <DesignTemplateTool />}
             {activeTab === 'disclaimer' && <DisclaimerTool />}
             {activeTab === 'checker' && <WordCheckerTool />}
             {activeTab === 'downloader' && <DownloaderTool />}
