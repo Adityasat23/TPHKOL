@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { toPng } from 'html-to-image';
 import { TIMEPHORIA_CATALOG, DEFAULT_PRODUCT } from '../../app/catalog'; 
 import { StarYellow, StarBlack, CartIcon, ShopeeTicketIcon, ShopeeDots } from '../icons';
+import ReceiptVideoTool from './ReceiptVideoTool';
 
 // Hapus DEFAULT_PRODUCT dari sini
 const SAFE_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk8A8AAQsAzQ/8/GkAAAAASUVORK5CYII=";
@@ -14,8 +15,8 @@ export interface CatalogItem {
 }
 
 export default function ProductCardTool() {
-  const [productLayout, setProductLayout] = useState<'tiktok-portrait' | 'tiktok-landscape' | 'shopee' | 'shopee-horizontal'>('tiktok-landscape');
-  const [tkPortraitDesign, setTkPortraitDesign] = useState<1 | 2>(1);
+  const [productLayout, setProductLayout] = useState<'tiktok-portrait' | 'tiktok-landscape' | 'shopee' | 'shopee-horizontal'>('tiktok-portrait');
+  const [tkPortraitDesign, setTkPortraitDesign] = useState<1 | 2 | 3>(1);
   const [productImage, setProductImage] = useState(SAFE_IMAGE); // Base64 — hanya untuk export
   const [productImageUrl, setProductImageUrl] = useState(''); // URL asli — untuk preview (instant)
   const [productTitle, setProductTitle] = useState("ALTERA BLURRING LIP TINT + LIP MATTE");
@@ -179,12 +180,57 @@ const exportProductImage = async () => {
 
   const canvasSpec =
     productLayout === 'tiktok-portrait'
-      ? `300 × 420 px · Design ${tkPortraitDesign} · 3.5× PNG`
+      ? (tkPortraitDesign === 3 ? '1080 × 1920 px · Design 3 (Receipt Video) · MP4' : `300 × 420 px · Design ${tkPortraitDesign} · 3.5× PNG`)
       : productLayout === 'tiktok-landscape'
       ? '540 × 220 px · Landscape · 3.5× PNG'
       : productLayout === 'shopee'
       ? '300 × 410 px · Square · 3.5× PNG'
       : '400 × 132 px · Horizontal · 3.5× PNG';
+
+  if (productLayout === 'tiktok-portrait' && tkPortraitDesign === 3) {
+    return (
+      <ReceiptVideoTool
+        productLayout={productLayout}
+        setProductLayout={setProductLayout}
+        tkPortraitDesign={tkPortraitDesign}
+        setTkPortraitDesign={setTkPortraitDesign}
+        productTitle={productTitle}
+        setProductTitle={setProductTitle}
+        productPrice={productPrice}
+        setProductPrice={setProductPrice}
+        productOriginalPrice={productOriginalPrice}
+        setProductOriginalPrice={setProductOriginalPrice}
+        productUnit={productUnit}
+        setProductUnit={setProductUnit}
+        productRating={productRating}
+        setProductRating={setProductRating}
+        productSold={productSold}
+        setProductSold={setProductSold}
+        productImage={productImage}
+        productImageUrl={productImageUrl}
+        handleImageUpload={handleImageUpload}
+        priceColor={priceColor}
+        setPriceColor={setPriceColor}
+        currency={currency}
+        setCurrency={setCurrency}
+        priceFormat={priceFormat}
+        setPriceFormat={setPriceFormat}
+        displayPrice={displayPrice}
+        rawOrigPrice={rawOrigPrice}
+        autoDiscountBadge={autoDiscountBadge}
+        autoDiscountTagText={autoDiscountTagText}
+        selectedCategory={selectedCategory}
+        categories={categories}
+        filteredCatalog={filteredCatalog}
+        showSuggestions={showSuggestions}
+        setShowSuggestions={setShowSuggestions}
+        handleSelectProduct={handleSelectProduct}
+        handleCategoryChange={handleCategoryChange}
+        handleTitleChange={handleTitleChange}
+        searchContainerRef={searchContainerRef}
+      />
+    );
+  }
 
   return (
      <div className="w-full grid grid-cols-1 lg:grid-cols-[440px_1fr] gap-5 sm:gap-6 items-start">
@@ -390,7 +436,7 @@ const exportProductImage = async () => {
             {/* RENDER: TIKTOK PORTRAIT (Terpisah) */}
             {productLayout === 'tiktok-portrait' && (
               <div className="flex flex-col items-center gap-4">
-                <div className="lg-segmented grid-cols-2 gap-1 w-48">
+                <div className="lg-segmented grid-cols-3 gap-1 w-64 sm:w-72">
                   <button
                     type="button"
                     onClick={() => setTkPortraitDesign(1)}
@@ -407,11 +453,24 @@ const exportProductImage = async () => {
                   >
                     Design 2
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => setTkPortraitDesign(3)}
+                    data-active={tkPortraitDesign === 3}
+                    className="lg-segment-btn py-1.5 px-3 text-xs"
+                  >
+                    Design 3
+                  </button>
                 </div>
                 
                 <div className="flex items-center gap-4">
                   {/* Left Arrow */}
-                  <button type="button" onClick={() => setTkPortraitDesign(1)} className={`liquid-glass-chip w-9 h-9 flex items-center justify-center rounded-full ${tkPortraitDesign === 1 ? 'opacity-30 cursor-not-allowed' : ''}`}>
+                  <button
+                    type="button"
+                    onClick={() => setTkPortraitDesign((prev) => (prev > 1 ? (prev - 1) as 1 | 2 | 3 : 1))}
+                    disabled={tkPortraitDesign === 1}
+                    className={`liquid-glass-chip w-9 h-9 flex items-center justify-center rounded-full ${tkPortraitDesign === 1 ? 'opacity-30 cursor-not-allowed' : ''}`}
+                  >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
                   </button>
 
@@ -505,7 +564,12 @@ const exportProductImage = async () => {
                   )}
 
                   {/* Right Arrow */}
-                  <button type="button" onClick={() => setTkPortraitDesign(2)} className={`liquid-glass-chip w-9 h-9 flex items-center justify-center rounded-full ${tkPortraitDesign === 2 ? 'opacity-30 cursor-not-allowed' : ''}`}>
+                  <button
+                    type="button"
+                    onClick={() => setTkPortraitDesign((prev) => (prev < 3 ? (prev + 1) as 1 | 2 | 3 : 3))}
+                    disabled={tkPortraitDesign === 3}
+                    className={`liquid-glass-chip w-9 h-9 flex items-center justify-center rounded-full ${tkPortraitDesign === 3 ? 'opacity-30 cursor-not-allowed' : ''}`}
+                  >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
                   </button>
                 </div>
