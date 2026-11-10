@@ -205,9 +205,10 @@ export default function DesignTemplateTool() {
   const [uploadName, setUploadName] = useState<string>('');
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [customBgType, setCustomBgType] = useState<'green' | 'transparent' | 'black' | 'white'>('green');
+  const [customBgType, setCustomBgType] = useState<'green' | 'transparent' | 'black' | 'white'>('transparent');
   const [customNameEdit, setCustomNameEdit] = useState<string>('');
   const customVideoRef = useRef<HTMLVideoElement>(null);
+  const [exportingTemplateId, setExportingTemplateId] = useState<TemplateId | null>(null);
 
   // Load custom templates from server registry on mount
   useEffect(() => {
@@ -229,7 +230,7 @@ export default function DesignTemplateTool() {
 
   // Canvas settings
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>('1:1');
-  const [bgType, setBgType] = useState<BgType>('green');
+  const [bgType, setBgType] = useState<BgType>('transparent');
   const [duration, setDuration] = useState<number>(3.5);
   const [fps] = useState<60>(60);
 
@@ -1184,6 +1185,17 @@ export default function DesignTemplateTool() {
     setCurrentView('gallery');
   };
 
+  const handleQuickDownloadPreset = async (templateId: TemplateId, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (exportProgress !== null || exportingTemplateId !== null) return;
+    setExportingTemplateId(templateId);
+    try {
+      await handleExportMp4(templateId);
+    } finally {
+      setExportingTemplateId(null);
+    }
+  };
+
   const handleSelectTemplate = (id: TemplateId) => {
     setCurrentCustomTemplate(null);
     setSelectedTemplate(id);
@@ -1211,7 +1223,7 @@ export default function DesignTemplateTool() {
   };
 
   // 60FPS MP4 Export via WebCodecs + mp4-muxer
-  const handleExportMp4 = async () => {
+  const handleExportMp4 = async (overrideTemplateId?: TemplateId | React.MouseEvent) => {
     if (exportProgress !== null) return;
     cancelExportRef.current = false;
     setExportProgress(0);
@@ -1227,7 +1239,10 @@ export default function DesignTemplateTool() {
       const exportCtx = exportCanvas.getContext('2d', { willReadFrequently: true });
       if (!exportCtx) throw new Error('Canvas 2D unavailable');
 
-      const totalFrames = Math.max(1, Math.round(duration * fps));
+      const targetId = (typeof overrideTemplateId === 'string' ? overrideTemplateId : undefined) || selectedTemplate;
+      const targetMeta = TEMPLATES.find((t) => t.id === targetId);
+      const targetDuration = overrideTemplateId && targetMeta ? targetMeta.defaultDuration : duration;
+      const totalFrames = Math.max(1, Math.round(targetDuration * fps));
       const frameDurationUs = Math.round(1_000_000 / fps);
 
       const muxer = new Muxer({
@@ -1267,7 +1282,7 @@ export default function DesignTemplateTool() {
         if (cancelExportRef.current) throw new Error('Export dibatalkan.');
 
         const t = i / fps;
-        renderFrame(selectedTemplate, exportCtx, t, canvasW, canvasH);
+        renderFrame(targetId, exportCtx, t, canvasW, canvasH);
 
         if (videoEncoder && !encoderError) {
           const timestamp = i * frameDurationUs;
@@ -1295,7 +1310,8 @@ export default function DesignTemplateTool() {
 
       const a = document.createElement('a');
       a.href = dlUrl;
-      a.download = `${selectedTemplate}-${Date.now()}.mp4`;
+      const dlName = (overrideTemplateId ? targetMeta?.name : (selectedTemplate === 'banner' ? bannerText : badgeText)) || targetId;
+      a.download = `${dlName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-60fps.mp4`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -1497,14 +1513,14 @@ export default function DesignTemplateTool() {
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {activeTemplates.map((template) => (
-                <button
+                <div
                   key={template.id}
-                  type="button"
-                  onClick={() => handleSelectTemplate(template.id)}
                   className="text-left group flex flex-col focus:outline-none"
                 >
+                  {/* Card Thumbnail Stage */}
                   <div
-                    className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-[var(--separator)] group-hover:border-[var(--tint)] group-hover:shadow-lg group-hover:shadow-[var(--tint)]/10 transition-all p-3 flex items-center justify-center relative"
+                    onClick={() => handleSelectTemplate(template.id)}
+                    className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-[var(--separator)] group-hover:border-[var(--tint)] group-hover:shadow-lg group-hover:shadow-[var(--tint)]/10 transition-all p-3 flex items-center justify-center relative cursor-pointer"
                     style={{ backgroundColor: template.thumbBg }}
                   >
                     <div className="w-full h-full flex items-center justify-center">
@@ -1513,21 +1529,60 @@ export default function DesignTemplateTool() {
                         renderTemplateNormalized={renderTemplateNormalized}
                       />
                     </div>
-                    <div className="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="liquid-glass-chip text-[10px] font-semibold text-[var(--tint)] px-2 py-0.5">
-                        Buka
-                      </span>
-                    </div>
                   </div>
+
+                  {/* Title & Category */}
                   <div className="mt-2.5 px-1 flex items-center justify-between">
-                    <span className="text-sm font-semibold text-[var(--label)] group-hover:text-[var(--tint)] transition-colors">
+                    <span
+                      onClick={() => handleSelectTemplate(template.id)}
+                      className="text-sm font-semibold text-[var(--label)] group-hover:text-[var(--tint)] transition-colors cursor-pointer"
+                    >
                       {template.name}
                     </span>
                     <span className="text-[11px] text-[var(--label-3)]">
                       {template.category}
                     </span>
                   </div>
-                </button>
+
+                  {/* Two Buttons: Kustomisasi & Auto Download */}
+                  <div className="mt-2.5 grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleSelectTemplate(template.id)}
+                      className="apple-nav-pill py-2 text-xs font-semibold flex items-center justify-center gap-1.5"
+                    >
+                      <svg className="w-3.5 h-3.5 text-[var(--tint)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                      <span>Kustomisasi</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={(e) => handleQuickDownloadPreset(template.id, e)}
+                      disabled={exportingTemplateId !== null}
+                      className="lg-btn-primary py-2 text-xs font-semibold flex items-center justify-center gap-1.5"
+                      title="Download langsung MP4 60FPS"
+                    >
+                      {exportingTemplateId === template.id ? (
+                        <>
+                          <svg className="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                          </svg>
+                          <span>{Math.round(exportProgress || 0)}%</span>
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                          </svg>
+                          <span>Download</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
@@ -1601,6 +1656,33 @@ export default function DesignTemplateTool() {
                       <span className="text-[11px] text-[var(--label-3)] shrink-0 ml-2">
                         {(item.fileSize / (1024 * 1024)).toFixed(1)} MB
                       </span>
+                    </div>
+
+                    {/* Two Buttons: Kustomisasi & Auto Download */}
+                    <div className="mt-2.5 grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleSelectCustomTemplate(item)}
+                        className="apple-nav-pill py-2 text-xs font-semibold flex items-center justify-center gap-1.5"
+                      >
+                        <svg className="w-3.5 h-3.5 text-[var(--tint)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        <span>Kustomisasi</span>
+                      </button>
+
+                      <a
+                        href={item.fileUrl}
+                        download={item.name || item.fileName}
+                        onClick={(e) => e.stopPropagation()}
+                        className="lg-btn-primary py-2 text-xs font-semibold flex items-center justify-center gap-1.5"
+                        title="Download langsung file"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        <span>Download</span>
+                      </a>
                     </div>
                   </div>
                 ))}
@@ -1730,7 +1812,7 @@ export default function DesignTemplateTool() {
                 customBgType === 'green'
                   ? 'bg-[#00FF00]'
                   : customBgType === 'transparent'
-                  ? 'bg-[repeating-conic-gradient(#e5e7eb_0%_25%,#ffffff_0%_50%)] bg-[length:24px_24px]'
+                  ? 'bg-[radial-gradient(#d1d5db_1.2px,transparent_1.2px)] dark:bg-[radial-gradient(#334155_1.2px,transparent_1.2px)] [background-size:16px_16px]'
                   : customBgType === 'black'
                   ? 'bg-black'
                   : 'bg-white'
@@ -2493,7 +2575,7 @@ export default function DesignTemplateTool() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <button
                     type="button"
-                    onClick={handleExportMp4}
+                    onClick={() => handleExportMp4()}
                     className="lg-btn-primary py-3.5 text-xs font-semibold flex items-center justify-center gap-2 rounded-2xl shadow-lg shadow-black/20"
                   >
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
