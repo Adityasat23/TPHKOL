@@ -1411,7 +1411,7 @@ export default function DesignTemplateTool() {
                 ))}
               </optgroup>
               {customTemplates.length > 0 && (
-                <optgroup label="Template Saya">
+                <optgroup label="Team Template">
                   {customTemplates.map((c) => (
                     <option key={c.id} value={`custom:${c.id}`}>
                       {c.name} ({c.fileName.split('.').pop()?.toUpperCase() || c.fileType})
@@ -1591,7 +1591,7 @@ export default function DesignTemplateTool() {
           {customTemplates.length > 0 && (
             <div className="space-y-3 pt-2">
               <h3 className="text-xs font-semibold text-[var(--label-2)] uppercase tracking-wider">
-                Template Saya ({customTemplates.length})
+                Team Template
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 {customTemplates.map((item) => (
