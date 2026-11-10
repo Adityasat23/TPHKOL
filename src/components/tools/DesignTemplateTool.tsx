@@ -1529,6 +1529,51 @@ export default function DesignTemplateTool() {
                         renderTemplateNormalized={renderTemplateNormalized}
                       />
                     </div>
+
+                    {/* Hover Action Bar: Kustomisasi & Download */}
+                    <div
+                      className={`absolute top-2.5 right-2.5 flex items-center gap-1 p-1 rounded-full bg-black/60 dark:bg-black/80 backdrop-blur-md border border-white/15 transition-all duration-200 shadow-md ${
+                        exportingTemplateId === template.id
+                          ? 'opacity-100 scale-100'
+                          : 'opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100'
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSelectTemplate(template.id);
+                        }}
+                        className="w-7 h-7 rounded-full hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+                        title="Kustomisasi"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={(e) => handleQuickDownloadPreset(template.id, e)}
+                        disabled={exportingTemplateId !== null}
+                        className="h-7 px-2 rounded-full hover:bg-white/20 text-white flex items-center justify-center gap-1 transition-colors"
+                        title="Download langsung MP4 60FPS"
+                      >
+                        {exportingTemplateId === template.id ? (
+                          <>
+                            <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                            </svg>
+                            <span className="text-[10px] font-bold">{Math.round(exportProgress || 0)}%</span>
+                          </>
+                        ) : (
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
                   </div>
 
                   {/* Title & Category */}
@@ -1542,45 +1587,6 @@ export default function DesignTemplateTool() {
                     <span className="text-[11px] text-[var(--label-3)]">
                       {template.category}
                     </span>
-                  </div>
-
-                  {/* Two Buttons: Kustomisasi & Auto Download */}
-                  <div className="mt-2.5 grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleSelectTemplate(template.id)}
-                      className="apple-nav-pill py-2 text-xs font-semibold flex items-center justify-center gap-1.5"
-                    >
-                      <svg className="w-3.5 h-3.5 text-[var(--tint)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                      <span>Kustomisasi</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={(e) => handleQuickDownloadPreset(template.id, e)}
-                      disabled={exportingTemplateId !== null}
-                      className="lg-btn-primary py-2 text-xs font-semibold flex items-center justify-center gap-1.5"
-                      title="Download langsung MP4 60FPS"
-                    >
-                      {exportingTemplateId === template.id ? (
-                        <>
-                          <svg className="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                          </svg>
-                          <span>{Math.round(exportProgress || 0)}%</span>
-                        </>
-                      ) : (
-                        <>
-                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                          </svg>
-                          <span>Download</span>
-                        </>
-                      )}
-                    </button>
                   </div>
                 </div>
               ))}
@@ -1621,21 +1627,50 @@ export default function DesignTemplateTool() {
                       )}
 
                       {/* Format Badge */}
-                      <div className="absolute top-2.5 left-2.5">
+                      <div className="absolute top-2.5 left-2.5 pointer-events-none">
                         <span className="liquid-glass-chip text-[10px] font-bold uppercase tracking-wider text-[var(--tint)] px-2 py-0.5">
                           {item.fileName.split('.').pop()?.toUpperCase() || item.fileType}
                         </span>
                       </div>
 
-                      {/* Delete Button */}
-                      <div className="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {/* Hover Action Bar: Kustomisasi - Download - Hapus */}
+                      <div className="absolute top-2.5 right-2.5 flex items-center gap-1 p-1 rounded-full bg-black/60 dark:bg-black/80 backdrop-blur-md border border-white/15 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200 shadow-md">
+                        {/* Kustomisasi */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSelectCustomTemplate(item);
+                          }}
+                          className="w-7 h-7 rounded-full hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+                          title="Kustomisasi"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </button>
+
+                        {/* Download */}
+                        <a
+                          href={item.fileUrl}
+                          download={item.name || item.fileName}
+                          onClick={(e) => e.stopPropagation()}
+                          className="w-7 h-7 rounded-full hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+                          title="Download file"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                          </svg>
+                        </a>
+
+                        {/* Hapus */}
                         <button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDeleteCustomTemplate(item.id);
                           }}
-                          className="w-7 h-7 rounded-full bg-red-500/80 hover:bg-red-500 text-white flex items-center justify-center shadow-md transition-colors"
+                          className="w-7 h-7 rounded-full hover:bg-red-500 text-white flex items-center justify-center transition-colors"
                           title="Hapus template"
                         >
                           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1656,33 +1691,6 @@ export default function DesignTemplateTool() {
                       <span className="text-[11px] text-[var(--label-3)] shrink-0 ml-2">
                         {(item.fileSize / (1024 * 1024)).toFixed(1)} MB
                       </span>
-                    </div>
-
-                    {/* Two Buttons: Kustomisasi & Auto Download */}
-                    <div className="mt-2.5 grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleSelectCustomTemplate(item)}
-                        className="apple-nav-pill py-2 text-xs font-semibold flex items-center justify-center gap-1.5"
-                      >
-                        <svg className="w-3.5 h-3.5 text-[var(--tint)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                        <span>Kustomisasi</span>
-                      </button>
-
-                      <a
-                        href={item.fileUrl}
-                        download={item.name || item.fileName}
-                        onClick={(e) => e.stopPropagation()}
-                        className="lg-btn-primary py-2 text-xs font-semibold flex items-center justify-center gap-1.5"
-                        title="Download langsung file"
-                      >
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                        </svg>
-                        <span>Download</span>
-                      </a>
                     </div>
                   </div>
                 ))}
