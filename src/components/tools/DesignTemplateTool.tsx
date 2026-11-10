@@ -43,6 +43,17 @@ export interface TemplateMeta {
   disabled?: boolean;
 }
 
+export interface CustomTemplate {
+  id: string;
+  name: string;
+  fileUrl: string;
+  fileType: 'video' | 'gif' | 'image';
+  mimeType: string;
+  fileName: string;
+  fileSize: number;
+  createdAt: string;
+}
+
 const TEMPLATES: TemplateMeta[] = [
   {
     id: 'starburst',
@@ -186,6 +197,35 @@ export default function DesignTemplateTool() {
   // Navigation View: 'gallery' or 'editor'
   const [currentView, setCurrentView] = useState<'gallery' | 'editor'>('gallery');
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>('banner');
+
+  // Custom User-Uploaded Templates (JPG, PNG, GIF, MP4)
+  const [customTemplates, setCustomTemplates] = useState<CustomTemplate[]>([]);
+  const [currentCustomTemplate, setCurrentCustomTemplate] = useState<CustomTemplate | null>(null);
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadName, setUploadName] = useState<string>('');
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [customBgType, setCustomBgType] = useState<'green' | 'transparent' | 'black' | 'white'>('green');
+  const [customNameEdit, setCustomNameEdit] = useState<string>('');
+  const customVideoRef = useRef<HTMLVideoElement>(null);
+
+  // Load custom templates from server registry on mount
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        const res = await fetch('/api/upload-template');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.templates && Array.isArray(data.templates)) {
+            setCustomTemplates(data.templates);
+          }
+        }
+      } catch (err) {
+        console.warn('Gagal memuat custom templates:', err);
+      }
+    };
+    fetchTemplates();
+  }, []);
 
   // Canvas settings
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>('1:1');
@@ -1063,7 +1103,89 @@ export default function DesignTemplateTool() {
   };
 
   // Select Template and Apply Its Curated Defaults
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadFile(file);
+    setUploadError(null);
+    if (!uploadName.trim()) {
+      const cleanName = file.name
+        .replace(/\.[^/.]+$/, '')
+        .replace(/[-_]+/g, ' ')
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+      setUploadName(cleanName);
+    }
+  };
+
+  const handleUploadSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!uploadFile) return;
+
+    setIsUploading(true);
+    setUploadError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', uploadFile);
+      formData.append('name', uploadName.trim() || uploadFile.name);
+
+      const res = await fetch('/api/upload-template', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Gagal mengupload template');
+      }
+
+      if (data.template) {
+        setCustomTemplates((prev) => [data.template, ...prev]);
+        setUploadFile(null);
+        setUploadName('');
+        const fileInput = document.getElementById('template-upload-input') as HTMLInputElement;
+        if (fileInput) fileInput.value = '';
+      }
+    } catch (err: any) {
+      setUploadError(err.message || 'Terjadi kesalahan saat upload');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleDeleteCustomTemplate = async (id: string) => {
+    if (!confirm('Hapus template ini dari Design Template?')) return;
+
+    try {
+      const res = await fetch(`/api/upload-template?id=${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        setCustomTemplates((prev) => prev.filter((item) => item.id !== id));
+        if (currentCustomTemplate?.id === id) {
+          setCurrentCustomTemplate(null);
+          setCurrentView('gallery');
+        }
+      }
+    } catch (err) {
+      console.error('Gagal menghapus template:', err);
+    }
+  };
+
+  const handleSelectCustomTemplate = (item: CustomTemplate) => {
+    setCurrentCustomTemplate(item);
+    setCustomNameEdit(item.name);
+    setCurrentView('editor');
+  };
+
+  const handleBackToGallery = () => {
+    setCurrentCustomTemplate(null);
+    setCurrentView('gallery');
+  };
+
   const handleSelectTemplate = (id: TemplateId) => {
+    setCurrentCustomTemplate(null);
     setSelectedTemplate(id);
     const meta = TEMPLATES.find((t) => t.id === id);
     if (meta) {
@@ -1227,7 +1349,7 @@ export default function DesignTemplateTool() {
           {currentView === 'editor' && (
             <button
               type="button"
-              onClick={() => setCurrentView('gallery')}
+              onClick={handleBackToGallery}
               className="liquid-glass-chip w-9 h-9 rounded-full flex items-center justify-center text-[var(--label)] hover:text-[var(--tint)] shrink-0"
               title="Kembali ke Galeri Template"
             >
@@ -1238,17 +1360,13 @@ export default function DesignTemplateTool() {
           )}
 
           <div>
-            <h2 className="text-xl font-bold tracking-tight text-[var(--label)] flex items-center gap-2">
-              <span>{currentView === 'gallery' ? 'Design Templates' : TEMPLATES.find((t) => t.id === selectedTemplate)?.name}</span>
-              <span className="liquid-glass-chip text-[11px] font-semibold uppercase tracking-wider text-[var(--tint)] px-2.5 py-0.5">
-                Jitter Motion
-              </span>
-            </h2>
-            <p className="text-xs text-[var(--label-2)] mt-0.5">
+            <h2 className="text-xl font-bold tracking-tight text-[var(--label)]">
               {currentView === 'gallery'
-                ? 'Pilih template animasi siap pakai ala Jitter untuk konten dan ads TikTok/Reels.'
-                : 'Sesuaikan teks, warna gradient, durasi, dan export MP4 60FPS.'}
-            </p>
+                ? 'Design Template'
+                : currentCustomTemplate
+                ? currentCustomTemplate.name
+                : TEMPLATES.find((t) => t.id === selectedTemplate)?.name || 'Design Template'}
+            </h2>
           </div>
         </div>
 
@@ -1256,20 +1374,40 @@ export default function DesignTemplateTool() {
         {currentView === 'editor' && (
           <div className="flex items-center gap-2">
             <select
-              value={selectedTemplate}
-              onChange={(e) => handleSelectTemplate(e.target.value as TemplateId)}
+              value={currentCustomTemplate ? `custom:${currentCustomTemplate.id}` : selectedTemplate}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val.startsWith('custom:')) {
+                  const id = val.replace('custom:', '');
+                  const found = customTemplates.find((t) => t.id === id);
+                  if (found) handleSelectCustomTemplate(found);
+                } else {
+                  handleSelectTemplate(val as TemplateId);
+                }
+              }}
               className="h-9 px-3 lg-input text-xs font-semibold"
             >
-              {activeTemplates.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
+              <optgroup label="Template Desain">
+                {activeTemplates.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                  </option>
+                ))}
+              </optgroup>
+              {customTemplates.length > 0 && (
+                <optgroup label="Template Saya">
+                  {customTemplates.map((c) => (
+                    <option key={c.id} value={`custom:${c.id}`}>
+                      {c.name} ({c.fileName.split('.').pop()?.toUpperCase() || c.fileType})
+                    </option>
+                  ))}
+                </optgroup>
+              )}
             </select>
 
             <button
               type="button"
-              onClick={() => setCurrentView('gallery')}
+              onClick={handleBackToGallery}
               className="apple-nav-pill py-2 px-3.5 text-xs font-semibold"
             >
               Semua Template
@@ -1279,47 +1417,347 @@ export default function DesignTemplateTool() {
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          VIEW A: CLEAN JITTER GALLERY GRID (Image 2 style)
+          VIEW A: GALLERY GRID
           ───────────────────────────────────────────────────────────── */}
       {currentView === 'gallery' ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {activeTemplates.map((template) => (
-            <button
-              key={template.id}
-              type="button"
-              onClick={() => handleSelectTemplate(template.id)}
-              className="text-left group flex flex-col focus:outline-none"
-            >
-              {/* Card Thumbnail Stage */}
-              <div
-                className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-[var(--separator)] group-hover:border-[var(--tint)] group-hover:shadow-lg group-hover:shadow-[var(--tint)]/10 transition-all p-3 flex items-center justify-center relative"
-                style={{ backgroundColor: template.thumbBg }}
-              >
-                <div className="w-full h-full flex items-center justify-center">
-                  <TemplateMiniThumbnail
-                    templateMeta={template}
-                    renderTemplateNormalized={renderTemplateNormalized}
-                  />
-                </div>
+        <div className="space-y-8">
+          {/* UPLOAD TEMPLATE SECTION */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-[var(--fill)] border border-[var(--separator)] space-y-4">
+            <div>
+              <h3 className="text-sm font-semibold text-[var(--label)] flex items-center gap-2">
+                <svg className="w-4 h-4 text-[var(--tint)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                <span>Upload Template Baru</span>
+              </h3>
+              <p className="text-[11px] text-[var(--label-2)] mt-0.5">
+                Upload format JPG, JPEG, PNG, GIF, atau MP4. Setiap upload otomatis menjadi template tersendiri.
+              </p>
+            </div>
 
-                <div className="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="liquid-glass-chip text-[10px] font-semibold text-[var(--tint)] px-2 py-0.5">
-                    Customize
+            <form onSubmit={handleUploadSubmit} className="grid grid-cols-1 sm:grid-cols-[1fr_240px_auto] gap-3 items-end">
+              <div>
+                <label className="block text-[11px] font-medium text-[var(--label-2)] mb-1">
+                  Pilih File (JPG, PNG, GIF, MP4)
+                </label>
+                <input
+                  id="template-upload-input"
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,video/mp4,.jpg,.jpeg,.png,.gif,.mp4"
+                  onChange={handleFileSelect}
+                  className={fileInputClass}
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-medium text-[var(--label-2)] mb-1">
+                  Nama Template
+                </label>
+                <input
+                  type="text"
+                  value={uploadName}
+                  onChange={(e) => setUploadName(e.target.value)}
+                  placeholder="Contoh: Promo 11.11 Animated"
+                  className="w-full h-9 px-3 lg-input text-xs font-semibold"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={!uploadFile || isUploading}
+                className="h-9 px-5 lg-btn-primary text-xs font-semibold rounded-xl flex items-center justify-center gap-2 shrink-0 disabled:opacity-50"
+              >
+                {isUploading ? (
+                  <>
+                    <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                    </svg>
+                    <span>Mengunggah...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Simpan Template</span>
+                  </>
+                )}
+              </button>
+            </form>
+
+            {uploadError && (
+              <div className="text-xs text-red-500 font-medium bg-red-500/10 p-2.5 rounded-lg border border-red-500/20">
+                {uploadError}
+              </div>
+            )}
+          </div>
+
+          {/* SECTION 1: PRESET TEMPLATES */}
+          <div className="space-y-3">
+            <h3 className="text-xs font-semibold text-[var(--label-2)] uppercase tracking-wider">
+              Template Desain
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {activeTemplates.map((template) => (
+                <button
+                  key={template.id}
+                  type="button"
+                  onClick={() => handleSelectTemplate(template.id)}
+                  className="text-left group flex flex-col focus:outline-none"
+                >
+                  <div
+                    className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-[var(--separator)] group-hover:border-[var(--tint)] group-hover:shadow-lg group-hover:shadow-[var(--tint)]/10 transition-all p-3 flex items-center justify-center relative"
+                    style={{ backgroundColor: template.thumbBg }}
+                  >
+                    <div className="w-full h-full flex items-center justify-center">
+                      <TemplateMiniThumbnail
+                        templateMeta={template}
+                        renderTemplateNormalized={renderTemplateNormalized}
+                      />
+                    </div>
+                    <div className="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span className="liquid-glass-chip text-[10px] font-semibold text-[var(--tint)] px-2 py-0.5">
+                        Buka
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-2.5 px-1 flex items-center justify-between">
+                    <span className="text-sm font-semibold text-[var(--label)] group-hover:text-[var(--tint)] transition-colors">
+                      {template.name}
+                    </span>
+                    <span className="text-[11px] text-[var(--label-3)]">
+                      {template.category}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* SECTION 2: CUSTOM USER UPLOADS */}
+          {customTemplates.length > 0 && (
+            <div className="space-y-3 pt-2">
+              <h3 className="text-xs font-semibold text-[var(--label-2)] uppercase tracking-wider">
+                Template Saya ({customTemplates.length})
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {customTemplates.map((item) => (
+                  <div
+                    key={item.id}
+                    className="text-left group flex flex-col focus:outline-none relative"
+                  >
+                    <div
+                      onClick={() => handleSelectCustomTemplate(item)}
+                      className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-[var(--separator)] group-hover:border-[var(--tint)] group-hover:shadow-lg group-hover:shadow-[var(--tint)]/10 transition-all p-2 flex items-center justify-center relative bg-[var(--fill)] cursor-pointer"
+                    >
+                      {item.fileType === 'video' ? (
+                        <video
+                          src={item.fileUrl}
+                          muted
+                          loop
+                          autoPlay
+                          playsInline
+                          className="w-full h-full object-contain pointer-events-none rounded-xl"
+                        />
+                      ) : (
+                        <img
+                          src={item.fileUrl}
+                          alt={item.name}
+                          className="w-full h-full object-contain pointer-events-none rounded-xl"
+                        />
+                      )}
+
+                      {/* Format Badge */}
+                      <div className="absolute top-2.5 left-2.5">
+                        <span className="liquid-glass-chip text-[10px] font-bold uppercase tracking-wider text-[var(--tint)] px-2 py-0.5">
+                          {item.fileName.split('.').pop()?.toUpperCase() || item.fileType}
+                        </span>
+                      </div>
+
+                      {/* Delete Button */}
+                      <div className="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteCustomTemplate(item.id);
+                          }}
+                          className="w-7 h-7 rounded-full bg-red-500/80 hover:bg-red-500 text-white flex items-center justify-center shadow-md transition-colors"
+                          title="Hapus template"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="mt-2.5 px-1 flex items-center justify-between">
+                      <span
+                        onClick={() => handleSelectCustomTemplate(item)}
+                        className="text-sm font-semibold text-[var(--label)] group-hover:text-[var(--tint)] transition-colors truncate cursor-pointer"
+                        title={item.name}
+                      >
+                        {item.name}
+                      </span>
+                      <span className="text-[11px] text-[var(--label-3)] shrink-0 ml-2">
+                        {(item.fileSize / (1024 * 1024)).toFixed(1)} MB
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      ) : currentCustomTemplate ? (
+        /* ─────────────────────────────────────────────────────────────
+            VIEW B-1: CUSTOM TEMPLATE VIEWER & EXPORTER
+            ───────────────────────────────────────────────────────────── */
+        <div className="w-full grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6 items-start">
+          {/* LEFT INSPECTOR PANEL */}
+          <div className="lg-panel p-4 sm:p-6 space-y-5 min-w-0">
+            <div className="space-y-3 pb-4 border-b border-[var(--separator)]">
+              <label className="block text-xs font-semibold text-[var(--label)] uppercase tracking-wider">
+                1. Info Template
+              </label>
+
+              <div>
+                <label className="block text-[11px] font-medium text-[var(--label-2)] mb-1">Nama Template</label>
+                <input
+                  type="text"
+                  value={customNameEdit}
+                  onChange={(e) => setCustomNameEdit(e.target.value)}
+                  className="w-full h-9 px-3 lg-input text-xs font-semibold"
+                />
+              </div>
+
+              <div className="p-3 rounded-xl bg-[var(--fill)] border border-[var(--separator)] space-y-1.5 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-[var(--label-2)]">Format File:</span>
+                  <span className="font-bold text-[var(--tint)] uppercase">
+                    {currentCustomTemplate.fileName.split('.').pop() || currentCustomTemplate.fileType}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[var(--label-2)]">Ukuran:</span>
+                  <span className="font-mono text-[var(--label)]">
+                    {(currentCustomTemplate.fileSize / (1024 * 1024)).toFixed(2)} MB
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[var(--label-2)]">Nama File:</span>
+                  <span className="font-mono text-[var(--label-2)] truncate max-w-[180px]" title={currentCustomTemplate.fileName}>
+                    {currentCustomTemplate.fileName}
                   </span>
                 </div>
               </div>
+            </div>
 
-              {/* Title & Category below card */}
-              <div className="mt-2.5 px-1 flex items-center justify-between">
-                <span className="text-sm font-semibold text-[var(--label)] group-hover:text-[var(--tint)] transition-colors">
-                  {template.name}
-                </span>
-                <span className="text-[11px] text-[var(--label-3)]">
-                  {template.category}
-                </span>
+            {/* Background Stage Selector */}
+            <div className="space-y-3 pb-4 border-b border-[var(--separator)]">
+              <label className="block text-xs font-semibold text-[var(--label)] uppercase tracking-wider">
+                2. Background Stage
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCustomBgType('green')}
+                  data-active={customBgType === 'green'}
+                  className="lg-segment-btn py-2 text-xs flex items-center justify-center gap-1.5"
+                >
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#00FF00] border border-black/20" />
+                  <span>Green Screen</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCustomBgType('transparent')}
+                  data-active={customBgType === 'transparent'}
+                  className="lg-segment-btn py-2 text-xs flex items-center justify-center gap-1.5"
+                >
+                  <span className="w-2.5 h-2.5 rounded-full bg-slate-400 border border-black/20" />
+                  <span>Transparan</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCustomBgType('black')}
+                  data-active={customBgType === 'black'}
+                  className="lg-segment-btn py-2 text-xs flex items-center justify-center gap-1.5"
+                >
+                  <span className="w-2.5 h-2.5 rounded-full bg-black border border-white/20" />
+                  <span>Hitam</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCustomBgType('white')}
+                  data-active={customBgType === 'white'}
+                  className="lg-segment-btn py-2 text-xs flex items-center justify-center gap-1.5"
+                >
+                  <span className="w-2.5 h-2.5 rounded-full bg-white border border-black/20" />
+                  <span>Putih</span>
+                </button>
               </div>
-            </button>
-          ))}
+            </div>
+
+            {/* Actions */}
+            <div className="pt-2 space-y-2.5">
+              <a
+                href={currentCustomTemplate.fileUrl}
+                download={customNameEdit || currentCustomTemplate.fileName}
+                className="w-full lg-btn-primary py-3.5 text-xs font-semibold rounded-xl flex items-center justify-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                <span>Download {currentCustomTemplate.fileType === 'video' ? 'MP4' : 'File'}</span>
+              </a>
+
+              <button
+                type="button"
+                onClick={() => handleDeleteCustomTemplate(currentCustomTemplate.id)}
+                className="w-full py-2.5 text-xs font-medium text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-colors flex items-center justify-center gap-1.5"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                <span>Hapus Template Ini</span>
+              </button>
+            </div>
+          </div>
+
+          {/* RIGHT STAGE PREVIEW */}
+          <div className="flex flex-col items-center gap-4">
+            <div
+              className={`w-full aspect-square max-w-[620px] rounded-[28px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.18)] border border-[var(--separator)] relative flex items-center justify-center p-4 ${
+                customBgType === 'green'
+                  ? 'bg-[#00FF00]'
+                  : customBgType === 'transparent'
+                  ? 'bg-[repeating-conic-gradient(#e5e7eb_0%_25%,#ffffff_0%_50%)] bg-[length:24px_24px]'
+                  : customBgType === 'black'
+                  ? 'bg-black'
+                  : 'bg-white'
+              }`}
+            >
+              {currentCustomTemplate.fileType === 'video' ? (
+                <video
+                  ref={customVideoRef}
+                  src={currentCustomTemplate.fileUrl}
+                  loop
+                  autoPlay
+                  playsInline
+                  controls
+                  className="w-full h-full object-contain rounded-2xl"
+                />
+              ) : (
+                <img
+                  src={currentCustomTemplate.fileUrl}
+                  alt={currentCustomTemplate.name}
+                  className="w-full h-full object-contain rounded-2xl"
+                />
+              )}
+            </div>
+          </div>
         </div>
       ) : (
         /* ─────────────────────────────────────────────────────────────
