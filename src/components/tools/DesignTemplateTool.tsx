@@ -8,6 +8,7 @@ import {
   saveCustomTemplate,
   deleteCustomTemplate,
   updateCustomTemplateName,
+  subscribeCustomTemplates,
 } from '@/utils/templateStorage';
 
 import {
@@ -46,7 +47,7 @@ export default function DesignTemplateTool() {
   const customVideoRef = useRef<HTMLVideoElement>(null);
   const [exportingTemplateId, setExportingTemplateId] = useState<TemplateId | null>(null);
 
-  // Load custom templates from local IndexedDB on mount
+  // Load custom templates on mount & subscribe to realtime changes
   useEffect(() => {
     loadCustomTemplates()
       .then((items) => {
@@ -55,6 +56,16 @@ export default function DesignTemplateTool() {
       .catch((err) => {
         console.warn('Gagal memuat custom templates:', err);
       });
+
+    const unsubscribe = subscribeCustomTemplates(() => {
+      loadCustomTemplates().then((items) => {
+        setCustomTemplates(items);
+      });
+    });
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   // Canvas settings
