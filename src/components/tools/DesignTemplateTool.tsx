@@ -9,6 +9,7 @@ import {
   deleteCustomTemplate,
   updateCustomTemplateName,
   subscribeCustomTemplates,
+  isCloudConnected,
 } from '@/utils/templateStorage';
 
 import {
@@ -634,6 +635,7 @@ export default function DesignTemplateTool() {
             uploadError={uploadError}
             hasFile={Boolean(uploadFile)}
             fileInputClass={fileInputClass}
+            isCloudConnected={isCloudConnected}
             onFileSelect={handleFileSelect}
             onNameChange={setUploadName}
             onSubmit={handleUploadSubmit}
@@ -659,12 +661,23 @@ export default function DesignTemplateTool() {
             </div>
           </div>
 
-          {/* SECTION 2: CUSTOM USER UPLOADS */}
-          {customTemplates.length > 0 && (
-            <div className="space-y-3 pt-2">
+          {/* SECTION 2: TEAM TEMPLATES */}
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center justify-between">
               <h3 className="text-xs font-semibold text-[var(--label-2)] uppercase tracking-wider">
                 Team Template
               </h3>
+              {!isCloudConnected && (
+                <span
+                  className="text-[11px] text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full font-medium"
+                  title="Penyimpanan masih tersimpan di browser lokal perangkat ini. Hubungkan Supabase di Cloudflare Pages agar file dapat dilihat oleh semua orang."
+                >
+                  Mode Penyimpanan Lokal
+                </span>
+              )}
+            </div>
+
+            {customTemplates.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 {customTemplates.map((item) => (
                   <TeamTemplateCard
@@ -675,8 +688,12 @@ export default function DesignTemplateTool() {
                   />
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="p-8 rounded-2xl border border-dashed border-[var(--separator)] text-center text-xs text-[var(--label-3)]">
+                Belum ada template tim yang tersimpan. Unggah file melalui form di atas untuk membuat template baru.
+              </div>
+            )}
+          </div>
         </div>
       ) : currentCustomTemplate ? (
         /* VIEW B-1: CUSTOM TEMPLATE VIEWER & EXPORTER */

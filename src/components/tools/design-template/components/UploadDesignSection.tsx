@@ -6,6 +6,7 @@ interface UploadDesignSectionProps {
   uploadError: string | null;
   hasFile: boolean;
   fileInputClass: string;
+  isCloudConnected?: boolean;
   onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onNameChange: (val: string) => void;
   onSubmit: (e: React.FormEvent) => void;
@@ -17,6 +18,7 @@ export function UploadDesignSection({
   uploadError,
   hasFile,
   fileInputClass,
+  isCloudConnected = false,
   onFileSelect,
   onNameChange,
   onSubmit,
@@ -117,6 +119,12 @@ export function UploadDesignSection({
         <div className="text-xs text-red-500 font-medium bg-red-500/10 p-2.5 rounded-lg border border-red-500/20">
           {uploadError}
         </div>
+      )}
+
+      {!isCloudConnected && (
+        <p className="text-[11px] text-[var(--label-3)] leading-relaxed">
+          Catatan: Cloud Supabase belum terhubung. File yang diunggah saat ini tersimpan di browser lokal perangkat ini. Hubungkan Supabase di Cloudflare Pages agar file otomatis dibagikan ke semua orang.
+        </p>
       )}
     </div>
   );
