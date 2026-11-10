@@ -2,6 +2,15 @@
 
 import { useCallback, useMemo, useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { Muxer, ArrayBufferTarget } from 'mp4-muxer';
+import {
+  type CustomTemplate,
+  loadCustomTemplates,
+  saveCustomTemplate,
+  deleteCustomTemplate,
+  updateCustomTemplateName,
+} from '@/utils/templateStorage';
+
+export type { CustomTemplate };
 
 // Base coordinate space for normalized, un-distorted vector rendering
 const BASE_DIM = 1080;
@@ -41,17 +50,6 @@ export interface TemplateMeta {
   defaultGradientEnd: string;
   defaultGradientAngle: number;
   disabled?: boolean;
-}
-
-export interface CustomTemplate {
-  id: string;
-  name: string;
-  fileUrl: string;
-  fileType: 'video' | 'gif' | 'image';
-  mimeType: string;
-  fileName: string;
-  fileSize: number;
-  createdAt: string;
 }
 
 const TEMPLATES: TemplateMeta[] = [
@@ -210,22 +208,15 @@ export default function DesignTemplateTool() {
   const customVideoRef = useRef<HTMLVideoElement>(null);
   const [exportingTemplateId, setExportingTemplateId] = useState<TemplateId | null>(null);
 
-  // Load custom templates from server registry on mount
+  // Load custom templates from local IndexedDB on mount
   useEffect(() => {
-    const fetchTemplates = async () => {
-      try {
-        const res = await fetch('/api/upload-template');
-        if (res.ok) {
-          const data = await res.json();
-          if (data.templates && Array.isArray(data.templates)) {
-            setCustomTemplates(data.templates);
-          }
-        }
-      } catch (err) {
+    loadCustomTemplates()
+      .then((items) => {
+        setCustomTemplates(items);
+      })
+      .catch((err) => {
         console.warn('Gagal memuat custom templates:', err);
-      }
-    };
-    fetchTemplates();
+      });
   }, []);
 
   // Canvas settings
@@ -1126,28 +1117,12 @@ export default function DesignTemplateTool() {
     setUploadError(null);
 
     try {
-      const formData = new FormData();
-      formData.append('file', uploadFile);
-      formData.append('name', uploadName.trim() || uploadFile.name);
-
-      const res = await fetch('/api/upload-template', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await res.json();
-
-      if (!res.ok || data.error) {
-        throw new Error(data.error || 'Gagal mengupload template');
-      }
-
-      if (data.template) {
-        setCustomTemplates((prev) => [data.template, ...prev]);
-        setUploadFile(null);
-        setUploadName('');
-        const fileInput = document.getElementById('template-upload-input') as HTMLInputElement;
-        if (fileInput) fileInput.value = '';
-      }
+      const newTemplate = await saveCustomTemplate(uploadFile, uploadName);
+      setCustomTemplates((prev) => [newTemplate, ...prev]);
+      setUploadFile(null);
+      setUploadName('');
+      const fileInput = document.getElementById('template-upload-input') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
     } catch (err: any) {
       setUploadError(err.message || 'Terjadi kesalahan saat upload');
     } finally {
@@ -1159,18 +1134,29 @@ export default function DesignTemplateTool() {
     if (!confirm('Hapus template ini dari Design Template?')) return;
 
     try {
-      const res = await fetch(`/api/upload-template?id=${encodeURIComponent(id)}`, {
-        method: 'DELETE',
-      });
-      if (res.ok) {
-        setCustomTemplates((prev) => prev.filter((item) => item.id !== id));
-        if (currentCustomTemplate?.id === id) {
-          setCurrentCustomTemplate(null);
-          setCurrentView('gallery');
-        }
+      await deleteCustomTemplate(id);
+      setCustomTemplates((prev) => prev.filter((item) => item.id !== id));
+      if (currentCustomTemplate?.id === id) {
+        setCurrentCustomTemplate(null);
+        setCurrentView('gallery');
       }
     } catch (err) {
       console.error('Gagal menghapus template:', err);
+    }
+  };
+
+  const handleCustomNameChange = async (newName: string) => {
+    setCustomNameEdit(newName);
+    if (currentCustomTemplate) {
+      setCurrentCustomTemplate((prev) => (prev ? { ...prev, name: newName } : null));
+      setCustomTemplates((prev) =>
+        prev.map((t) => (t.id === currentCustomTemplate.id ? { ...t, name: newName } : t))
+      );
+      try {
+        await updateCustomTemplateName(currentCustomTemplate.id, newName);
+      } catch (err) {
+        console.warn('Gagal memperbarui nama template:', err);
+      }
     }
   };
 
@@ -1715,7 +1701,7 @@ export default function DesignTemplateTool() {
                 <input
                   type="text"
                   value={customNameEdit}
-                  onChange={(e) => setCustomNameEdit(e.target.value)}
+                  onChange={(e) => handleCustomNameChange(e.target.value)}
                   className="w-full h-9 px-3 lg-input text-xs font-semibold"
                 />
               </div>
