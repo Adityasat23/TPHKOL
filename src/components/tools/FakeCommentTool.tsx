@@ -108,7 +108,7 @@ export default function FakeCommentTool() {
   const [secondRepliesCount, setSecondRepliesCount] = useState('1');
   const [secondLikesCount, setSecondLikesCount] = useState('92');
 
-  const DEFAULT_SENDER_IMAGE = '/samples/default-sender-attachment.jpg';
+  const DEFAULT_SENDER_IMAGE = '/images/default-sender-attachment.jpg';
   const [commentImage, setCommentImage] = useState<string>(DEFAULT_SENDER_IMAGE);
   const [replyImage, setReplyImage] = useState<string>('');
   const [brandAvatar, setBrandAvatar] = useState<string>(TIMEPHORIA_LOGO);
