@@ -18,14 +18,15 @@ export type CurrencyOption = 'Rp' | 'RM' | '$' | 'none';
 
 export default function ProductCardTool() {
   const [productLayout, setProductLayout] = useState<'tiktok-portrait' | 'tiktok-landscape' | 'shopee' | 'shopee-horizontal'>('tiktok-portrait');
-  const [tkPortraitDesign, setTkPortraitDesign] = useState<1 | 2 | 3>(1);
+  const [tkPortraitDesign, setTkPortraitDesign] = useState<1 | 2 | 3 | 4>(1);
   const [productImage, setProductImage] = useState(SAFE_IMAGE); // Base64 — hanya untuk export
   const [productImageUrl, setProductImageUrl] = useState(''); // URL asli — untuk preview (instant)
   const [productTitle, setProductTitle] = useState("ALTERA BLURRING LIP TINT + LIP MATTE");
   const [productPrice, setProductPrice] = useState("50.000");
   const [productOriginalPrice, setProductOriginalPrice] = useState("100.000");
   const [productUnit, setProductUnit] = useState("/pcs");
-  const [productSold, setProductSold] = useState("1.1K sold");
+  const [productSold, setProductSold] = useState("10.5k sold");
+  const [brandName, setBrandName] = useState("TIMEPHORIA");
   const [productRating, setProductRating] = useState("4.9");
   const [priceColor, setPriceColor] = useState<'pink' | 'black'>('pink');
   
@@ -87,26 +88,42 @@ const urlToBase64 = (url: string): Promise<string> => {
   }, []);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value; setProductTitle(value);
-    if (value.trim().length > 0 || selectedCategory !== "All") {
-      setFilteredCatalog(TIMEPHORIA_CATALOG.filter((item: any) => (selectedCategory === "All" || item.category === selectedCategory) && item.name.toLowerCase().includes(value.toLowerCase())));
-      setShowSuggestions(true);
-    } else setShowSuggestions(false);
+    const value = e.target.value;
+    setProductTitle(value);
+    const query = value.toLowerCase().trim();
+    if (query.length > 0) {
+      setFilteredCatalog(
+        (TIMEPHORIA_CATALOG || []).filter(
+          (item: any) =>
+            item.name.toLowerCase().includes(query) ||
+            (item.category && item.category.toLowerCase().includes(query))
+        )
+      );
+    } else {
+      setFilteredCatalog(TIMEPHORIA_CATALOG || []);
+    }
+    setShowSuggestions(true);
   };
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const category = e.target.value; setSelectedCategory(category);
-    setFilteredCatalog(TIMEPHORIA_CATALOG.filter((item: any) => (category === "All" || item.category === category) && (productTitle === "" || item.name.toLowerCase().includes(productTitle.toLowerCase()))));
-    setShowSuggestions(productTitle.trim().length > 0 || category !== "All");
+    const category = e.target.value;
+    setSelectedCategory(category);
+    setFilteredCatalog(
+      (TIMEPHORIA_CATALOG || []).filter(
+        (item: any) =>
+          (category === "All" || item.category === category) &&
+          (productTitle === "" || item.name.toLowerCase().includes(productTitle.toLowerCase()))
+      )
+    );
+    setShowSuggestions(true);
   };
 
-const handleSelectProduct = (product: { name: string; image: string; category?: string }) => {
+  const handleSelectProduct = (product: { name: string; image: string; category?: string }) => {
     setProductTitle(product.name);
     // Set URL langsung → preview instan, tanpa tunggu fetch
     const imgUrl = product.image || DEFAULT_PRODUCT;
     setProductImageUrl(imgUrl);
-    setProductImage(imgUrl); // sementara pakai URL dulu, nanti diganti Base64 saat export
-    if (product.category && selectedCategory === "All") setSelectedCategory(product.category);
+    setProductImage(imgUrl);
     setShowSuggestions(false);
   };
 
@@ -166,6 +183,11 @@ const exportProductImage = async () => {
   const autoDiscountBadge = discountPct > 0 ? `-${discountPct}%` : '';
   const autoDiscountTagText = discountPct > 0 ? `${discountPct}% off` : '';
 
+  const brandPrefix = brandName.trim();
+  const cleanTitle = productTitle.trim();
+  const titleHasBrand = brandPrefix && cleanTitle.toLowerCase().startsWith(brandPrefix.toLowerCase());
+  const formattedProductTitle = titleHasBrand ? cleanTitle : (brandPrefix ? `${brandPrefix} - ${cleanTitle}` : cleanTitle);
+
   // Clean any leading typed currency symbol
   const cleanPrice = productPrice.trim().replace(/^(rp\.?|rm\.?|\$)\s*/i, '');
   const cleanOrigPrice = productOriginalPrice.trim().replace(/^(rp\.?|rm\.?|\$)\s*/i, '');
@@ -181,9 +203,9 @@ const exportProductImage = async () => {
   }
 
   let displayPrice = rawPrice;
-  if (priceFormat === 'k-an' && newPriceNum > 0 && currency === 'Rp') {
-    const kValue = Math.floor(newPriceNum / 1000);
-    displayPrice = `${currency}${kValue}K-an`;
+  if (priceFormat === 'k-an') {
+    const kValue = newPriceNum >= 1000 ? Math.floor(newPriceNum / 1000) : (newPriceNum > 0 ? newPriceNum : 50);
+    displayPrice = currency !== 'none' ? `${currency} ${kValue}K-an` : `${kValue}K-an`;
   }
 
   // ==========================================
@@ -201,14 +223,14 @@ const exportProductImage = async () => {
 
   const canvasSpec =
     productLayout === 'tiktok-portrait'
-      ? (tkPortraitDesign === 3 ? '1080 × 1920 px · Design 3 (Receipt Video) · MP4' : `300 × 420 px · Design ${tkPortraitDesign} · 3.5× PNG`)
+      ? (tkPortraitDesign === 4 ? '1080 × 1920 px · Printer (Receipt Video) · MP4' : `300 × 420 px · Design ${tkPortraitDesign} · 3.5× PNG`)
       : productLayout === 'tiktok-landscape'
       ? '540 × 220 px · Landscape · 3.5× PNG'
       : productLayout === 'shopee'
       ? '300 × 410 px · Square · 3.5× PNG'
       : '400 × 132 px · Horizontal · 3.5× PNG';
 
-  if (productLayout === 'tiktok-portrait' && tkPortraitDesign === 3) {
+  if (productLayout === 'tiktok-portrait' && tkPortraitDesign === 4) {
     return (
       <ReceiptVideoTool
         productLayout={productLayout}
@@ -230,6 +252,8 @@ const exportProductImage = async () => {
         productImage={productImage}
         productImageUrl={productImageUrl}
         handleImageUpload={handleImageUpload}
+        brandName={brandName}
+        setBrandName={setBrandName}
         priceColor={priceColor}
         setPriceColor={setPriceColor}
         currency={currency}
@@ -312,12 +336,47 @@ const exportProductImage = async () => {
             </div>
 
             <div>
+              <label className="block text-xs font-medium text-[var(--label-2)] mb-1.5">Brand / Store Tag</label>
+              <div className="flex items-center gap-2">
+                <span className="bg-[#fe2c55] text-white text-[11px] font-extrabold px-2.5 py-2 rounded-xl shrink-0 tracking-wider shadow-sm flex items-center gap-1">
+                  [MALL]
+                </span>
+                <input
+                  type="text"
+                  value={brandName}
+                  onChange={(e) => setBrandName(e.target.value)}
+                  placeholder="TIMEPHORIA"
+                  className="w-full h-10 px-3 lg-input text-sm font-semibold tracking-wide uppercase"
+                />
+              </div>
+            </div>
+
+            <div>
               <label className="block text-xs font-medium text-[var(--label-2)] mb-1.5">Catalog product</label>
-              <div ref={searchContainerRef} className="relative flex w-full lg-input overflow-visible">
-                <select value={selectedCategory} onChange={handleCategoryChange} className="px-3 h-10 bg-transparent border-r border-[var(--separator)] text-xs font-medium text-[var(--label-2)] focus:outline-none cursor-pointer">
-                  {categories.map((cat: any) => (<option key={cat} value={cat}>{cat}</option>))}
-                </select>
-                <input type="text" value={productTitle} onChange={handleTitleChange} onFocus={() => { if (productTitle.trim().length > 0 || selectedCategory !== "All") setShowSuggestions(true); }} placeholder="Cari produk katalog..." className="w-full px-3 h-10 bg-transparent focus:outline-none text-sm text-[var(--label)] rounded-r-xl" />
+              <div ref={searchContainerRef} className="relative flex w-full lg-input overflow-visible items-center">
+                <svg className="w-4 h-4 ml-3 text-[var(--label-3)] shrink-0 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <circle cx="11" cy="11" r="7" strokeWidth="2" />
+                  <path d="M21 21l-4.35-4.35" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+                <input
+                  type="text"
+                  value={productTitle}
+                  onChange={handleTitleChange}
+                  onFocus={() => {
+                    setFilteredCatalog(
+                      productTitle.trim()
+                        ? (TIMEPHORIA_CATALOG || []).filter(
+                            (item: any) =>
+                              item.name.toLowerCase().includes(productTitle.toLowerCase()) ||
+                              (item.category && item.category.toLowerCase().includes(productTitle.toLowerCase()))
+                          )
+                        : (TIMEPHORIA_CATALOG || [])
+                    );
+                    setShowSuggestions(true);
+                  }}
+                  placeholder="Cari nama produk (Lip, Combo, dll)..."
+                  className="w-full px-3 h-10 bg-transparent focus:outline-none text-sm text-[var(--label)] rounded-xl"
+                />
                 {showSuggestions && filteredCatalog.length > 0 && (
                   <ul className="absolute top-full left-0 right-0 z-50 mt-1.5 bg-[var(--surface-solid)]/95 backdrop-blur-2xl border border-[var(--separator)] rounded-2xl shadow-[0_16px_40px_rgba(0,0,0,0.16)] max-h-64 overflow-y-auto custom-scrollbar p-1">
                     {filteredCatalog.map((item: any, index: number) => (
@@ -357,7 +416,7 @@ const exportProductImage = async () => {
               </div>
               <div>
                 <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Sold count</label>
-                <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="1.1K sold" className="w-full h-10 px-3 lg-input tabular-nums text-sm" />
+                <input type="text" value={productSold} onChange={(e) => setProductSold(e.target.value)} placeholder="10.5k sold" className="w-full h-10 px-3 lg-input tabular-nums text-sm" />
               </div>
             </div>
 
@@ -399,7 +458,7 @@ const exportProductImage = async () => {
                   <div style={{ padding: '8px', backgroundColor: '#ffffff' }}>
                      <div style={{ fontSize: '14px', lineHeight: '20px', color: '#222', maxHeight: '40px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordWrap: 'break-word', whiteSpace: 'normal' }}>
                         {showShopeeLive && ( <span style={{ backgroundColor: '#ee4d2d', color: '#fff', fontSize: '10px', fontWeight: 'bold', padding: '1px 4px', borderRadius: '2px', marginRight: '6px', verticalAlign: 'middle', display: 'inline-flex', alignItems: 'center' }}>|・| LIVE</span> )}
-                        <span style={{ verticalAlign: 'middle' }}>[MALL] TIMEPHORIA - {productTitle}</span>
+                        <span style={{ verticalAlign: 'middle' }}>[MALL] {formattedProductTitle}</span>
                      </div>
                      <div style={{ marginTop: '8px' }}><div style={{ border: '1px solid #fabb05', display: 'inline-flex', alignItems: 'center', padding: '1px 4px', borderRadius: '2px', gap: '4px' }}><StarYellow /><span style={{ fontSize: '12px', color: '#222' }}>{productRating}</span></div></div>
                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', gap: '8px' }}>
@@ -432,7 +491,7 @@ const exportProductImage = async () => {
                 <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, paddingRight: '4px' }}>
                   <div style={{ fontSize: '14px', lineHeight: '20px', color: '#222', maxHeight: '40px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', wordWrap: 'break-word', whiteSpace: 'normal', marginBottom: '4px' }}>
                     <span style={{ backgroundColor: '#ee4d2d', color: '#fff', fontSize: '10px', fontWeight: 'bold', padding: '1px 4px', borderRadius: '2px', marginRight: '6px', verticalAlign: 'middle' }}>Star+</span>
-                    <span style={{ verticalAlign: 'middle' }}>[MALL] TIMEPHORIA - {productTitle}</span>
+                    <span style={{ verticalAlign: 'middle' }}>[MALL] {formattedProductTitle}</span>
                   </div>
                   
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 'auto' }}>
@@ -458,12 +517,12 @@ const exportProductImage = async () => {
             {/* RENDER: TIKTOK PORTRAIT (Terpisah) */}
             {productLayout === 'tiktok-portrait' && (
               <div className="flex flex-col items-center gap-4">
-                <div className="lg-segmented grid-cols-3 gap-1 w-64 sm:w-72">
+                <div className="lg-segmented grid-cols-4 gap-1 w-full max-w-[360px]">
                   <button
                     type="button"
                     onClick={() => setTkPortraitDesign(1)}
                     data-active={tkPortraitDesign === 1}
-                    className="lg-segment-btn py-1.5 px-3 text-xs"
+                    className="lg-segment-btn py-1.5 px-2 text-xs whitespace-nowrap"
                   >
                     Design 1
                   </button>
@@ -471,7 +530,7 @@ const exportProductImage = async () => {
                     type="button"
                     onClick={() => setTkPortraitDesign(2)}
                     data-active={tkPortraitDesign === 2}
-                    className="lg-segment-btn py-1.5 px-3 text-xs"
+                    className="lg-segment-btn py-1.5 px-2 text-xs whitespace-nowrap"
                   >
                     Design 2
                   </button>
@@ -479,9 +538,17 @@ const exportProductImage = async () => {
                     type="button"
                     onClick={() => setTkPortraitDesign(3)}
                     data-active={tkPortraitDesign === 3}
-                    className="lg-segment-btn py-1.5 px-3 text-xs"
+                    className="lg-segment-btn py-1.5 px-2 text-xs whitespace-nowrap"
                   >
                     Design 3
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTkPortraitDesign(4)}
+                    data-active={tkPortraitDesign === 4}
+                    className="lg-segment-btn py-1.5 px-2 text-xs whitespace-nowrap"
+                  >
+                    Printer
                   </button>
                 </div>
                 
@@ -489,7 +556,7 @@ const exportProductImage = async () => {
                   {/* Left Arrow */}
                   <button
                     type="button"
-                    onClick={() => setTkPortraitDesign((prev) => (prev > 1 ? (prev - 1) as 1 | 2 | 3 : 1))}
+                    onClick={() => setTkPortraitDesign((prev) => (prev > 1 ? ((prev - 1) as 1 | 2 | 3 | 4) : 1))}
                     disabled={tkPortraitDesign === 1}
                     className={`liquid-glass-chip w-9 h-9 flex items-center justify-center rounded-full ${tkPortraitDesign === 1 ? 'opacity-30 cursor-not-allowed' : ''}`}
                   >
@@ -507,7 +574,7 @@ const exportProductImage = async () => {
                         {autoDiscountBadge && ( <div style={{ position: 'absolute', top: 0, right: 0, backgroundColor: '#fe2c55', color: '#fff', padding: '4px 8px', fontSize: '14px', fontWeight: 'bold', borderBottomLeftRadius: '8px', zIndex: 10 }}>{autoDiscountBadge}</div> )}
                       </div>
                       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, backgroundColor: '#ffffff', boxSizing: 'border-box', minWidth: 0 }}>
-                        <div style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#222', lineHeight: '20px', maxHeight: '40px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', wordWrap: 'break-word', whiteSpace: 'normal' }}>[MALL] TIMEPHORIA - {productTitle}</div>
+                        <div style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#222', lineHeight: '20px', maxHeight: '40px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', wordWrap: 'break-word', whiteSpace: 'normal' }}>[MALL] {formattedProductTitle}</div>
                         <div style={{ display: 'flex', gap: '6px', marginBottom: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                          {autoDiscountTagText && ( <span style={{ backgroundColor: '#ffeef2', color: '#fe2c55', padding: '2px 6px', fontSize: '12px', borderRadius: '4px', fontWeight: 'bold' }}>{autoDiscountTagText}</span> )}
                         </div>
@@ -522,7 +589,7 @@ const exportProductImage = async () => {
                         </div>
                       </div>
                     </div>
-                  ) : (
+                  ) : tkPortraitDesign === 2 ? (
                     <div ref={productPreviewRef} style={{ backgroundColor: '#ffffff', borderRadius: '16px', overflow: 'hidden', fontFamily: 'Arial, sans-serif', width: '300px', minWidth: '300px', display: 'flex', flexDirection: 'column' }}>
                       <div style={{ position: 'relative', width: '300px', height: '300px', flexShrink: 0, backgroundColor: '#a3a3a3', overflow: 'hidden' }}>
                         <img key={productImageUrl || productImage} src={productImageUrl || productImage} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { 
@@ -549,7 +616,7 @@ const exportProductImage = async () => {
                       {/* Bottom Info */}
                       <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', backgroundColor: '#ffffff' }}>
                         <div style={{ fontSize: '16px', fontWeight: 800, color: '#111', lineHeight: '1.2', maxHeight: '38px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', textTransform: 'uppercase', marginBottom: '12px' }}>
-                          {productTitle}
+                          {formattedProductTitle}
                         </div>
 
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
@@ -587,14 +654,318 @@ const exportProductImage = async () => {
                         </div>
                       </div>
                     </div>
+                  ) : (
+                    /* RENDER: DESIGN 3 (TikTok Shop Bottom Sheet Card - Exact Reference) */
+                    (() => {
+                      const pTrim = productPrice.trim();
+                      const ribuMatch = pTrim.match(/^(\d+[\d.,]*)\s*(ribu|ribuan|k|k-an)?$/i);
+                      let d3Prefix = currency !== 'none' ? currency : '';
+                      let d3Number = '';
+                      let d3Suffix = '';
+
+                      if (priceFormat === 'k-an') {
+                        const kVal = newPriceNum >= 1000 ? Math.floor(newPriceNum / 1000) : (newPriceNum > 0 ? newPriceNum : 50);
+                        d3Number = `${kVal}`;
+                        d3Suffix = 'K-an';
+                      } else if (ribuMatch && ribuMatch[2]) {
+                        d3Number = ribuMatch[1];
+                        d3Suffix = ribuMatch[2].toLowerCase().startsWith('rib') ? 'Ribuan' : ribuMatch[2];
+                      } else {
+                        d3Number = cleanPrice || '50.000';
+                        d3Suffix = productUnit || '';
+                      }
+
+                      const finalTitle = formattedProductTitle;
+
+                      return (
+                        <div
+                          ref={productPreviewRef}
+                          style={{
+                            backgroundColor: '#ffffff',
+                            borderRadius: '16px',
+                            overflow: 'hidden',
+                            fontFamily: 'Arial, -apple-system, sans-serif',
+                            width: '300px',
+                            minWidth: '300px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            padding: '10px 10px 14px 10px',
+                            boxSizing: 'border-box',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                          }}
+                        >
+                          {/* 1. Product Image with rounded corners inside white card */}
+                          <div
+                            style={{
+                              position: 'relative',
+                              width: '280px',
+                              height: '280px',
+                              flexShrink: 0,
+                              borderRadius: '12px',
+                              overflow: 'hidden',
+                              backgroundColor: '#f3f4f6',
+                            }}
+                          >
+                            <img
+                              key={productImageUrl || productImage}
+                              src={productImageUrl || productImage}
+                              alt={productTitle}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                display: 'block',
+                              }}
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = SAFE_IMAGE;
+                              }}
+                            />
+                            {autoDiscountBadge && (
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  right: 0,
+                                  backgroundColor: '#fe2c55',
+                                  color: '#fff',
+                                  padding: '4px 8px',
+                                  fontSize: '12px',
+                                  fontWeight: 'bold',
+                                  borderBottomLeftRadius: '8px',
+                                  zIndex: 10,
+                                }}
+                              >
+                                {autoDiscountBadge}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* 2. Big Red Price (e.g. 70Ribuan) matching reference */}
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'baseline',
+                              color: priceColor === 'black' ? '#111827' : '#ff2442',
+                              marginTop: '8px',
+                              marginBottom: '6px',
+                              lineHeight: '1',
+                              overflow: 'hidden',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {d3Prefix && (
+                              <span style={{ fontSize: '18px', fontWeight: 800, marginRight: '2px' }}>
+                                {d3Prefix}
+                              </span>
+                            )}
+                            <span
+                              style={{
+                                fontSize: d3Number.length > 7 ? '30px' : '38px',
+                                fontWeight: 800,
+                                letterSpacing: '-1px',
+                                lineHeight: '1',
+                              }}
+                            >
+                              {d3Number}
+                            </span>
+                            {d3Suffix && (
+                              <span
+                                style={{
+                                  fontSize: '24px',
+                                  fontWeight: 700,
+                                  marginLeft: '2px',
+                                  lineHeight: '1',
+                                }}
+                              >
+                                {d3Suffix}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* 3. Product Title Line with TikTok Mall Badge (No ellipsis, full text display) */}
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'flex-start',
+                              gap: '6px',
+                              marginBottom: '6px',
+                              lineHeight: '1.25',
+                            }}
+                          >
+                            <span
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: '#111827',
+                                color: '#ffffff',
+                                fontSize: '10px',
+                                fontWeight: 800,
+                                padding: '1.5px 5.5px',
+                                borderRadius: '3.5px',
+                                boxShadow: '-1.5px 0 0 #00f2fe, 1.5px 0 0 #fe2c55',
+                                lineHeight: '13px',
+                                flexShrink: 0,
+                                marginTop: '1.5px',
+                              }}
+                            >
+                              Mall
+                            </span>
+                            <span
+                              style={{
+                                fontSize: finalTitle.length > 40 ? '12px' : '13px',
+                                fontWeight: 700,
+                                color: '#111827',
+                                lineHeight: '16px',
+                                whiteSpace: 'normal',
+                                wordBreak: 'break-word',
+                                flex: 1,
+                              }}
+                            >
+                              {finalTitle}
+                            </span>
+                          </div>
+
+                          {/* 4. Rating & Sold Row */}
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              fontSize: '12px',
+                              color: '#6b7280',
+                              marginBottom: '12px',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            <StarYellow />
+                            <span style={{ color: '#111827', fontWeight: 700, marginLeft: '2px' }}>
+                              {productRating}
+                            </span>
+                            <span style={{ color: '#2563eb', fontWeight: 600, marginLeft: '2px' }}>
+                              (7.9K)
+                            </span>
+                            <span style={{ color: '#d1d5db', margin: '0 4px' }}>|</span>
+                            <span style={{ color: '#6b7280' }}>
+                              {productSold.includes('sold') || productSold.includes('terjual')
+                                ? productSold
+                                : `${productSold} sold`}
+                            </span>
+                          </div>
+
+                          {/* 5. Bottom Action Bar: Shop, Chat, Add to Cart, Buy Now */}
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              gap: '8px',
+                              width: '100%',
+                            }}
+                          >
+                            {/* Shop & Chat */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', paddingLeft: '2px' }}>
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  alignItems: 'center',
+                                  color: '#4b5563',
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                <svg
+                                  width="18"
+                                  height="18"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <path d="M3 9h18v2H3z" />
+                                  <path d="M3 9l2-4h14l2 4" />
+                                  <path d="M4 11v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                                </svg>
+                                <span style={{ fontSize: '10px', marginTop: '2px', fontWeight: 500 }}>Shop</span>
+                              </div>
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  alignItems: 'center',
+                                  color: '#4b5563',
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                <svg
+                                  width="18"
+                                  height="18"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                                </svg>
+                                <span style={{ fontSize: '10px', marginTop: '2px', fontWeight: 500 }}>Chat</span>
+                              </div>
+                            </div>
+
+                            {/* Buttons */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1, justifyContent: 'flex-end' }}>
+                              <div
+                                style={{
+                                  backgroundColor: '#ffffff',
+                                  border: '1px solid #d1d5db',
+                                  color: '#111827',
+                                  fontSize: '12px',
+                                  fontWeight: 600,
+                                  padding: '7px 11px',
+                                  borderRadius: '6px',
+                                  whiteSpace: 'nowrap',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                }}
+                              >
+                                Add to cart
+                              </div>
+                              <div
+                                style={{
+                                  backgroundColor: '#00b578',
+                                  color: '#ffffff',
+                                  fontSize: '12px',
+                                  fontWeight: 700,
+                                  padding: '7px 16px',
+                                  borderRadius: '6px',
+                                  whiteSpace: 'nowrap',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                }}
+                              >
+                                Buy now
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()
                   )}
 
                   {/* Right Arrow */}
                   <button
                     type="button"
-                    onClick={() => setTkPortraitDesign((prev) => (prev < 3 ? (prev + 1) as 1 | 2 | 3 : 3))}
-                    disabled={tkPortraitDesign === 3}
-                    className={`liquid-glass-chip w-9 h-9 flex items-center justify-center rounded-full ${tkPortraitDesign === 3 ? 'opacity-30 cursor-not-allowed' : ''}`}
+                    onClick={() => setTkPortraitDesign((prev) => (prev < 4 ? ((prev + 1) as 1 | 2 | 3 | 4) : 4))}
+                    disabled={tkPortraitDesign === 4}
+                    className={`liquid-glass-chip w-9 h-9 flex items-center justify-center rounded-full ${tkPortraitDesign === 4 ? 'opacity-30 cursor-not-allowed' : ''}`}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
                   </button>
@@ -624,7 +995,7 @@ const exportProductImage = async () => {
                   
                   {/* Judul */}
                   <div style={{ fontSize: '16px', fontWeight: 800, color: '#222', lineHeight: '1.4', maxHeight: '44px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', textTransform: 'uppercase', marginBottom: '8px' }}>
-                    [MALL] TIMEPHORIA - {productTitle}
+                    [MALL] {formattedProductTitle}
                   </div>
 
                   {/* Tag Diskon */}

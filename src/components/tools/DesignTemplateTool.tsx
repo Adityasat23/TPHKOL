@@ -107,6 +107,29 @@ export default function DesignTemplateTool() {
   const [boxTitle, setBoxTitle] = useState('SPECIAL PROMO');
   const [boxSubtitle, setBoxSubtitle] = useState('Use code TIMEPHORIA at checkout');
 
+  // Graphic Sticker Templates (Per-template text isolation)
+  const [customText, setCustomText] = useState('Lorem Ipsum dolor');
+  const [customTextSecondary, setCustomTextSecondary] = useState('CARES');
+  const [customTextSize, setCustomTextSize] = useState<number>(72);
+  const [customTextColor, setCustomTextColor] = useState<string>('#ffffff');
+  const [templateTexts, setTemplateTexts] = useState<Record<string, { text: string; textSec?: string }>>({});
+
+  const handleCustomTextChange = (val: string) => {
+    setCustomText(val);
+    setTemplateTexts((prev) => ({
+      ...prev,
+      [selectedTemplate]: { ...prev[selectedTemplate], text: val, textSec: customTextSecondary },
+    }));
+  };
+
+  const handleCustomTextSecondaryChange = (val: string) => {
+    setCustomTextSecondary(val);
+    setTemplateTexts((prev) => ({
+      ...prev,
+      [selectedTemplate]: { ...prev[selectedTemplate], text: customText, textSec: val },
+    }));
+  };
+
   // Starburst Polygon Settings
   const [points, setPoints] = useState<number>(16);
   const [depthRatio, setDepthRatio] = useState<number>(0.84);
@@ -116,6 +139,7 @@ export default function DesignTemplateTool() {
   const [colorStyle, setColorStyle] = useState<ColorStyle>('solid');
   const [solidColor, setSolidColor] = useState<string>('#09090b');
   const [gradientStart, setGradientStart] = useState<string>('#ff0000');
+  const [gradientMid, setGradientMid] = useState<string>('');
   const [gradientEnd, setGradientEnd] = useState<string>('#990000');
   const [gradientAngle, setGradientAngle] = useState<number>(90);
 
@@ -194,12 +218,17 @@ export default function DesignTemplateTool() {
       cartCount,
       boxTitle,
       boxSubtitle,
+      customText,
+      customTextSecondary,
+      customTextSize,
+      customTextColor,
       points,
       depthRatio,
       borderWidth,
       colorStyle,
       solidColor,
       gradientStart,
+      gradientMid,
       gradientEnd,
       gradientAngle,
       spinSpeed,
@@ -228,12 +257,17 @@ export default function DesignTemplateTool() {
       cartCount,
       boxTitle,
       boxSubtitle,
+      customText,
+      customTextSecondary,
+      customTextSize,
+      customTextColor,
       points,
       depthRatio,
       borderWidth,
       colorStyle,
       solidColor,
       gradientStart,
+      gradientMid,
       gradientEnd,
       gradientAngle,
       spinSpeed,
@@ -389,8 +423,78 @@ export default function DesignTemplateTool() {
       setDuration(meta.defaultDuration);
       setSolidColor(meta.defaultSolidColor);
       setGradientStart(meta.defaultGradientStart);
+      setGradientMid(meta.defaultGradientMid || '');
       setGradientEnd(meta.defaultGradientEnd);
       setGradientAngle(meta.defaultGradientAngle);
+    }
+    // Set appropriate text color & size defaults for sticker templates
+    if (
+      [
+        'safari-bar',
+        'chat-bubble-pink',
+        'blue-pin-banner',
+        'attention-oval',
+        'swag-badge',
+        'chat-bubble-white',
+        'retro-oval-badge',
+        'pixel-megaphone',
+        'chat-bubble-blue',
+      ].includes(id)
+    ) {
+      if (templateTexts[id]) {
+        setCustomText(templateTexts[id].text);
+        setCustomTextSecondary(templateTexts[id].textSec || '');
+      } else if (id === 'attention-oval') {
+        setCustomText('Attention');
+        setCustomTextSecondary('');
+        setCustomTextColor('#ffffff');
+        setCustomTextSize(125);
+      } else if (id === 'swag-badge') {
+        setCustomText('SWAG');
+        setCustomTextSecondary('');
+        setCustomTextColor('#ffffff');
+        setCustomTextSize(115);
+      } else if (id === 'retro-oval-badge') {
+        setCustomText('who');
+        setCustomTextSecondary('CARES');
+        setCustomTextColor('#000000');
+        setCustomTextSize(80);
+      } else if (id === 'safari-bar') {
+        setCustomText('Where i go today?');
+        setCustomTextSecondary('');
+        setCustomTextColor('#1c1c1e');
+        setCustomTextSize(40);
+      } else if (id === 'chat-bubble-pink') {
+        setCustomText('Whatever');
+        setCustomTextSecondary('');
+        setCustomTextColor('#ffffff');
+        setCustomTextSize(56);
+      } else if (id === 'chat-bubble-blue') {
+        setCustomText('hEllOoo !!! 😵💫💗');
+        setCustomTextSecondary('');
+        setCustomTextColor('#ffffff');
+        setCustomTextSize(52);
+      } else if (id === 'blue-pin-banner') {
+        setCustomText('Lorem Ipsum dolor');
+        setCustomTextSecondary('');
+        setCustomTextColor('#0047ff');
+        setCustomTextSize(64);
+      } else if (id === 'chat-bubble-white') {
+        setCustomText('Lorem Ipsum dolor');
+        setCustomTextSecondary('');
+        setCustomTextColor('#000000');
+        setCustomTextSize(52);
+      } else if (id === 'pixel-megaphone') {
+        setCustomText('Lorem Ipsum dolor');
+        setCustomTextSecondary('');
+        setCustomTextColor('#1e1b4b');
+        setCustomTextSize(56);
+      } else {
+        setCustomText('Lorem Ipsum dolor');
+        setCustomTextSecondary('');
+        setCustomTextColor('#ffffff');
+        setCustomTextSize(56);
+      }
     }
     setCurrentView('editor');
     handleSeek(0);
@@ -487,8 +591,13 @@ export default function DesignTemplateTool() {
       const a = document.createElement('a');
       a.href = dlUrl;
       const dlName =
-        (overrideTemplateId ? targetMeta?.name : selectedTemplate === 'banner' ? bannerText : badgeText) ||
-        targetId;
+        (overrideTemplateId
+          ? targetMeta?.name
+          : selectedTemplate === 'banner'
+          ? bannerText
+          : selectedTemplate === 'starburst'
+          ? badgeText
+          : customText || targetMeta?.name) || targetId;
       a.download = `${dlName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-60fps.mp4`;
       document.body.appendChild(a);
       a.click();
@@ -641,27 +750,7 @@ export default function DesignTemplateTool() {
             onSubmit={handleUploadSubmit}
           />
 
-          {/* SECTION 1: PRESET TEMPLATES */}
-          <div className="space-y-3">
-            <h3 className="text-xs font-semibold text-[var(--label-2)] uppercase tracking-wider">
-              Template Desain
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {activeTemplates.map((template) => (
-                <PresetTemplateCard
-                  key={template.id}
-                  template={template}
-                  exportingTemplateId={exportingTemplateId}
-                  exportProgress={exportProgress}
-                  onSelect={handleSelectTemplate}
-                  onQuickDownload={handleQuickDownloadPreset}
-                  renderTemplateNormalized={renderNormalized}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* SECTION 2: TEAM TEMPLATES */}
+          {/* SECTION 1: TEAM TEMPLATES (Dahulukan Team Template) */}
           <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-semibold text-[var(--label-2)] uppercase tracking-wider">
@@ -693,6 +782,26 @@ export default function DesignTemplateTool() {
                 Belum ada template tim yang tersimpan. Unggah file melalui form di atas untuk membuat template baru.
               </div>
             )}
+          </div>
+
+          {/* SECTION 2: PRESET TEMPLATES */}
+          <div className="space-y-3 pt-4 border-t border-[var(--separator)]">
+            <h3 className="text-xs font-semibold text-[var(--label-2)] uppercase tracking-wider">
+              Template Desain
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {activeTemplates.map((template) => (
+                <PresetTemplateCard
+                  key={template.id}
+                  template={template}
+                  exportingTemplateId={exportingTemplateId}
+                  exportProgress={exportProgress}
+                  onSelect={handleSelectTemplate}
+                  onQuickDownload={handleQuickDownloadPreset}
+                  renderTemplateNormalized={renderNormalized}
+                />
+              ))}
+            </div>
           </div>
         </div>
       ) : currentCustomTemplate ? (
@@ -750,6 +859,14 @@ export default function DesignTemplateTool() {
             setBoxTitle={setBoxTitle}
             boxSubtitle={boxSubtitle}
             setBoxSubtitle={setBoxSubtitle}
+            customText={customText}
+            setCustomText={handleCustomTextChange}
+            customTextSecondary={customTextSecondary}
+            setCustomTextSecondary={handleCustomTextSecondaryChange}
+            customTextSize={customTextSize}
+            setCustomTextSize={setCustomTextSize}
+            customTextColor={customTextColor}
+            setCustomTextColor={setCustomTextColor}
             points={points}
             setPoints={setPoints}
             depthRatio={depthRatio}
@@ -762,6 +879,8 @@ export default function DesignTemplateTool() {
             setSolidColor={setSolidColor}
             gradientStart={gradientStart}
             setGradientStart={setGradientStart}
+            gradientMid={gradientMid}
+            setGradientMid={setGradientMid}
             gradientEnd={gradientEnd}
             setGradientEnd={setGradientEnd}
             gradientAngle={gradientAngle}

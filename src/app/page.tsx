@@ -171,8 +171,19 @@ export default function Home() {
       </div>
 
       {/* FOOTER */}
-      <footer className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 py-4 flex items-center justify-between text-xs text-[var(--label-3)]">
-        <span>Aditya Satria Pratama</span>
+      <footer className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 py-6 border-t border-[var(--separator)] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[var(--label-3)]">
+        <div className="text-center sm:text-left">
+          <span>
+            Contact at Ding: <span className="font-medium text-[var(--label-2)]">Aditya Satria Pratama</span> / Email:{' '}
+            <a href="mailto:adityasatriapwork@gmail.com" className="font-medium text-[var(--tint)] hover:underline">
+              adityasatriapwork@gmail.com
+            </a>{' '}
+            jika ada bug, error atau request update
+          </span>
+        </div>
+        <p className="text-[11px] text-[var(--label-3)] text-center sm:text-right font-medium">
+          Confidential &amp; Proprietary: For internal use only. Do not copy, share, or misuse any data without authorization.
+        </p>
       </footer>
     </main>
   );

@@ -1,12 +1,15 @@
 export type TemplateId =
   | 'starburst'
-  | 'instagram-like'
-  | 'box'
   | 'banner'
-  | 'interactive-button-trace'
-  | 'glass-button'
-  | 'view-cart-button'
-  | 'continue-button-interaction';
+  | 'safari-bar'
+  | 'chat-bubble-pink'
+  | 'blue-pin-banner'
+  | 'attention-oval'
+  | 'swag-badge'
+  | 'chat-bubble-white'
+  | 'retro-oval-badge'
+  | 'pixel-megaphone'
+  | 'chat-bubble-blue';
 
 export type TemplateCategory = 'Badges' | 'Buttons' | 'Social' | 'Containers';
 
@@ -18,6 +21,7 @@ export interface TemplateMeta {
   thumbBg: string;
   defaultSolidColor: string;
   defaultGradientStart: string;
+  defaultGradientMid?: string;
   defaultGradientEnd: string;
   defaultGradientAngle: number;
   disabled?: boolean;
@@ -61,6 +65,12 @@ export interface RenderState {
   boxTitle: string;
   boxSubtitle: string;
 
+  // New Sticker / Graphic Template Texts (Default: "Lorem Ipsum dolor")
+  customText: string;
+  customTextSecondary?: string;
+  customTextSize: number;
+  customTextColor: string;
+
   // Starburst Polygon Settings
   points: number;
   depthRatio: number;
@@ -70,6 +80,7 @@ export interface RenderState {
   colorStyle: ColorStyle;
   solidColor: string;
   gradientStart: string;
+  gradientMid?: string;
   gradientEnd: string;
   gradientAngle: number;
 

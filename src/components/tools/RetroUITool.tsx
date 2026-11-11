@@ -29,6 +29,7 @@ export default function RetroUITool() {
         cacheBust: true,
         pixelRatio: 2,
         backgroundColor: 'transparent',
+        skipFonts: true,
       });
       const link = document.createElement('a');
       link.download = `ig-notes-reply-${Date.now()}.png`;

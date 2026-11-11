@@ -55,6 +55,8 @@ interface PresetTemplateInspectorProps {
   setSolidColor: (val: string) => void;
   gradientStart: string;
   setGradientStart: (val: string) => void;
+  gradientMid: string;
+  setGradientMid: (val: string) => void;
   gradientEnd: string;
   setGradientEnd: (val: string) => void;
   gradientAngle: number;
@@ -67,6 +69,14 @@ interface PresetTemplateInspectorProps {
   setAspectRatio: (val: AspectRatio) => void;
   duration: number;
   setDuration: (val: number) => void;
+  customText: string;
+  setCustomText: (val: string) => void;
+  customTextSecondary?: string;
+  setCustomTextSecondary?: (val: string) => void;
+  customTextSize: number;
+  setCustomTextSize: (val: number) => void;
+  customTextColor: string;
+  setCustomTextColor: (val: string) => void;
   exportProgress: number | null;
   exportStatusText: string;
   onCancelExport: () => void;
@@ -129,12 +139,22 @@ export function PresetTemplateInspector(props: PresetTemplateInspectorProps) {
     setSolidColor,
     gradientStart,
     setGradientStart,
+    gradientMid,
+    setGradientMid,
     gradientEnd,
     setGradientEnd,
     gradientAngle,
     setGradientAngle,
     spinSpeed,
     setSpinSpeed,
+    customText,
+    setCustomText,
+    customTextSecondary = '',
+    setCustomTextSecondary,
+    customTextSize,
+    setCustomTextSize,
+    customTextColor,
+    setCustomTextColor,
     bgType,
     setBgType,
     aspectRatio,
@@ -344,70 +364,98 @@ export function PresetTemplateInspector(props: PresetTemplateInspectorProps) {
           </div>
         )}
 
-        {/* Button Text Controls */}
-        {(selectedTemplate === 'interactive-button-trace' ||
-          selectedTemplate === 'glass-button') && (
+        {/* Graphic Sticker Templates */}
+        {[
+          'safari-bar',
+          'chat-bubble-pink',
+          'blue-pin-banner',
+          'attention-oval',
+          'swag-badge',
+          'chat-bubble-white',
+          'retro-oval-badge',
+          'pixel-megaphone',
+          'chat-bubble-blue',
+        ].includes(selectedTemplate) && (
           <div className="space-y-3">
-            <div>
-              <label className="block text-xs font-medium text-[var(--label-2)] mb-1">
-                Teks Tombol:
-              </label>
-              <input
-                type="text"
-                value={buttonText}
-                onChange={(e) => setButtonText(e.target.value)}
-                placeholder="CLAIM VOUCHER"
-                className="w-full h-9 px-3 lg-input text-sm font-bold uppercase"
-              />
-            </div>
-          </div>
-        )}
+            {selectedTemplate === 'retro-oval-badge' ? (
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-[var(--label-2)] mb-1">
+                    Teks Atas (Cursive Script):
+                  </label>
+                  <input
+                    type="text"
+                    value={customText}
+                    onChange={(e) => setCustomText(e.target.value)}
+                    placeholder="who"
+                    className="w-full h-9 px-3 lg-input text-sm italic font-serif"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[var(--label-2)] mb-1">
+                    Teks Bawah (Bold Sans):
+                  </label>
+                  <input
+                    type="text"
+                    value={customTextSecondary}
+                    onChange={(e) => setCustomTextSecondary?.(e.target.value)}
+                    placeholder="CARES"
+                    className="w-full h-9 px-3 lg-input text-sm font-black uppercase"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div>
+                <label className="block text-xs font-medium text-[var(--label-2)] mb-1">
+                  Teks Desain:
+                </label>
+                <input
+                  type="text"
+                  value={customText}
+                  onChange={(e) => setCustomText(e.target.value)}
+                  placeholder="Lorem Ipsum dolor"
+                  className="w-full h-9 px-3 lg-input text-sm font-semibold"
+                />
+              </div>
+            )}
 
-        {/* View Cart Button Controls */}
-        {selectedTemplate === 'view-cart-button' && (
-          <div className="space-y-3">
-            <div className="flex justify-between text-xs text-[var(--label-2)] mb-1">
-              <span>Jumlah Item di Keranjang:</span>
-              <span className="tabular-nums font-semibold text-[var(--label)]">
-                {cartCount} Item
-              </span>
+            <div>
+              <div className="flex justify-between text-xs text-[var(--label-2)] mb-1">
+                <span>Ukuran Teks</span>
+                <span className="tabular-nums font-semibold text-[var(--label)]">
+                  {customTextSize}px
+                </span>
+              </div>
+              <input
+                type="range"
+                min={30}
+                max={140}
+                step={2}
+                value={customTextSize}
+                onChange={(e) => setCustomTextSize(Number(e.target.value))}
+                className="w-full accent-[var(--tint)]"
+              />
             </div>
-            <input
-              type="range"
-              min={1}
-              max={9}
-              step={1}
-              value={cartCount}
-              onChange={(e) => setCartCount(Number(e.target.value))}
-              className="w-full accent-[var(--tint)]"
-            />
-          </div>
-        )}
 
-        {/* Box Controls */}
-        {selectedTemplate === 'box' && (
-          <div className="space-y-3">
             <div>
-              <label className="block text-xs font-medium text-[var(--label-2)] mb-1">
-                Judul Box:
+              <label className="block text-xs font-medium text-[var(--label-2)] mb-1.5">
+                Warna Teks:
               </label>
-              <input
-                type="text"
-                value={boxTitle}
-                onChange={(e) => setBoxTitle(e.target.value)}
-                className="w-full h-9 px-3 lg-input text-sm font-bold uppercase"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-[var(--label-2)] mb-1">
-                Subjudul:
-              </label>
-              <input
-                type="text"
-                value={boxSubtitle}
-                onChange={(e) => setBoxSubtitle(e.target.value)}
-                className="w-full h-9 px-3 lg-input text-xs"
-              />
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={customTextColor.startsWith('#') ? customTextColor : '#ffffff'}
+                  onChange={(e) => setCustomTextColor(e.target.value)}
+                  className="w-8 h-8 rounded-lg border border-[var(--separator)] cursor-pointer"
+                />
+                <input
+                  type="text"
+                  value={customTextColor}
+                  onChange={(e) => setCustomTextColor(e.target.value)}
+                  className="w-28 h-8 px-2.5 lg-input text-xs font-mono"
+                  placeholder="#ffffff"
+                />
+              </div>
             </div>
           </div>
         )}
@@ -695,23 +743,59 @@ export function PresetTemplateInspector(props: PresetTemplateInspectorProps) {
           </div>
         ) : (
           <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-2">
               <div>
                 <label className="block text-[11px] font-medium text-[var(--label-2)] mb-1">
                   Start Color
                 </label>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <input
                     type="color"
-                    value={gradientStart}
+                    value={gradientStart.startsWith('#') ? gradientStart : '#ff0000'}
                     onChange={(e) => setGradientStart(e.target.value)}
-                    className="w-8 h-8 rounded-lg cursor-pointer border border-white/20 shrink-0"
+                    className="w-7 h-7 rounded-lg cursor-pointer border border-white/20 shrink-0"
                   />
                   <input
                     type="text"
                     value={gradientStart}
                     onChange={(e) => setGradientStart(e.target.value)}
-                    className="w-full h-8 px-2 lg-input text-xs font-mono uppercase"
+                    className="w-full h-8 px-1.5 lg-input text-[11px] font-mono uppercase"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-[11px] font-medium text-[var(--label-2)] truncate">
+                    Mid (3-Stop)
+                  </label>
+                  {gradientMid && (
+                    <button
+                      type="button"
+                      onClick={() => setGradientMid('')}
+                      className="text-[10px] text-red-500 hover:text-red-400 font-medium"
+                      title="Hapus Warna Tengah (Jadi 2 Warna)"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="color"
+                    value={gradientMid ? (gradientMid.startsWith('#') ? gradientMid : '#22c55e') : '#22c55e'}
+                    onChange={(e) => setGradientMid(e.target.value)}
+                    className={`w-7 h-7 rounded-lg cursor-pointer border border-white/20 shrink-0 ${
+                      !gradientMid ? 'opacity-35' : ''
+                    }`}
+                    title={gradientMid ? 'Warna Tengah Aktif' : 'Klik untuk mengaktifkan warna ke-3'}
+                  />
+                  <input
+                    type="text"
+                    value={gradientMid}
+                    placeholder="Opsional"
+                    onChange={(e) => setGradientMid(e.target.value)}
+                    className="w-full h-8 px-1.5 lg-input text-[11px] font-mono uppercase"
                   />
                 </div>
               </div>
@@ -720,18 +804,18 @@ export function PresetTemplateInspector(props: PresetTemplateInspectorProps) {
                 <label className="block text-[11px] font-medium text-[var(--label-2)] mb-1">
                   End Color
                 </label>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <input
                     type="color"
-                    value={gradientEnd}
+                    value={gradientEnd.startsWith('#') ? gradientEnd : '#990000'}
                     onChange={(e) => setGradientEnd(e.target.value)}
-                    className="w-8 h-8 rounded-lg cursor-pointer border border-white/20 shrink-0"
+                    className="w-7 h-7 rounded-lg cursor-pointer border border-white/20 shrink-0"
                   />
                   <input
                     type="text"
                     value={gradientEnd}
                     onChange={(e) => setGradientEnd(e.target.value)}
-                    className="w-full h-8 px-2 lg-input text-xs font-mono uppercase"
+                    className="w-full h-8 px-1.5 lg-input text-[11px] font-mono uppercase"
                   />
                 </div>
               </div>

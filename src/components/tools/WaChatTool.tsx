@@ -177,7 +177,7 @@ export default function WaChatTool() {
       setIsExporting(true);
       await document.fonts.ready;
       await new Promise(resolve => setTimeout(resolve, 150));
-      const dataUrl = await toPng(waPreviewRef.current, { cacheBust: true, pixelRatio: 3, backgroundColor: waTheme === 'dark' ? '#000000' : '#ffffff' });
+      const dataUrl = await toPng(waPreviewRef.current, { cacheBust: true, pixelRatio: 3, backgroundColor: waTheme === 'dark' ? '#000000' : '#ffffff', skipFonts: true });
       const link = document.createElement('a'); link.download = `whatsapp-ios-${waTheme}-${Date.now()}.png`; link.href = dataUrl; link.click();
     } catch (err) { alert("Export WA Chat gagal."); } finally {
       setIsExporting(false);

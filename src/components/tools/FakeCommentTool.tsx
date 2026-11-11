@@ -101,15 +101,17 @@ export default function FakeCommentTool() {
 
   // State Komentar ke-2 (Khusus Threads Page View)
   const [showSecondComment, setShowSecondComment] = useState(true);
-  const [secondUsername, setSecondUsername] = useState('elibrooks');
+  const [secondUsername, setSecondUsername] = useState('alisyatiaraselamanya');
   const [secondAvatar, setSecondAvatar] = useState(DEFAULT_AVATAR);
   const [secondTime, setSecondTime] = useState('37m');
-  const [secondText, setSecondText] = useState('need the color grade preset immediately');
+  const [secondText, setSecondText] = useState('kapan alas roban episod baru?');
   const [secondRepliesCount, setSecondRepliesCount] = useState('1');
   const [secondLikesCount, setSecondLikesCount] = useState('92');
 
-  const [commentImage, setCommentImage] = useState<string>('');
+  const DEFAULT_SENDER_IMAGE = '/samples/default-sender-attachment.jpg';
+  const [commentImage, setCommentImage] = useState<string>(DEFAULT_SENDER_IMAGE);
   const [replyImage, setReplyImage] = useState<string>('');
+  const [brandAvatar, setBrandAvatar] = useState<string>(TIMEPHORIA_LOGO);
 
   const previewRef = useRef<HTMLDivElement>(null);
   const { getDetectedBannedWords, renderWithHighlights } = useBannedWords();
@@ -130,7 +132,7 @@ export default function FakeCommentTool() {
       setIsExporting(true);
       await document.fonts.ready;
       await new Promise(resolve => setTimeout(resolve, 150));
-      const dataUrl = await toPng(previewRef.current, { cacheBust: true, pixelRatio: 3, backgroundColor: 'transparent' });
+      const dataUrl = await toPng(previewRef.current, { cacheBust: true, pixelRatio: 3, backgroundColor: 'transparent', skipFonts: true });
       const link = document.createElement('a');
       link.download = `comment-${commentMode}-${Date.now()}.png`;
       link.href = dataUrl;
@@ -276,13 +278,75 @@ export default function FakeCommentTool() {
           </div>
 
           {(commentMode === 'thread' || commentMode === 'threads') && (
-            <div>
-              <label className="block text-xs font-medium text-[var(--label-2)] mb-1.5">Lampiran gambar di post utama (opsional)</label>
-              <input type="file" onChange={(e) => handleImageUpload(e, setCommentImage)} className="text-xs block w-full file:mr-3 file:py-1.5 file:px-3.5 file:rounded-full file:border file:border-white/50 file:text-xs file:font-medium file:bg-white/60 file:text-[var(--label)] hover:file:bg-white/80 transition-colors cursor-pointer text-[var(--label-2)]" />
-              {commentImage && (
-                <button onClick={() => setCommentImage('')} className="mt-2 text-xs font-medium text-[#FF383C] hover:underline">
-                  Hapus gambar komentar
-                </button>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-medium text-[var(--label-2)]">
+                  Lampiran gambar sender (post utama)
+                </label>
+                {commentImage && (
+                  <button
+                    type="button"
+                    onClick={() => setCommentImage('')}
+                    className="text-xs font-medium text-[#FF383C] hover:underline cursor-pointer"
+                  >
+                    Hapus gambar
+                  </button>
+                )}
+              </div>
+
+              {commentImage ? (
+                <div className="flex items-center gap-3 p-2 bg-[var(--fill)] rounded-xl border border-[var(--separator)]">
+                  <img
+                    src={commentImage}
+                    alt="Lampiran Sender"
+                    className="w-14 h-14 object-cover rounded-lg border border-[var(--separator)] shrink-0"
+                  />
+                  <div className="flex-1 min-w-0 space-y-1">
+                    <p className="text-xs font-medium text-[var(--label)] truncate">
+                      {commentImage === DEFAULT_SENDER_IMAGE ? 'default-sender-cat.jpg' : 'Lampiran kustom'}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <label className="text-[11px] font-medium text-[var(--tint)] hover:underline cursor-pointer">
+                        Ganti manual
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleImageUpload(e, setCommentImage)}
+                          className="sr-only"
+                        />
+                      </label>
+                      {commentImage !== DEFAULT_SENDER_IMAGE && (
+                        <>
+                          <span className="text-[var(--label-3)]">·</span>
+                          <button
+                            type="button"
+                            onClick={() => setCommentImage(DEFAULT_SENDER_IMAGE)}
+                            className="text-[11px] font-medium text-[var(--label-2)] hover:text-[var(--label)] cursor-pointer"
+                          >
+                            Reset ke default
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, setCommentImage)}
+                    className="text-xs block w-full file:mr-3 file:py-1.5 file:px-3.5 file:rounded-full file:border file:border-white/50 file:text-xs file:font-medium file:bg-white/60 file:text-[var(--label)] hover:file:bg-white/80 transition-colors cursor-pointer text-[var(--label-2)]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setCommentImage(DEFAULT_SENDER_IMAGE)}
+                    className="shrink-0 px-2.5 py-1.5 text-xs font-medium lg-btn rounded-xl cursor-pointer"
+                    title="Gunakan gambar meme default"
+                  >
+                    Pakai default
+                  </button>
+                </div>
               )}
             </div>
           )}
@@ -303,16 +367,83 @@ export default function FakeCommentTool() {
 
             {showReply && (
               <div className="space-y-3">
-                <div className="w-full">
-                  <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Akun brand</label>
-                  <select
-                    value={brandName}
-                    onChange={(e) => setBrandName(e.target.value)}
-                    className="w-full px-3 py-2 lg-input text-sm font-medium cursor-pointer"
-                  >
-                    <option value="Timephoria.id">Timephoria.id</option>
-                    <option value="timephoria.basemakeup">timephoria.basemakeup</option>
-                  </select>
+                <div className="w-full space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-xs font-medium text-[var(--label-2)]">Akun brand balasan</label>
+                    <div className="flex items-center gap-2">
+                      <label className="text-[11px] font-medium text-[var(--tint)] hover:underline cursor-pointer">
+                        Ganti logo
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleImageUpload(e, setBrandAvatar)}
+                          className="sr-only"
+                        />
+                      </label>
+                      {brandAvatar !== TIMEPHORIA_LOGO && (
+                        <>
+                          <span className="text-[var(--label-3)]">·</span>
+                          <button
+                            type="button"
+                            onClick={() => setBrandAvatar(TIMEPHORIA_LOGO)}
+                            className="text-[11px] font-medium text-[var(--label-2)] hover:text-[var(--label)] cursor-pointer"
+                          >
+                            Reset logo
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <select
+                      value={['Timephoria.id', 'timephoria.basemakeup'].includes(brandName) ? brandName : '__custom__'}
+                      onChange={(e) => {
+                        if (e.target.value !== '__custom__') {
+                          setBrandName(e.target.value);
+                        }
+                      }}
+                      className="w-full sm:w-44 px-2.5 py-2 lg-input text-xs font-medium cursor-pointer shrink-0"
+                    >
+                      <option value="Timephoria.id">Timephoria.id</option>
+                      <option value="timephoria.basemakeup">timephoria.basemakeup</option>
+                      <option value="__custom__">Kustom (Ketik Akun)</option>
+                    </select>
+
+                    <input
+                      type="text"
+                      value={brandName}
+                      onChange={(e) => setBrandName(e.target.value)}
+                      placeholder="Nama akun brand..."
+                      className="flex-1 px-3 py-2 lg-input text-sm font-medium"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-1.5 pt-0.5">
+                    <span className="text-[11px] text-[var(--label-3)]">Preset tetap:</span>
+                    <button
+                      type="button"
+                      onClick={() => setBrandName('Timephoria.id')}
+                      className={`text-[11px] px-2.5 py-0.5 rounded-full transition-colors cursor-pointer ${
+                        brandName === 'Timephoria.id'
+                          ? 'bg-[var(--tint)] text-white font-medium shadow-sm'
+                          : 'bg-[var(--fill)] text-[var(--label-2)] hover:text-[var(--label)]'
+                      }`}
+                    >
+                      Timephoria.id
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBrandName('timephoria.basemakeup')}
+                      className={`text-[11px] px-2.5 py-0.5 rounded-full transition-colors cursor-pointer ${
+                        brandName === 'timephoria.basemakeup'
+                          ? 'bg-[var(--tint)] text-white font-medium shadow-sm'
+                          : 'bg-[var(--fill)] text-[var(--label-2)] hover:text-[var(--label)]'
+                      }`}
+                    >
+                      timephoria.basemakeup
+                    </button>
+                  </div>
                 </div>
 
                 {commentMode === 'thread' ? (
@@ -693,7 +824,7 @@ export default function FakeCommentTool() {
                 {/* BALASAN BRAND */}
                 {showReply && (
                   <div style={{ display: 'flex', gap: '14px', marginLeft: '54px' }}>
-                    <img src={TIMEPHORIA_LOGO} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                    <img src={brandAvatar} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                     <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
                       <div style={{ display: 'flex', alignItems: 'center', margin: 0 }}>
                         <p style={{ color: '#8A8B91', fontSize: '14px', fontWeight: 600, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{brandName}</p>
@@ -855,7 +986,7 @@ export default function FakeCommentTool() {
                   <div style={{ display: 'flex', gap: '12px', marginTop: '16px', marginLeft: '54px' }}>
                     {/* Avatar Reply */}
                     <div style={{ position: 'relative', width: '36px', height: '36px', flexShrink: 0 }}>
-                      <img src={TIMEPHORIA_LOGO} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', display: 'block' }} />
+                      <img src={brandAvatar} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', display: 'block' }} />
                       <div style={{
                         position: 'absolute',
                         bottom: '-2px',
@@ -1029,7 +1160,7 @@ export default function FakeCommentTool() {
                     {/* INDENTED REPLY */}
                     {showReply && (
                       <div style={{ display: 'flex', gap: '10px', marginTop: '14px' }}>
-                        <img src={TIMEPHORIA_LOGO} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                        <img src={brandAvatar} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -1119,7 +1250,7 @@ export default function FakeCommentTool() {
                   alignItems: 'center',
                   gap: '10px'
                 }}>
-                  <img src={TIMEPHORIA_LOGO} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                  <img src={brandAvatar} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                   <div style={{
                     flex: 1,
                     backgroundColor: isDark ? '#1E1E1E' : '#F3F4F6',
