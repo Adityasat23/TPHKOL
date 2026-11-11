@@ -517,6 +517,11 @@ export default function ReceiptVideoTool({
   // Selected Card Design to Print in the Receipt Video
   const [printedCardDesign, setPrintedCardDesign] = useState<'design-1' | 'design-2' | 'design-3' | 'shopee'>('design-1');
 
+  // Accordion Section States
+  const [openCardSection, setOpenCardSection] = useState(true);
+  const [openAnimSection, setOpenAnimSection] = useState(false);
+  const [openProductSection, setOpenProductSection] = useState(true);
+
   // Auto-captured receipt texture from selected card (sharp top, rounded bottom)
   const [receiptDataUrl, setReceiptDataUrl] = useState<string>('');
   const captureCardRef = useRef<HTMLDivElement>(null);
@@ -836,7 +841,7 @@ export default function ReceiptVideoTool({
     'text-xs block w-full file:mr-3 file:py-1.5 file:px-3.5 file:rounded-full file:border file:border-white/50 file:text-xs file:font-medium file:bg-white/60 file:text-[var(--label)] hover:file:bg-white/80 transition-colors cursor-pointer text-[var(--label-2)]';
 
   return (
-    <div className="w-full grid grid-cols-1 lg:grid-cols-[440px_1fr] gap-5 sm:gap-6 items-start">
+    <div className="w-full grid grid-cols-1 lg:grid-cols-[440px_1fr] gap-5 sm:gap-6 items-stretch lg:h-[calc(100vh-130px)] lg:min-h-[580px] lg:max-h-[860px]">
       {/* ─────────────────────────────────────────────────────────────
           HIDDEN OFF-SCREEN NODE: SELECTED CARD WITH SHARP TOP, ROUNDED BOTTOM
           (Top is straight sharp cut, bottom is rounded)
@@ -1207,480 +1212,553 @@ export default function ReceiptVideoTool({
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          LEFT CONTROL PANEL
+          LEFT CONTROL PANEL - Equal height guaranteed
           ───────────────────────────────────────────────────────────── */}
-      <div className="lg-panel p-4 sm:p-6 space-y-5 min-w-0">
-        <div className="flex items-center justify-between border-b border-[var(--separator)] pb-4">
-          <h2 className="text-[16px] font-semibold text-[var(--label)] tracking-[-0.02em]">Product SS</h2>
-          <span className="liquid-glass-chip text-xs text-[var(--label)] tabular-nums px-2.5 py-1">
-            Printer (Receipt Video)
-          </span>
-        </div>
-
-        {/* Layout format buttons */}
-        <div className="space-y-2">
-          <label className="block text-xs font-medium text-[var(--label-2)]">Layout format</label>
-          <div className="lg-segmented grid-cols-2 sm:grid-cols-4 gap-1">
-            <button
-              type="button"
-              onClick={() => setProductLayout('tiktok-portrait')}
-              data-active={productLayout === 'tiktok-portrait'}
-              className="lg-segment-btn h-8 text-xs"
-            >
-              TK Portrait
-            </button>
-            <button
-              type="button"
-              onClick={() => setProductLayout('tiktok-landscape')}
-              data-active={productLayout === 'tiktok-landscape'}
-              className="lg-segment-btn h-8 text-xs"
-            >
-              TK Landscape
-            </button>
-            <button
-              type="button"
-              onClick={() => setProductLayout('shopee')}
-              data-active={productLayout === 'shopee'}
-              className="lg-segment-btn h-8 text-xs"
-            >
-              SP Square
-            </button>
-            <button
-              type="button"
-              onClick={() => setProductLayout('shopee-horizontal')}
-              data-active={productLayout === 'shopee-horizontal'}
-              className="lg-segment-btn h-8 text-xs"
-            >
-              SP Horizontal
-            </button>
-          </div>
-        </div>
-
-        {/* Section 1: Pilihan Desain Kartu yang di-Print */}
-        <div className="space-y-2 pb-4 border-b border-[var(--separator)]">
-          <label className="block text-xs font-semibold text-[var(--label)] uppercase tracking-wider">
-            1. Desain Kartu yang di-Print
-          </label>
-          <div className="lg-segmented grid-cols-4 gap-1 w-full max-w-[360px]">
-            <button
-              type="button"
-              onClick={() => setPrintedCardDesign('design-1')}
-              data-active={printedCardDesign === 'design-1'}
-              className="lg-segment-btn py-1.5 px-2 text-xs whitespace-nowrap"
-            >
-              Design 1
-            </button>
-            <button
-              type="button"
-              onClick={() => setPrintedCardDesign('design-2')}
-              data-active={printedCardDesign === 'design-2'}
-              className="lg-segment-btn py-1.5 px-2 text-xs whitespace-nowrap"
-            >
-              Design 2
-            </button>
-            <button
-              type="button"
-              onClick={() => setPrintedCardDesign('design-3')}
-              data-active={printedCardDesign === 'design-3'}
-              className="lg-segment-btn py-1.5 px-2 text-xs whitespace-nowrap"
-            >
-              Design 3
-            </button>
-            <button
-              type="button"
-              onClick={() => setPrintedCardDesign('shopee')}
-              data-active={printedCardDesign === 'shopee'}
-              className="lg-segment-btn py-1.5 px-2 text-xs whitespace-nowrap"
-            >
-              SP Square
-            </button>
-          </div>
-        </div>
-
-        {/* Section 2: Pre-Built Printer Overlay */}
-        <div className="space-y-3 pb-4 border-b border-[var(--separator)]">
-          <label className="block text-xs font-semibold text-[var(--label)] uppercase tracking-wider">
-            2. Overlay Printer
-          </label>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-            <button
-              type="button"
-              onClick={() => setDispenserType('pink')}
-              data-active={dispenserType === 'pink'}
-              className="lg-segment-btn py-2 px-2 text-xs"
-            >
-              Pink
-            </button>
-            <button
-              type="button"
-              onClick={() => setDispenserType('silver')}
-              data-active={dispenserType === 'silver'}
-              className="lg-segment-btn py-2 px-2 text-xs"
-            >
-              Silver
-            </button>
-            <button
-              type="button"
-              onClick={() => setDispenserType('black')}
-              data-active={dispenserType === 'black'}
-              className="lg-segment-btn py-2 px-2 text-xs"
-            >
-              Black
-            </button>
-            <button
-              type="button"
-              onClick={() => setDispenserType('burgundy')}
-              data-active={dispenserType === 'burgundy'}
-              className="lg-segment-btn py-2 px-2 text-xs"
-            >
-              Burgundy
-            </button>
-          </div>
-
-          <div className="pt-1">
-            <label className="block text-[11px] font-medium text-[var(--label-3)] mb-1">
-              Atau unggah overlay custom PNG 9:16 (opsional):
-            </label>
-            <input type="file" accept="image/png" onChange={handleCustomOverlayUpload} className={fileInputClass} />
-          </div>
-        </div>
-
-        {/* Section 3: Durasi Video (Green Screen) */}
-        <div className="space-y-3 pb-4 border-b border-[var(--separator)]">
+      <div className="lg-panel flex flex-col lg:h-full overflow-hidden min-w-0">
+        
+        {/* Pinned Header */}
+        <div className="p-4 sm:p-5 border-b border-[var(--separator)] space-y-3 shrink-0 bg-[var(--surface-solid)]/40 backdrop-blur-md">
           <div className="flex items-center justify-between">
-            <label className="block text-xs font-semibold text-[var(--label)] uppercase tracking-wider">
-              3. Durasi Video
-            </label>
-            <span className="flex items-center gap-1.5 text-xs text-[#00c950] font-medium bg-[#00FF00]/10 px-2.5 py-0.5 rounded-full">
-              <span className="w-2 h-2 rounded-full bg-[#00FF00] border border-black/20" />
-              Green Screen (#00FF00)
+            <h2 className="text-[16px] font-semibold text-[var(--label)] tracking-[-0.02em]">Product SS</h2>
+            <span className="liquid-glass-chip text-xs text-[var(--label)] tabular-nums px-2.5 py-1">
+              Printer (Receipt Video)
             </span>
           </div>
 
-          <div>
-            <div className="flex justify-between text-xs text-[var(--label-2)] mb-1">
-              <span>Durasi Video Output</span>
-              <span className="tabular-nums font-semibold text-[var(--label)]">{greenDuration} detik</span>
-            </div>
-            <input
-              type="range"
-              min={2}
-              max={15}
-              step={0.5}
-              value={greenDuration}
-              onChange={(e) => setGreenDuration(Number(e.target.value))}
-              className="w-full accent-[var(--tint)]"
-            />
-          </div>
-        </div>
-
-        {/* Section 4: Kecepatan Animasi (Position and Width are fixed) */}
-        <div className="space-y-3 pb-4 border-b border-[var(--separator)]">
-          <label className="block text-xs font-semibold text-[var(--label)] uppercase tracking-wider">
-            4. Kecepatan Animasi
-          </label>
-
-          <div>
-            <label className="block text-xs font-medium text-[var(--label-2)] mb-1.5">Preset Kecepatan</label>
-            <div className="lg-segmented grid-cols-3 gap-1">
+          <div className="space-y-1.5">
+            <label className="block text-xs font-medium text-[var(--label-2)]">Layout format</label>
+            <div className="lg-segmented grid-cols-2 sm:grid-cols-4 gap-1">
               <button
                 type="button"
-                onClick={() => {
-                  setSpeed('fast');
-                  setDropSeconds(SPEED_SECONDS.fast);
-                }}
-                data-active={speed === 'fast'}
-                className="lg-segment-btn py-1.5 text-xs"
+                onClick={() => setProductLayout('tiktok-portrait')}
+                data-active={productLayout === 'tiktok-portrait'}
+                className="lg-segment-btn h-8 text-xs"
               >
-                Fast (0.7s)
+                TK Portrait
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setSpeed('normal');
-                  setDropSeconds(SPEED_SECONDS.normal);
-                }}
-                data-active={speed === 'normal'}
-                className="lg-segment-btn py-1.5 text-xs"
+                onClick={() => setProductLayout('tiktok-landscape')}
+                data-active={productLayout === 'tiktok-landscape'}
+                className="lg-segment-btn h-8 text-xs"
               >
-                Normal (1.2s)
+                TK Landscape
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setSpeed('slow');
-                  setDropSeconds(SPEED_SECONDS.slow);
-                }}
-                data-active={speed === 'slow'}
-                className="lg-segment-btn py-1.5 text-xs"
+                onClick={() => setProductLayout('shopee')}
+                data-active={productLayout === 'shopee'}
+                className="lg-segment-btn h-8 text-xs"
               >
-                Slow (2.0s)
+                SP Square
               </button>
-            </div>
-          </div>
-
-          <div>
-            <div className="flex justify-between text-xs text-[var(--label-2)] mb-1">
-              <span>Durasi Turun</span>
-              <span className="tabular-nums font-semibold text-[var(--label)]">{dropSeconds.toFixed(2)} detik</span>
-            </div>
-            <input
-              type="range"
-              min={0.3}
-              max={3.5}
-              step={0.05}
-              value={dropSeconds}
-              onChange={(e) => {
-                setDropSeconds(Number(e.target.value));
-                setSpeed('custom');
-              }}
-              className="w-full accent-[var(--tint)]"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 pt-1">
-            <div>
-              <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Easing</label>
-              <select
-                value={easing}
-                onChange={(e) => setEasing(e.target.value as EasingMode)}
-                className="w-full h-8 px-2 lg-input text-xs"
+              <button
+                type="button"
+                onClick={() => setProductLayout('shopee-horizontal')}
+                data-active={productLayout === 'shopee-horizontal'}
+                className="lg-segment-btn h-8 text-xs"
               >
-                <option value="smooth">Smooth</option>
-                <option value="printer">Printer Feed</option>
-                <option value="linear">Linear</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Framerate</label>
-              <select
-                value={fps}
-                onChange={(e) => setFps(Number(e.target.value) as 30 | 60)}
-                className="w-full h-8 px-2 lg-input text-xs"
-              >
-                <option value={60}>60 FPS</option>
-                <option value={30}>30 FPS</option>
-              </select>
+                SP Horizontal
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Section 4: Data Produk */}
-        <div className="space-y-4 pb-4 border-b border-[var(--separator)]">
-          <label className="block text-xs font-semibold text-[var(--label)] uppercase tracking-wider">
-            Product
-          </label>
+        {/* Scrollable Middle Body: Clean Accordions */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 custom-scrollbar">
 
-          {/* Brand / Store Tag */}
-          <div>
-            <label className="block text-xs font-medium text-[var(--label-2)] mb-1.5">Brand / Store Tag</label>
-            <div className="flex items-center gap-2">
-              <span className="bg-[#fe2c55] text-white text-[11px] font-extrabold px-2.5 py-2 rounded-xl shrink-0 tracking-wider shadow-sm flex items-center gap-1">
-                [MALL]
-              </span>
-              <input
-                type="text"
-                value={brandName || 'TIMEPHORIA'}
-                onChange={(e) => setBrandName ? setBrandName(e.target.value) : undefined}
-                placeholder="TIMEPHORIA"
-                className="w-full h-10 px-3 lg-input text-sm font-semibold tracking-wide uppercase"
-              />
-            </div>
-          </div>
-
-          {/* Catalog Autocomplete */}
-          <div>
-            <label className="block text-xs font-medium text-[var(--label-2)] mb-1.5">Pilih produk</label>
-            <div ref={searchContainerRef} className="relative flex w-full lg-input overflow-visible items-center">
-              <svg className="w-4 h-4 ml-3 text-[var(--label-3)] shrink-0 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <circle cx="11" cy="11" r="7" strokeWidth="2" />
-                <path d="M21 21l-4.35-4.35" strokeWidth="2" strokeLinecap="round" />
+          {/* ACCORDION 1: Desain Struk & Overlay Printer */}
+          <div className="border border-[var(--separator)] rounded-2xl overflow-hidden bg-[var(--fill)]/20 transition-all">
+            <button
+              type="button"
+              onClick={() => setOpenCardSection(!openCardSection)}
+              className="w-full px-3.5 py-2.5 flex items-center justify-between text-left hover:bg-[var(--fill)]/40 transition-colors"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-xs font-semibold text-[var(--label)]">Desain Struk & Overlay</span>
+                <span className="text-[11px] text-[var(--label-3)] truncate capitalize">
+                  {printedCardDesign} · {dispenserType}
+                </span>
+              </div>
+              <svg
+                className={`w-3.5 h-3.5 text-[var(--label-2)] shrink-0 transition-transform duration-200 ${openCardSection ? 'rotate-180' : ''}`}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+              >
+                <polyline points="6 9 12 15 18 9" />
               </svg>
-              <input
-                type="text"
-                value={productTitle}
-                onChange={handleTitleChange}
-                onFocus={() => {
-                  setShowSuggestions(true);
-                }}
-                placeholder="Cari produk katalog (Lip, Combo, dll)..."
-                className="w-full px-3 h-10 bg-transparent focus:outline-none text-sm text-[var(--label)] rounded-xl"
-              />
-              {showSuggestions && filteredCatalog.length > 0 && (
-                <ul className="absolute top-full left-0 right-0 z-50 mt-1.5 bg-[var(--surface-solid)]/95 backdrop-blur-2xl border border-[var(--separator)] rounded-2xl shadow-[0_16px_40px_rgba(0,0,0,0.16)] max-h-64 overflow-y-auto custom-scrollbar p-1">
-                  {filteredCatalog.map((item: any, index: number) => (
-                    <li
-                      key={index}
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        handleSelectProduct(item);
-                      }}
-                      className="p-2 hover:bg-[var(--fill)] rounded-xl cursor-pointer flex items-center gap-3 transition-colors"
+            </button>
+
+            {openCardSection && (
+              <div className="p-3.5 pt-2 space-y-3.5 border-t border-[var(--separator)]">
+                {/* 1. Desain Kartu */}
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-medium text-[var(--label-2)]">
+                    Desain kartu yang di-print
+                  </label>
+                  <div className="lg-segmented grid-cols-4 gap-1 w-full">
+                    <button
+                      type="button"
+                      onClick={() => setPrintedCardDesign('design-1')}
+                      data-active={printedCardDesign === 'design-1'}
+                      className="lg-segment-btn py-1.5 px-2 text-xs whitespace-nowrap"
                     >
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-9 h-9 rounded-lg object-cover border border-[var(--separator)]"
-                        onError={(e) => {
-                          e.currentTarget.onerror = null;
-                          e.currentTarget.src = SAFE_IMAGE;
+                      Design 1
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPrintedCardDesign('design-2')}
+                      data-active={printedCardDesign === 'design-2'}
+                      className="lg-segment-btn py-1.5 px-2 text-xs whitespace-nowrap"
+                    >
+                      Design 2
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPrintedCardDesign('design-3')}
+                      data-active={printedCardDesign === 'design-3'}
+                      className="lg-segment-btn py-1.5 px-2 text-xs whitespace-nowrap"
+                    >
+                      Design 3
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPrintedCardDesign('shopee')}
+                      data-active={printedCardDesign === 'shopee'}
+                      className="lg-segment-btn py-1.5 px-2 text-xs whitespace-nowrap"
+                    >
+                      SP Square
+                    </button>
+                  </div>
+                </div>
+
+                {/* 2. Overlay Printer */}
+                <div className="space-y-2 pt-1 border-t border-[var(--separator)]/60">
+                  <label className="block text-xs font-medium text-[var(--label-2)]">
+                    Warna overlay dispenser
+                  </label>
+                  <div className="grid grid-cols-4 gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setDispenserType('pink')}
+                      data-active={dispenserType === 'pink'}
+                      className="lg-segment-btn py-1.5 px-2 text-xs"
+                    >
+                      Pink
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDispenserType('silver')}
+                      data-active={dispenserType === 'silver'}
+                      className="lg-segment-btn py-1.5 px-2 text-xs"
+                    >
+                      Silver
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDispenserType('black')}
+                      data-active={dispenserType === 'black'}
+                      className="lg-segment-btn py-1.5 px-2 text-xs"
+                    >
+                      Black
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDispenserType('burgundy')}
+                      data-active={dispenserType === 'burgundy'}
+                      className="lg-segment-btn py-1.5 px-2 text-xs"
+                    >
+                      Burgundy
+                    </button>
+                  </div>
+
+                  <div className="pt-1">
+                    <label className="block text-[11px] font-medium text-[var(--label-3)] mb-1">
+                      Atau unggah overlay custom PNG 9:16 (opsional):
+                    </label>
+                    <input type="file" accept="image/png" onChange={handleCustomOverlayUpload} className={fileInputClass} />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ACCORDION 2: Durasi & Animasi Video */}
+          <div className="border border-[var(--separator)] rounded-2xl overflow-hidden bg-[var(--fill)]/20 transition-all">
+            <button
+              type="button"
+              onClick={() => setOpenAnimSection(!openAnimSection)}
+              className="w-full px-3.5 py-2.5 flex items-center justify-between text-left hover:bg-[var(--fill)]/40 transition-colors"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-xs font-semibold text-[var(--label)]">Durasi & Animasi</span>
+                <span className="text-[11px] text-[var(--label-3)] truncate">
+                  {greenDuration}s · {speed} · {fps}fps
+                </span>
+              </div>
+              <svg
+                className={`w-3.5 h-3.5 text-[var(--label-2)] shrink-0 transition-transform duration-200 ${openAnimSection ? 'rotate-180' : ''}`}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+
+            {openAnimSection && (
+              <div className="p-3.5 pt-2 space-y-3.5 border-t border-[var(--separator)]">
+                {/* Durasi Slider */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-[var(--label-2)]">Durasi output video</span>
+                    <span className="flex items-center gap-1.5 text-[11px] text-[#00c950] font-medium bg-[#00FF00]/10 px-2 py-0.5 rounded-full">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#00FF00] border border-black/20" />
+                      Green Screen
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs text-[var(--label-2)]">
+                    <span>Slider durasi</span>
+                    <span className="tabular-nums font-semibold text-[var(--label)]">{greenDuration} detik</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={2}
+                    max={15}
+                    step={0.5}
+                    value={greenDuration}
+                    onChange={(e) => setGreenDuration(Number(e.target.value))}
+                    className="w-full accent-[var(--tint)]"
+                  />
+                </div>
+
+                {/* Kecepatan Animasi */}
+                <div className="space-y-2 pt-1 border-t border-[var(--separator)]/60">
+                  <label className="block text-xs font-medium text-[var(--label-2)]">Preset kecepatan</label>
+                  <div className="lg-segmented grid-cols-3 gap-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSpeed('fast');
+                        setDropSeconds(SPEED_SECONDS.fast);
+                      }}
+                      data-active={speed === 'fast'}
+                      className="lg-segment-btn py-1.5 text-xs"
+                    >
+                      Fast (0.7s)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSpeed('normal');
+                        setDropSeconds(SPEED_SECONDS.normal);
+                      }}
+                      data-active={speed === 'normal'}
+                      className="lg-segment-btn py-1.5 text-xs"
+                    >
+                      Normal (1.2s)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSpeed('slow');
+                        setDropSeconds(SPEED_SECONDS.slow);
+                      }}
+                      data-active={speed === 'slow'}
+                      className="lg-segment-btn py-1.5 text-xs"
+                    >
+                      Slow (2.0s)
+                    </button>
+                  </div>
+
+                  <div className="pt-1">
+                    <div className="flex justify-between text-xs text-[var(--label-2)] mb-1">
+                      <span>Durasi turun struk</span>
+                      <span className="tabular-nums font-semibold text-[var(--label)]">{dropSeconds.toFixed(2)} detik</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={0.3}
+                      max={3.5}
+                      step={0.05}
+                      value={dropSeconds}
+                      onChange={(e) => {
+                        setDropSeconds(Number(e.target.value));
+                        setSpeed('custom');
+                      }}
+                      className="w-full accent-[var(--tint)]"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2.5 pt-1">
+                    <div>
+                      <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Easing</label>
+                      <select
+                        value={easing}
+                        onChange={(e) => setEasing(e.target.value as EasingMode)}
+                        className="w-full h-8 px-2 lg-input text-xs"
+                      >
+                        <option value="smooth">Smooth</option>
+                        <option value="printer">Printer Feed</option>
+                        <option value="linear">Linear</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Framerate</label>
+                      <select
+                        value={fps}
+                        onChange={(e) => setFps(Number(e.target.value) as 30 | 60)}
+                        className="w-full h-8 px-2 lg-input text-xs"
+                      >
+                        <option value={60}>60 FPS</option>
+                        <option value={30}>30 FPS</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ACCORDION 3: Detail Produk & Harga */}
+          <div className="border border-[var(--separator)] rounded-2xl overflow-hidden bg-[var(--fill)]/20 transition-all">
+            <button
+              type="button"
+              onClick={() => setOpenProductSection(!openProductSection)}
+              className="w-full px-3.5 py-2.5 flex items-center justify-between text-left hover:bg-[var(--fill)]/40 transition-colors"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-xs font-semibold text-[var(--label)]">Detail Produk & Harga</span>
+                <span className="text-[11px] text-[var(--label-3)] truncate">
+                  {productPrice} {currency !== 'none' ? currency : ''}
+                </span>
+              </div>
+              <svg
+                className={`w-3.5 h-3.5 text-[var(--label-2)] shrink-0 transition-transform duration-200 ${openProductSection ? 'rotate-180' : ''}`}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+
+            {openProductSection && (
+              <div className="p-3.5 pt-2 space-y-3 border-t border-[var(--separator)]">
+                {/* Brand / Store Tag */}
+                <div>
+                  <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Brand / Store Tag</label>
+                  <div className="flex items-center gap-2">
+                    <span className="bg-[#fe2c55] text-white text-[11px] font-extrabold px-2.5 py-2 rounded-xl shrink-0 tracking-wider shadow-sm flex items-center gap-1">
+                      [MALL]
+                    </span>
+                    <input
+                      type="text"
+                      value={brandName || 'TIMEPHORIA'}
+                      onChange={(e) => setBrandName ? setBrandName(e.target.value) : undefined}
+                      placeholder="TIMEPHORIA"
+                      className="w-full h-9 px-3 lg-input text-xs font-semibold tracking-wide uppercase"
+                    />
+                  </div>
+                </div>
+
+                {/* Catalog Autocomplete */}
+                <div>
+                  <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Pilih produk katalog</label>
+                  <div ref={searchContainerRef} className="relative flex w-full lg-input overflow-visible items-center">
+                    <svg className="w-3.5 h-3.5 ml-2.5 text-[var(--label-3)] shrink-0 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <circle cx="11" cy="11" r="7" strokeWidth="2" />
+                      <path d="M21 21l-4.35-4.35" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                    <input
+                      type="text"
+                      value={productTitle}
+                      onChange={handleTitleChange}
+                      onFocus={() => setShowSuggestions(true)}
+                      placeholder="Cari produk katalog..."
+                      className="w-full px-2.5 h-9 bg-transparent focus:outline-none text-xs text-[var(--label)] rounded-xl"
+                    />
+                    {showSuggestions && filteredCatalog.length > 0 && (
+                      <ul className="absolute top-full left-0 right-0 z-50 mt-1 bg-[var(--surface-solid)]/95 backdrop-blur-2xl border border-[var(--separator)] rounded-2xl shadow-[0_16px_40px_rgba(0,0,0,0.16)] max-h-56 overflow-y-auto custom-scrollbar p-1">
+                        {filteredCatalog.map((item: any, index: number) => (
+                          <li
+                            key={index}
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              handleSelectProduct(item);
+                            }}
+                            className="p-1.5 hover:bg-[var(--fill)] rounded-xl cursor-pointer flex items-center gap-2.5 transition-colors"
+                          >
+                            <img
+                              src={item.image}
+                              alt={item.name}
+                              className="w-8 h-8 rounded-lg object-cover border border-[var(--separator)] shrink-0"
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = SAFE_IMAGE;
+                              }}
+                            />
+                            <span className="text-xs font-medium text-[var(--label)] flex-1 truncate">{item.name}</span>
+                            <span className="text-[10px] text-[var(--label-2)] bg-[var(--fill)] px-2 py-0.5 rounded-full shrink-0">
+                              {item.category}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </div>
+
+                {/* Custom photo upload */}
+                <div>
+                  <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Ganti foto produk kustom</label>
+                  <input type="file" onChange={handleImageUpload} className={fileInputClass} />
+                </div>
+
+                {/* Currency and Price Format */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Tampilan Harga</label>
+                    <div className="lg-segmented grid-cols-2 gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setPriceFormat('exact')}
+                        data-active={priceFormat === 'exact'}
+                        className="lg-segment-btn h-7 text-xs"
+                      >
+                        Exact
+                      </button>
+                      {currency === 'Rp' && (
+                        <button
+                          type="button"
+                          onClick={() => setPriceFormat('k-an')}
+                          data-active={priceFormat === 'k-an'}
+                          className="lg-segment-btn h-7 text-xs"
+                        >
+                          K-an
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Currency</label>
+                    <div className="lg-segmented grid-cols-4 gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setCurrency('Rp')}
+                        data-active={currency === 'Rp'}
+                        className="lg-segment-btn h-7 text-xs"
+                      >
+                        IDR
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCurrency('RM');
+                          setPriceFormat('exact');
                         }}
-                      />
-                      <span className="text-xs font-medium text-[var(--label)] flex-1">{item.name}</span>
-                      <span className="text-[11px] text-[var(--label-2)] bg-[var(--fill)] px-2 py-0.5 rounded-full">
-                        {item.category}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
+                        data-active={currency === 'RM'}
+                        className="lg-segment-btn h-7 text-xs"
+                      >
+                        MYR
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCurrency('$');
+                          setPriceFormat('exact');
+                        }}
+                        data-active={currency === '$'}
+                        className="lg-segment-btn h-7 text-xs"
+                      >
+                        USD
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCurrency('none');
+                          setPriceFormat('exact');
+                        }}
+                        data-active={currency === 'none'}
+                        className="lg-segment-btn h-7 text-xs"
+                        title="Turn off currency"
+                      >
+                        Off
+                      </button>
+                    </div>
+                  </div>
+                </div>
 
-          {/* Custom photo upload */}
-          <div>
-            <label className="block text-xs font-medium text-[var(--label-2)] mb-1.5">Ganti foto produk kustom</label>
-            <input type="file" onChange={handleImageUpload} className={fileInputClass} />
-          </div>
+                {/* Price inputs */}
+                <div className="grid grid-cols-3 gap-2">
+                  <div>
+                    <label className="block text-[11px] font-medium text-[var(--label-2)] mb-1">Harga Promo</label>
+                    <input
+                      type="text"
+                      value={productPrice}
+                      onChange={(e) => setProductPrice(e.target.value)}
+                      placeholder="50.000"
+                      className="w-full h-8 px-2 lg-input tabular-nums text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-[var(--label-2)] mb-1">Harga Asli</label>
+                    <input
+                      type="text"
+                      value={productOriginalPrice}
+                      onChange={(e) => setProductOriginalPrice(e.target.value)}
+                      placeholder="100.000"
+                      className="w-full h-8 px-2 lg-input tabular-nums text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-[var(--label-2)] mb-1">Satuan</label>
+                    <input
+                      type="text"
+                      value={productUnit}
+                      onChange={(e) => setProductUnit(e.target.value)}
+                      placeholder="/pcs"
+                      className="w-full h-8 px-2 lg-input text-xs"
+                    />
+                  </div>
+                </div>
 
-          {/* Currency and Price Format selector */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-medium text-[var(--label-2)] mb-1.5">Tampilan Harga</label>
-              <div className="lg-segmented grid-cols-2 gap-1">
-                <button
-                  type="button"
-                  onClick={() => setPriceFormat('exact')}
-                  data-active={priceFormat === 'exact'}
-                  className="lg-segment-btn h-8 text-xs"
-                >
-                  Exact
-                </button>
-                {currency === 'Rp' && (
-                  <button
-                    type="button"
-                    onClick={() => setPriceFormat('k-an')}
-                    data-active={priceFormat === 'k-an'}
-                    className="lg-segment-btn h-8 text-xs"
-                  >
-                    K-an
-                  </button>
-                )}
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-[11px] font-medium text-[var(--label-2)] mb-1">Rating</label>
+                    <input
+                      type="text"
+                      value={productRating}
+                      onChange={(e) => setProductRating(e.target.value)}
+                      placeholder="4.9"
+                      className="w-full h-8 px-2 lg-input tabular-nums text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-[var(--label-2)] mb-1">Terjual</label>
+                    <input
+                      type="text"
+                      value={productSold}
+                      onChange={(e) => setProductSold(e.target.value)}
+                      placeholder="10.5k sold"
+                      className="w-full h-8 px-2 lg-input tabular-nums text-xs"
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-[var(--label-2)] mb-1.5">Currency</label>
-              <div className="lg-segmented grid-cols-4 gap-1">
-                <button
-                  type="button"
-                  onClick={() => setCurrency('Rp')}
-                  data-active={currency === 'Rp'}
-                  className="lg-segment-btn h-8 text-xs"
-                >
-                  IDR
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCurrency('RM');
-                    setPriceFormat('exact');
-                  }}
-                  data-active={currency === 'RM'}
-                  className="lg-segment-btn h-8 text-xs"
-                >
-                  MYR
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCurrency('$');
-                    setPriceFormat('exact');
-                  }}
-                  data-active={currency === '$'}
-                  className="lg-segment-btn h-8 text-xs"
-                >
-                  USD
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCurrency('none');
-                    setPriceFormat('exact');
-                  }}
-                  data-active={currency === 'none'}
-                  className="lg-segment-btn h-8 text-xs"
-                  title="Turn off currency"
-                >
-                  Off
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Price inputs */}
-          <div className="grid grid-cols-3 gap-2.5">
-            <div>
-              <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Harga Promo</label>
-              <input
-                type="text"
-                value={productPrice}
-                onChange={(e) => setProductPrice(e.target.value)}
-                placeholder="50.000"
-                className="w-full h-9 px-2.5 lg-input tabular-nums text-xs"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Harga Asli</label>
-              <input
-                type="text"
-                value={productOriginalPrice}
-                onChange={(e) => setProductOriginalPrice(e.target.value)}
-                placeholder="100.000"
-                className="w-full h-9 px-2.5 lg-input tabular-nums text-xs"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Satuan</label>
-              <input
-                type="text"
-                value={productUnit}
-                onChange={(e) => setProductUnit(e.target.value)}
-                placeholder="/pcs"
-                className="w-full h-9 px-2.5 lg-input text-xs"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2.5">
-            <div>
-              <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Rating</label>
-              <input
-                type="text"
-                value={productRating}
-                onChange={(e) => setProductRating(e.target.value)}
-                placeholder="4.9"
-                className="w-full h-9 px-2.5 lg-input tabular-nums text-xs"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-[var(--label-2)] mb-1">Terjual</label>
-              <input
-                type="text"
-                value={productSold}
-                onChange={(e) => setProductSold(e.target.value)}
-                placeholder="10.5k sold"
-                className="w-full h-9 px-2.5 lg-input tabular-nums text-xs"
-              />
-            </div>
+            )}
           </div>
         </div>
 
-        {/* Section 5: Generate MP4 Action Button */}
-        <div className="space-y-3 pt-2">
+        {/* Pinned Bottom Footer: Sticky Export CTA */}
+        <div className="p-4 sm:p-5 border-t border-[var(--separator)] shrink-0 bg-[var(--surface-solid)]/40 backdrop-blur-md">
           {exportProgress !== null ? (
-            <div className="space-y-2 p-3.5 rounded-2xl bg-[var(--fill)] border border-[var(--separator)]">
+            <div className="space-y-2 p-3 rounded-2xl bg-[var(--fill)] border border-[var(--separator)]">
               <div className="flex justify-between text-xs text-[var(--label)]">
                 <span className="font-semibold">{exportStatusText}</span>
                 <span className="font-mono tabular-nums">{exportProgress}%</span>
@@ -1697,7 +1775,7 @@ export default function ReceiptVideoTool({
                   cancelExportRef.current = true;
                   setExportProgress(null);
                 }}
-                className="text-xs text-rose-400 hover:text-rose-300 transition-colors pt-1"
+                className="text-xs text-rose-400 hover:text-rose-300 transition-colors pt-0.5 cursor-pointer"
               >
                 Batalkan export
               </button>
@@ -1706,7 +1784,7 @@ export default function ReceiptVideoTool({
             <button
               type="button"
               onClick={handleExportMp4}
-              className="lg-btn-primary w-full py-4 text-sm font-semibold flex items-center justify-center gap-2 rounded-2xl shadow-lg shadow-black/20"
+              className="lg-btn-primary w-full h-11 text-sm font-semibold flex items-center justify-center gap-2 rounded-2xl shadow-lg shadow-black/20 cursor-pointer transition-transform active:scale-[0.99]"
             >
               <span>Generate MP4 (1080×1920 @ {fps}fps)</span>
             </button>
@@ -1715,12 +1793,11 @@ export default function ReceiptVideoTool({
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          RIGHT PREVIEW PANEL
-          (Clickable 9:16 frame to toggle Play / Pause directly)
+          RIGHT PREVIEW PANEL - Equal height guaranteed
           ───────────────────────────────────────────────────────────── */}
-      <div className="lg-panel p-4 sm:p-6 flex flex-col items-center justify-center min-w-0">
-        {/* TikTok Portrait Design Switcher (Above Preview) */}
-        <div className="flex flex-col items-center gap-4 mb-5">
+      <div className="lg-panel flex flex-col min-h-[480px] sm:min-h-[580px] lg:min-h-0 lg:h-full overflow-hidden p-4 sm:p-5 relative min-w-0">
+        {/* TikTok Portrait Design Switcher (Centered Above Preview) */}
+        <div className="relative flex items-center justify-center mb-3 shrink-0 w-full">
           <div className="lg-segmented grid-cols-4 gap-1 w-full max-w-[360px]">
             <button
               type="button"
@@ -1755,71 +1832,89 @@ export default function ReceiptVideoTool({
               Printer
             </button>
           </div>
-        </div>
-
-        {/* Header with FPS badge */}
-        <div className="w-full max-w-[340px] sm:max-w-[380px] flex items-center justify-between mb-3 px-1">
-          <span className="text-xs font-semibold text-[var(--label-2)] uppercase tracking-wider">
-            9:16 Canvas Live Preview
-          </span>
-          <span className="liquid-glass-chip text-xs px-2.5 py-1 text-[var(--label)] font-mono">
-            {fps} FPS · 1080×1920
+          <span className="hidden sm:inline-flex absolute right-0 liquid-glass-chip text-xs px-2.5 py-1 text-[var(--label)] font-mono shrink-0">
+            {fps} FPS
           </span>
         </div>
 
-        {/* 9:16 Phone Aspect Frame - Directly Clickable to Play/Pause! */}
-        <div
-          role="button"
-          tabIndex={0}
-          onClick={() => setIsPlaying((p) => !p)}
-          onKeyDown={(e) => {
-            if (e.key === ' ' || e.key === 'Enter') {
-              e.preventDefault();
-              setIsPlaying((p) => !p);
-            }
-          }}
-          aria-label={isPlaying ? 'Jeda video' : 'Putar video'}
-          className="relative w-full max-w-[340px] sm:max-w-[380px] aspect-[9/16] rounded-[32px] overflow-hidden shadow-[0_24px_60px_rgba(0,0,0,0.45)] border border-white/15 bg-black cursor-pointer group select-none focus:outline-none focus:ring-2 focus:ring-[var(--tint)]"
-        >
-          <canvas
-            ref={canvasRef}
-            width={W}
-            height={H}
-            className="w-full h-full object-contain block select-none pointer-events-none"
-          />
+        {/* 9:16 Canvas Phone Frame with Design Switcher Arrows (Zero Scroll, Pure Fitted Stage) */}
+        <div className="flex-1 flex items-center justify-center gap-2.5 sm:gap-5 min-h-0 min-w-0 py-1 overflow-hidden select-none">
+          {/* Left Arrow: Kembali ke Design 3 */}
+          <button
+            type="button"
+            onClick={() => setTkPortraitDesign(3)}
+            aria-label="Kembali ke Design 3"
+            title="Kembali ke Design 3"
+            className="liquid-glass-chip w-9 h-9 flex items-center justify-center rounded-full shrink-0 hover:scale-105 active:scale-95 transition-transform cursor-pointer"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+          </button>
 
-          {/* Hidden HTML5 video element for background playback */}
-          {bgVideoUrl && (
-            <video
-              ref={videoRef}
-              src={bgVideoUrl}
-              playsInline
-              muted
-              loop
-              onLoadedMetadata={(e) => setVideoDuration(e.currentTarget.duration)}
-              className="hidden"
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => setIsPlaying((p) => !p)}
+            onKeyDown={(e) => {
+              if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                setIsPlaying((p) => !p);
+              }
+            }}
+            aria-label={isPlaying ? 'Jeda video' : 'Putar video'}
+            className="relative h-full max-h-[460px] aspect-[9/16] w-auto rounded-[28px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.4)] border border-white/15 bg-black cursor-pointer group select-none focus:outline-none focus:ring-2 focus:ring-[var(--tint)]"
+          >
+            <canvas
+              ref={canvasRef}
+              width={W}
+              height={H}
+              className="w-full h-full object-contain block select-none pointer-events-none"
             />
-          )}
 
-          {/* Play/Pause Overlay indicator when paused - Directly Clickable! */}
-          {!isPlaying && (
-            <div className="absolute inset-0 bg-black/35 backdrop-blur-[2px] flex items-center justify-center transition-all">
-              <div className="w-16 h-16 rounded-full bg-white/25 group-hover:bg-white/35 backdrop-blur-md flex items-center justify-center border border-white/40 text-white shadow-2xl transition-transform group-hover:scale-110 active:scale-95">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" className="ml-1">
-                  <polygon points="6 4 20 12 6 20 6 4" />
-                </svg>
+            {bgVideoUrl && (
+              <video
+                ref={videoRef}
+                src={bgVideoUrl}
+                playsInline
+                muted
+                loop
+                onLoadedMetadata={(e) => setVideoDuration(e.currentTarget.duration)}
+                className="hidden"
+              />
+            )}
+
+            {!isPlaying && (
+              <div className="absolute inset-0 bg-black/35 backdrop-blur-[2px] flex items-center justify-center transition-all">
+                <div className="w-14 h-14 rounded-full bg-white/25 group-hover:bg-white/35 backdrop-blur-md flex items-center justify-center border border-white/40 text-white shadow-2xl transition-transform group-hover:scale-110 active:scale-95">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="ml-0.5">
+                    <polygon points="6 4 20 12 6 20 6 4" />
+                  </svg>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
+
+          {/* Right Arrow: Desain Terakhir */}
+          <button
+            type="button"
+            disabled={true}
+            aria-label="Desain terakhir"
+            className="liquid-glass-chip w-9 h-9 flex items-center justify-center rounded-full shrink-0 opacity-30 cursor-not-allowed"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </button>
         </div>
 
         {/* Interactive Scrub Player Controls */}
-        <div className="w-full max-w-[380px] mt-4 space-y-2">
+        <div className="w-full max-w-[360px] mx-auto mt-2 shrink-0">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => setIsPlaying((p) => !p)}
-              className="liquid-glass-chip w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-[var(--label)]"
+              className="liquid-glass-chip w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-[var(--label)] cursor-pointer"
               aria-label={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? (
@@ -1837,7 +1932,7 @@ export default function ReceiptVideoTool({
             <button
               type="button"
               onClick={() => handleSeek(0)}
-              className="liquid-glass-chip w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-[var(--label)]"
+              className="liquid-glass-chip w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-[var(--label)] cursor-pointer"
               aria-label="Replay dari awal"
               title="Replay dari awal"
             >

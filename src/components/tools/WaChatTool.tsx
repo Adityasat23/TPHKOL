@@ -187,28 +187,29 @@ export default function WaChatTool() {
   const specLabel = `375 × 812 px · iOS (${waTheme}) · 3× PNG`;
 
   return (
-    <div className="w-full grid grid-cols-1 lg:grid-cols-[440px_1fr] gap-5 sm:gap-6 items-start">
+    <div className="w-full grid grid-cols-1 lg:grid-cols-[440px_1fr] gap-5 sm:gap-6 items-stretch lg:h-[calc(100vh-130px)] lg:min-h-[580px] lg:max-h-[860px]">
       
-      {/* KOTAK KONTROL / PENGATURAN */}
-      <div className="lg-panel p-4 sm:p-6 space-y-5 h-fit min-w-0">
+      {/* KOTAK KONTROL / PENGATURAN - Equal height guaranteed */}
+      <div className="lg-panel flex flex-col lg:h-full overflow-hidden min-w-0">
         
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <span className="block text-xs font-medium text-[var(--label-2)] mb-1.5">Tema tampilan</span>
-            <div className="lg-segmented grid-cols-2 gap-1">
-              <button onClick={() => setWaTheme('light')} data-active={waTheme === 'light'} className="lg-segment-btn py-1.5 text-xs">Terang</button>
-              <button onClick={() => setWaTheme('dark')} data-active={waTheme === 'dark'} className="lg-segment-btn py-1.5 text-xs">Gelap</button>
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 custom-scrollbar">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <span className="block text-xs font-medium text-[var(--label-2)] mb-1.5">Tema tampilan</span>
+              <div className="lg-segmented grid-cols-2 gap-1">
+                <button onClick={() => setWaTheme('light')} data-active={waTheme === 'light'} className="lg-segment-btn py-1.5 text-xs">Terang</button>
+                <button onClick={() => setWaTheme('dark')} data-active={waTheme === 'dark'} className="lg-segment-btn py-1.5 text-xs">Gelap</button>
+              </div>
             </div>
-          </div>
 
-          <div>
-            <span className="block text-xs font-medium text-[var(--label-2)] mb-1.5">Tipe ruang chat</span>
-            <div className="lg-segmented grid-cols-2 gap-1">
-              <button onClick={() => setChatType('personal')} data-active={chatType === 'personal'} className="lg-segment-btn py-1.5 text-xs">Personal</button>
-              <button onClick={() => setChatType('group')} data-active={chatType === 'group'} className="lg-segment-btn py-1.5 text-xs">Grup</button>
+            <div>
+              <span className="block text-xs font-medium text-[var(--label-2)] mb-1.5">Tipe ruang chat</span>
+              <div className="lg-segmented grid-cols-2 gap-1">
+                <button onClick={() => setChatType('personal')} data-active={chatType === 'personal'} className="lg-segment-btn py-1.5 text-xs">Personal</button>
+                <button onClick={() => setChatType('group')} data-active={chatType === 'group'} className="lg-segment-btn py-1.5 text-xs">Grup</button>
+              </div>
             </div>
           </div>
-        </div>
 
         <div className="space-y-3.5 pt-4 border-t border-[var(--separator)]">
           <h3 className="font-semibold text-[var(--label)] text-sm tracking-[-0.01em]">Pengaturan header</h3>
@@ -419,20 +420,25 @@ export default function WaChatTool() {
             ))}
           </div>
         </div>
-        <button onClick={exportWaImage} className="w-full h-11 lg-btn-primary text-sm flex items-center justify-center gap-2">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Export WhatsApp PNG
-        </button>
       </div>
 
-      {/* KOTAK PREVIEW */}
-      <div className="lg-panel flex flex-col min-h-[480px] sm:min-h-[580px] overflow-hidden relative min-w-0">
+        {/* Pinned Bottom Footer: Sticky Export CTA */}
+        <div className="p-4 sm:p-5 border-t border-[var(--separator)] shrink-0 bg-[var(--surface-solid)]/40 backdrop-blur-md">
+          <button onClick={exportWaImage} className="w-full h-11 lg-btn-primary text-sm flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-[0.99]">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Export WhatsApp PNG</span>
+          </button>
+        </div>
+      </div>
+
+      {/* KOTAK PREVIEW - Equal height guaranteed */}
+      <div className="lg-panel flex flex-col min-h-[500px] sm:min-h-[580px] lg:min-h-0 lg:h-full overflow-hidden relative min-w-0">
         <div className="h-11 px-4 sm:px-5 border-b border-[var(--separator)] flex items-center justify-between text-xs text-[var(--label-2)] gap-2">
           <span className="font-medium text-[var(--label)] truncate">Live Canvas Preview</span>
           <span className="liquid-glass-chip px-2.5 py-0.5 text-[11px] text-[var(--label-2)] tabular-nums shrink-0">{specLabel}</span>
         </div>
-        <div className="flex-1 flex items-center justify-center overflow-x-auto p-3 sm:p-6 relative">
-          <div className="max-sm:scale-[0.76] origin-center transition-transform" style={{ padding: '12px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
+        <div className="flex-1 flex items-center justify-center overflow-hidden p-2 sm:p-4 relative select-none">
+          <div className="max-sm:scale-[0.56] sm:max-md:scale-[0.66] lg:scale-[0.72] xl:scale-[0.78] origin-center transition-transform shrink-0" style={{ padding: '6px', display: 'inline-flex', justifyContent: 'center', backgroundColor: 'transparent', zIndex: 10 }}>
             
             <div ref={waPreviewRef} style={{ 
             backgroundImage: waTheme === 'dark' ? 'url("/bg/wadark.jpg")' : 'url("/bg/wawhite.jpg")', 

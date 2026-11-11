@@ -278,18 +278,20 @@ const exportProductImage = async () => {
   }
 
   return (
-     <div className="w-full grid grid-cols-1 lg:grid-cols-[440px_1fr] gap-5 sm:gap-6 items-start">
-       {/* LEFT CONTROL PANEL */}
-       <div className="lg-panel p-4 sm:p-6 space-y-5 min-w-0">
-          
-          <div className="flex items-center justify-between border-b border-[var(--separator)] pb-4">
+    <div className="w-full grid grid-cols-1 lg:grid-cols-[440px_1fr] gap-5 sm:gap-6 items-stretch lg:h-[calc(100vh-130px)] lg:min-h-[580px] lg:max-h-[860px]">
+      {/* LEFT CONTROL PANEL - Equal height guaranteed */}
+      <div className="lg-panel flex flex-col lg:h-full overflow-hidden min-w-0">
+        
+        {/* Pinned Header */}
+        <div className="p-4 sm:p-5 border-b border-[var(--separator)] space-y-3 shrink-0 bg-[var(--surface-solid)]/40 backdrop-blur-md">
+          <div className="flex items-center justify-between">
             <h2 className="text-[16px] font-semibold text-[var(--label)] tracking-[-0.02em]">Product SS</h2>
             <span className="liquid-glass-chip text-xs text-[var(--label)] tabular-nums px-2.5 py-1">
               {discountPct > 0 ? `-${discountPct}%` : '0%'}
             </span>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <label className="block text-xs font-medium text-[var(--label-2)]">Layout format</label>
             <div className="lg-segmented grid-cols-2 sm:grid-cols-4 gap-1">
               <button onClick={() => setProductLayout('tiktok-portrait')} data-active={productLayout === 'tiktok-portrait'} className="lg-segment-btn h-8 text-xs">TK Portrait</button>
@@ -298,6 +300,10 @@ const exportProductImage = async () => {
               <button onClick={() => setProductLayout('shopee-horizontal')} data-active={productLayout === 'shopee-horizontal'} className="lg-segment-btn h-8 text-xs">SP Horizontal</button>
             </div>
           </div>
+        </div>
+
+        {/* Scrollable Middle Body */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 custom-scrollbar">
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
@@ -430,20 +436,25 @@ const exportProductImage = async () => {
             )}
           </div>
 
-          <button onClick={exportProductImage} className="w-full h-11 lg-btn-primary text-sm flex items-center justify-center gap-2">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Export Product Card
-          </button>
+          </div>
+
+          {/* Pinned Bottom Footer: Sticky Export CTA */}
+          <div className="p-4 sm:p-5 border-t border-[var(--separator)] shrink-0 bg-[var(--surface-solid)]/40 backdrop-blur-md">
+            <button onClick={exportProductImage} className="w-full h-11 lg-btn-primary text-sm flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-[0.99]">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Export Product Card</span>
+            </button>
+          </div>
        </div>
 
-       {/* RIGHT PREVIEW STAGE */}
-       <div className="lg-panel flex flex-col min-h-[460px] sm:min-h-[580px] overflow-hidden relative min-w-0">
+       {/* RIGHT PREVIEW STAGE - Equal height guaranteed */}
+       <div className="lg-panel flex flex-col min-h-[460px] sm:min-h-[560px] lg:min-h-0 lg:h-full overflow-hidden relative min-w-0">
           <div className="h-11 px-4 sm:px-5 border-b border-[var(--separator)] flex items-center justify-between text-xs text-[var(--label-2)] z-10 gap-2">
             <span className="font-medium text-[var(--label)] truncate">Live Canvas Preview</span>
             <span className="liquid-glass-chip px-2.5 py-0.5 text-[11px] text-[var(--label-2)] tabular-nums shrink-0">{canvasSpec}</span>
           </div>
-          <div className="flex-1 flex items-center justify-center overflow-x-auto p-3 sm:p-8 relative custom-scrollbar">
-            <div className="max-sm:scale-[0.62] sm:max-md:scale-[0.82] origin-center transition-transform" style={{ padding: '12px', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'transparent', zIndex: 10, minWidth: 'min-content' }}>
+          <div className="flex-1 flex items-center justify-center p-2 sm:p-4 relative overflow-hidden select-none">
+            <div className="max-sm:scale-[0.62] sm:max-md:scale-[0.78] lg:scale-[0.88] xl:scale-[0.92] origin-center transition-transform" style={{ padding: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'transparent', zIndex: 10, minWidth: 'min-content' }}>
             
             {/* RENDER: SHOPEE SQUARE */}
             {productLayout === 'shopee' && (
