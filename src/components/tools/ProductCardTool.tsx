@@ -14,6 +14,8 @@ export interface CatalogItem {
   image: string;
 }
 
+export type CurrencyOption = 'Rp' | 'RM' | '$' | 'none';
+
 export default function ProductCardTool() {
   const [productLayout, setProductLayout] = useState<'tiktok-portrait' | 'tiktok-landscape' | 'shopee' | 'shopee-horizontal'>('tiktok-portrait');
   const [tkPortraitDesign, setTkPortraitDesign] = useState<1 | 2 | 3>(1);
@@ -30,7 +32,7 @@ export default function ProductCardTool() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [filteredCatalog, setFilteredCatalog] = useState(TIMEPHORIA_CATALOG || []);
-  const [currency, setCurrency] = useState<'Rp' | 'RM' | '$'>('Rp');
+  const [currency, setCurrency] = useState<CurrencyOption>('Rp');
   const [priceFormat, setPriceFormat] = useState<'exact' | 'k-an'>('exact');
   const [showShopeeLive, setShowShopeeLive] = useState(true);
   
@@ -150,20 +152,39 @@ const exportProductImage = async () => {
     }
   };
 
-  const getNum = (str: string, curr: string) => curr === 'Rp' ? parseInt(str.replace(/[^0-9]/g, ''), 10) || 0 : parseFloat(str.replace(/[^0-9.]/g, '')) || 0;
+  const getNum = (str: string, curr: CurrencyOption) =>
+    curr === 'Rp' || curr === 'none'
+      ? parseInt(str.replace(/[^0-9]/g, ''), 10) || 0
+      : parseFloat(str.replace(/[^0-9.]/g, '')) || 0;
   const origPriceNum = getNum(productOriginalPrice, currency);
   const newPriceNum = getNum(productPrice, currency);
-  let discountPct = (origPriceNum > 0 && newPriceNum > 0 && origPriceNum > newPriceNum) ? Math.round(((origPriceNum - newPriceNum) / origPriceNum) * 100) : 0;
-  
+  let discountPct =
+    origPriceNum > 0 && newPriceNum > 0 && origPriceNum > newPriceNum
+      ? Math.round(((origPriceNum - newPriceNum) / origPriceNum) * 100)
+      : 0;
+
   const autoDiscountBadge = discountPct > 0 ? `-${discountPct}%` : '';
   const autoDiscountTagText = discountPct > 0 ? `${discountPct}% off` : '';
 
-  let rawPrice = productPrice.trim();
-  if (rawPrice && !rawPrice.toLowerCase().startsWith(currency.toLowerCase())) rawPrice = currency + rawPrice;
-  let rawOrigPrice = productOriginalPrice.trim();
-  if (rawOrigPrice && !rawOrigPrice.toLowerCase().startsWith(currency.toLowerCase())) rawOrigPrice = currency + rawOrigPrice;
+  // Clean any leading typed currency symbol
+  const cleanPrice = productPrice.trim().replace(/^(rp\.?|rm\.?|\$)\s*/i, '');
+  const cleanOrigPrice = productOriginalPrice.trim().replace(/^(rp\.?|rm\.?|\$)\s*/i, '');
+
+  let rawPrice = '';
+  let rawOrigPrice = '';
+  if (currency === 'none') {
+    rawPrice = cleanPrice;
+    rawOrigPrice = cleanOrigPrice;
+  } else {
+    rawPrice = cleanPrice ? currency + cleanPrice : '';
+    rawOrigPrice = cleanOrigPrice ? currency + cleanOrigPrice : '';
+  }
+
   let displayPrice = rawPrice;
-  if (priceFormat === 'k-an' && newPriceNum > 0 && currency === 'Rp') { const kValue = Math.floor(newPriceNum / 1000); displayPrice = `${currency}${kValue}K-an`; }
+  if (priceFormat === 'k-an' && newPriceNum > 0 && currency === 'Rp') {
+    const kValue = Math.floor(newPriceNum / 1000);
+    displayPrice = `${currency}${kValue}K-an`;
+  }
 
   // ==========================================
   // DYNAMIC FONT SIZING LOGIC (AUTO-SHRINK)
@@ -265,10 +286,11 @@ const exportProductImage = async () => {
 
             <div>
               <label className="block text-xs font-medium text-[var(--label-2)] mb-1.5">Currency</label>
-              <div className="lg-segmented grid-cols-3 gap-1">
+              <div className="lg-segmented grid-cols-4 gap-1">
                 <button onClick={() => setCurrency('Rp')} data-active={currency === 'Rp'} className="lg-segment-btn h-8 text-xs">IDR</button>
                 <button onClick={() => { setCurrency('RM'); setPriceFormat('exact'); }} data-active={currency === 'RM'} className="lg-segment-btn h-8 text-xs">MYR</button>
                 <button onClick={() => { setCurrency('$'); setPriceFormat('exact'); }} data-active={currency === '$'} className="lg-segment-btn h-8 text-xs">USD</button>
+                <button onClick={() => { setCurrency('none'); setPriceFormat('exact'); }} data-active={currency === 'none'} className="lg-segment-btn h-8 text-xs" title="Turn off currency">Off</button>
               </div>
             </div>
           </div>
@@ -511,8 +533,12 @@ const exportProductImage = async () => {
                       
                       {/* Price Banner */}
                       <div style={{ background: 'linear-gradient(90deg, #ff2a2a, #ff7b00)', padding: '6px 16px', color: '#ffffff', display: 'flex', alignItems: 'baseline', gap: '4px', flexWrap: 'nowrap', overflow: 'hidden' }}>
-                        <span style={{ fontSize: '16px', fontWeight: '700', fontStyle: 'italic', lineHeight: '1', flexShrink: 0 }}>{currency}</span>
-                        <span style={{ fontSize: displayPrice.replace(currency, '').trim().length > 7 ? '30px' : '36px', fontWeight: '900', fontStyle: 'italic', letterSpacing: '-0.5px', lineHeight: '1', whiteSpace: 'nowrap' }}>{displayPrice.replace(currency, '').trim()}</span>
+                        {currency !== 'none' && (
+                          <span style={{ fontSize: '16px', fontWeight: '700', fontStyle: 'italic', lineHeight: '1', flexShrink: 0 }}>{currency}</span>
+                        )}
+                        <span style={{ fontSize: (currency !== 'none' ? displayPrice.replace(currency, '') : displayPrice).trim().length > 7 ? '30px' : '36px', fontWeight: '900', fontStyle: 'italic', letterSpacing: '-0.5px', lineHeight: '1', whiteSpace: 'nowrap' }}>
+                          {(currency !== 'none' ? displayPrice.replace(currency, '') : displayPrice).trim()}
+                        </span>
                         {productUnit && (
                           <span style={{ fontSize: '12px', fontWeight: '600', fontStyle: 'normal', lineHeight: '1', marginLeft: '2px', whiteSpace: 'nowrap', flexShrink: 0 }}>
                             {productUnit}

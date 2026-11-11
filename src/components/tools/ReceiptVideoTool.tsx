@@ -439,8 +439,8 @@ export interface ReceiptVideoToolProps {
   handleImageUpload: (e: ChangeEvent<HTMLInputElement>) => void;
   priceColor?: 'pink' | 'black';
   setPriceColor?: (v: 'pink' | 'black') => void;
-  currency: 'Rp' | 'RM' | '$';
-  setCurrency: (v: 'Rp' | 'RM' | '$') => void;
+  currency: 'Rp' | 'RM' | '$' | 'none';
+  setCurrency: (v: 'Rp' | 'RM' | '$' | 'none') => void;
   priceFormat: 'exact' | 'k-an';
   setPriceFormat: (v: 'exact' | 'k-an') => void;
   displayPrice: string;
@@ -479,6 +479,9 @@ export default function ReceiptVideoTool({
   productImageUrl,
   handleImageUpload,
   currency,
+  setCurrency,
+  priceFormat,
+  setPriceFormat,
   displayPrice,
   rawOrigPrice,
   autoDiscountBadge,
@@ -1226,6 +1229,81 @@ export default function ReceiptVideoTool({
           <div>
             <label className="block text-xs font-medium text-[var(--label-2)] mb-1.5">Ganti foto produk kustom</label>
             <input type="file" onChange={handleImageUpload} className={fileInputClass} />
+          </div>
+
+          {/* Currency and Price Format selector */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-[var(--label-2)] mb-1.5">Tampilan Harga</label>
+              <div className="lg-segmented grid-cols-2 gap-1">
+                <button
+                  type="button"
+                  onClick={() => setPriceFormat('exact')}
+                  data-active={priceFormat === 'exact'}
+                  className="lg-segment-btn h-8 text-xs"
+                >
+                  Exact
+                </button>
+                {currency === 'Rp' && (
+                  <button
+                    type="button"
+                    onClick={() => setPriceFormat('k-an')}
+                    data-active={priceFormat === 'k-an'}
+                    className="lg-segment-btn h-8 text-xs"
+                  >
+                    K-an
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-[var(--label-2)] mb-1.5">Currency</label>
+              <div className="lg-segmented grid-cols-4 gap-1">
+                <button
+                  type="button"
+                  onClick={() => setCurrency('Rp')}
+                  data-active={currency === 'Rp'}
+                  className="lg-segment-btn h-8 text-xs"
+                >
+                  IDR
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCurrency('RM');
+                    setPriceFormat('exact');
+                  }}
+                  data-active={currency === 'RM'}
+                  className="lg-segment-btn h-8 text-xs"
+                >
+                  MYR
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCurrency('$');
+                    setPriceFormat('exact');
+                  }}
+                  data-active={currency === '$'}
+                  className="lg-segment-btn h-8 text-xs"
+                >
+                  USD
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCurrency('none');
+                    setPriceFormat('exact');
+                  }}
+                  data-active={currency === 'none'}
+                  className="lg-segment-btn h-8 text-xs"
+                  title="Turn off currency"
+                >
+                  Off
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Price inputs */}
