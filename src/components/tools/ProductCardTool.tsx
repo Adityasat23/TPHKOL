@@ -155,8 +155,11 @@ const exportProductImage = async () => {
 
       const dataUrl = await toPng(productPreviewRef.current, { 
         pixelRatio: 3.5, 
-        backgroundColor: 'transparent',
-        skipFonts: true 
+        cacheBust: true,
+        skipFonts: true,
+        style: {
+          backgroundColor: '#ffffff',
+        },
       });
       
       const link = document.createElement('a');
