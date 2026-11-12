@@ -770,15 +770,7 @@ export default function FakeCommentTool() {
                           fontFamily: "'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
                         }}
                       >
-                        <span>Reply to </span>
-                        <span
-                          style={{
-                            fontWeight: 700,
-                            color: isDark ? '#ffffff' : '#111827',
-                          }}
-                        >
-                          {replyTo || 'username'}
-                        </span>
+                        <span>Reply to {replyTo || 'username'}</span>
                         {mainVerified && (
                           <span
                             style={{
