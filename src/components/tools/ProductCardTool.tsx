@@ -191,18 +191,24 @@ const exportProductImage = async () => {
   const titleHasBrand = brandPrefix && cleanTitle.toLowerCase().startsWith(brandPrefix.toLowerCase());
   const formattedProductTitle = titleHasBrand ? cleanTitle : (brandPrefix ? `${brandPrefix} - ${cleanTitle}` : cleanTitle);
 
-  // Clean any leading typed currency symbol
-  const cleanPrice = productPrice.trim().replace(/^(rp\.?|rm\.?|\$)\s*/i, '');
-  const cleanOrigPrice = productOriginalPrice.trim().replace(/^(rp\.?|rm\.?|\$)\s*/i, '');
+  const pTrimmed = productPrice.trim();
+  const origTrimmed = productOriginalPrice.trim();
 
   let rawPrice = '';
   let rawOrigPrice = '';
   if (currency === 'none') {
-    rawPrice = cleanPrice;
-    rawOrigPrice = cleanOrigPrice;
+    rawPrice = pTrimmed;
+    rawOrigPrice = origTrimmed;
   } else {
-    rawPrice = cleanPrice ? currency + cleanPrice : '';
-    rawOrigPrice = cleanOrigPrice ? currency + cleanOrigPrice : '';
+    const startsWithCurrency = pTrimmed.toLowerCase().startsWith(currency.toLowerCase());
+    rawPrice = startsWithCurrency
+      ? pTrimmed
+      : (pTrimmed ? (currency === 'Rp' ? `${currency} ` : currency) + pTrimmed.replace(/^(rp\.?|rm\.?|\$)\s*/i, '') : '');
+
+    const origStartsWithCurr = origTrimmed.toLowerCase().startsWith(currency.toLowerCase());
+    rawOrigPrice = origStartsWithCurr
+      ? origTrimmed
+      : (origTrimmed ? (currency === 'Rp' ? `${currency} ` : currency) + origTrimmed.replace(/^(rp\.?|rm\.?|\$)\s*/i, '') : '');
   }
 
   let displayPrice = rawPrice;
@@ -617,8 +623,8 @@ const exportProductImage = async () => {
                         {currency !== 'none' && (
                           <span style={{ fontSize: '16px', fontWeight: '700', fontStyle: 'italic', lineHeight: '1', flexShrink: 0 }}>{currency}</span>
                         )}
-                        <span style={{ fontSize: (currency !== 'none' ? displayPrice.replace(currency, '') : displayPrice).trim().length > 7 ? '30px' : '36px', fontWeight: '900', fontStyle: 'italic', letterSpacing: '-0.5px', lineHeight: '1', whiteSpace: 'nowrap' }}>
-                          {(currency !== 'none' ? displayPrice.replace(currency, '') : displayPrice).trim()}
+                        <span style={{ fontSize: (currency !== 'none' ? displayPrice.replace(new RegExp(`^${currency}\\s*`, 'i'), '') : displayPrice).trim().length > 7 ? '30px' : '36px', fontWeight: '900', fontStyle: 'italic', letterSpacing: '-0.5px', lineHeight: '1', whiteSpace: 'nowrap' }}>
+                          {(currency !== 'none' ? displayPrice.replace(new RegExp(`^${currency}\\s*`, 'i'), '') : displayPrice).trim()}
                         </span>
                         {productUnit && (
                           <span style={{ fontSize: '12px', fontWeight: '600', fontStyle: 'normal', lineHeight: '1', marginLeft: '2px', whiteSpace: 'nowrap', flexShrink: 0 }}>
@@ -671,8 +677,11 @@ const exportProductImage = async () => {
                   ) : (
                     /* RENDER: DESIGN 3 (TikTok Shop Bottom Sheet Card - Exact Reference) */
                     (() => {
-                      const pTrim = productPrice.trim();
-                      const ribuMatch = pTrim.match(/^(\d+[\d.,]*)\s*(ribu|ribuan|k|k-an)?$/i);
+                      const rawInput = productPrice.trim();
+                      const priceWithoutCurr = currency !== 'none'
+                        ? rawInput.replace(new RegExp(`^(${currency}|rp|rm|\\$)\\.?\\s*`, 'i'), '')
+                        : rawInput;
+
                       let d3Prefix = currency !== 'none' ? currency : '';
                       let d3Number = '';
                       let d3Suffix = '';
@@ -681,12 +690,20 @@ const exportProductImage = async () => {
                         const kVal = newPriceNum >= 1000 ? Math.floor(newPriceNum / 1000) : (newPriceNum > 0 ? newPriceNum : 50);
                         d3Number = `${kVal}`;
                         d3Suffix = 'K-an';
-                      } else if (ribuMatch && ribuMatch[2]) {
-                        d3Number = ribuMatch[1];
-                        d3Suffix = ribuMatch[2].toLowerCase().startsWith('rib') ? 'Ribuan' : ribuMatch[2];
                       } else {
-                        d3Number = cleanPrice || '50.000';
-                        d3Suffix = productUnit || '';
+                        const spaceParts = priceWithoutCurr.match(/^(.+?)\s+(.+)$/);
+                        const wordParts = !spaceParts ? priceWithoutCurr.match(/^([0-9.,?!~#\-_+]+)\s*([a-zA-Z가-힣/].*)$/) : null;
+
+                        if (spaceParts) {
+                          d3Number = spaceParts[1];
+                          d3Suffix = spaceParts[2];
+                        } else if (wordParts) {
+                          d3Number = wordParts[1];
+                          d3Suffix = wordParts[2];
+                        } else {
+                          d3Number = priceWithoutCurr || '50.000';
+                          d3Suffix = productUnit || '';
+                        }
                       }
 
                       const finalTitle = formattedProductTitle;
@@ -775,7 +792,7 @@ const exportProductImage = async () => {
                             )}
                             <span
                               style={{
-                                fontSize: d3Number.length > 7 ? '30px' : '38px',
+                                fontSize: d3Number.length > 10 ? '24px' : d3Number.length > 7 ? '30px' : '38px',
                                 fontWeight: 800,
                                 letterSpacing: '-1px',
                                 lineHeight: '1',

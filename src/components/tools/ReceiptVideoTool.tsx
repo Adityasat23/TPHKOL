@@ -526,10 +526,14 @@ export default function ReceiptVideoTool({
   const [receiptDataUrl, setReceiptDataUrl] = useState<string>('');
   const captureCardRef = useRef<HTMLDivElement>(null);
 
-  const cleanPrice = productPrice.replace(/[^0-9]/g, '');
-  const newPriceNum = Number(cleanPrice) || 0;
-  const pTrim = productPrice.trim();
-  const ribuMatch = pTrim.match(/^(\d+[\d.,]*)\s*(ribu|ribuan|k|k-an)?$/i);
+  const rawInput = productPrice.trim();
+  const cleanPriceOnlyDigits = productPrice.replace(/[^0-9]/g, '');
+  const newPriceNum = Number(cleanPriceOnlyDigits) || 0;
+
+  const priceWithoutCurr = currency !== 'none'
+    ? rawInput.replace(new RegExp(`^(${currency}|rp|rm|\\$)\\.?\\s*`, 'i'), '')
+    : rawInput;
+
   let d3Prefix = currency !== 'none' ? currency : '';
   let d3Number = '';
   let d3Suffix = '';
@@ -538,18 +542,28 @@ export default function ReceiptVideoTool({
     const kVal = newPriceNum >= 1000 ? Math.floor(newPriceNum / 1000) : (newPriceNum > 0 ? newPriceNum : 50);
     d3Number = `${kVal}`;
     d3Suffix = 'K-an';
-  } else if (ribuMatch && ribuMatch[2]) {
-    d3Number = ribuMatch[1];
-    d3Suffix = ribuMatch[2].toLowerCase().startsWith('rib') ? 'Ribuan' : ribuMatch[2];
   } else {
-    d3Number = cleanPrice || '50.000';
-    d3Suffix = productUnit || '';
+    const spaceParts = priceWithoutCurr.match(/^(.+?)\s+(.+)$/);
+    const wordParts = !spaceParts ? priceWithoutCurr.match(/^([0-9.,?!~#\-_+]+)\s*([a-zA-Z가-힣/].*)$/) : null;
+
+    if (spaceParts) {
+      d3Number = spaceParts[1];
+      d3Suffix = spaceParts[2];
+    } else if (wordParts) {
+      d3Number = wordParts[1];
+      d3Suffix = wordParts[2];
+    } else {
+      d3Number = priceWithoutCurr || '50.000';
+      d3Suffix = productUnit || '';
+    }
   }
 
   let activeDisplayPrice = displayPrice;
   if (priceFormat === 'k-an') {
     const kVal = newPriceNum >= 1000 ? Math.floor(newPriceNum / 1000) : (newPriceNum > 0 ? newPriceNum : 50);
     activeDisplayPrice = currency !== 'none' ? `${currency} ${kVal}K-an` : `${kVal}K-an`;
+  } else if (currency === 'none') {
+    activeDisplayPrice = rawInput;
   }
 
   const brandPrefix = (brandName || '').trim();
@@ -980,8 +994,8 @@ export default function ReceiptVideoTool({
                 {currency !== 'none' && (
                   <span style={{ fontSize: '18px', fontWeight: '700', fontStyle: 'italic', lineHeight: '1', flexShrink: 0 }}>{currency}</span>
                 )}
-                <span style={{ fontSize: (currency !== 'none' ? activeDisplayPrice.replace(currency, '') : activeDisplayPrice).trim().length > 7 ? '34px' : '42px', fontWeight: '900', fontStyle: 'italic', letterSpacing: '-0.5px', lineHeight: '1', whiteSpace: 'nowrap' }}>
-                  {(currency !== 'none' ? activeDisplayPrice.replace(currency, '') : activeDisplayPrice).trim()}
+                <span style={{ fontSize: (currency !== 'none' ? activeDisplayPrice.replace(new RegExp(`^${currency}\\s*`, 'i'), '') : activeDisplayPrice).trim().length > 7 ? '34px' : '42px', fontWeight: '900', fontStyle: 'italic', letterSpacing: '-0.5px', lineHeight: '1', whiteSpace: 'nowrap' }}>
+                  {(currency !== 'none' ? activeDisplayPrice.replace(new RegExp(`^${currency}\\s*`, 'i'), '') : activeDisplayPrice).trim()}
                 </span>
                 {productUnit && (
                   <span style={{ fontSize: '14px', fontWeight: '600', fontStyle: 'normal', lineHeight: '1', marginLeft: '3px', whiteSpace: 'nowrap', flexShrink: 0 }}>
@@ -1073,7 +1087,7 @@ export default function ReceiptVideoTool({
                     {d3Prefix}
                   </span>
                 )}
-                <span style={{ fontSize: d3Number.length > 7 ? '34px' : '42px', fontWeight: '900', letterSpacing: '-1px' }}>
+                <span style={{ fontSize: d3Number.length > 10 ? '26px' : d3Number.length > 7 ? '34px' : '42px', fontWeight: '900', letterSpacing: '-1px' }}>
                   {d3Number}
                 </span>
                 {d3Suffix && (
