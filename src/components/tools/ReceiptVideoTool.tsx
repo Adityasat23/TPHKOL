@@ -8,7 +8,7 @@ import { StarYellow } from '../icons';
 // 9:16 TikTok / Reels canvas dimensions
 const W = 1080;
 const H = 1920;
-const GREEN = '#00FF00';
+const BLUE = '#0000FF';
 const SAFE_IMAGE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk8A8AAQsAzQ/8/GkAAAAASUVORK5CYII=';
 
 // Fixed optimal width and printer position (no messy sliders)
@@ -16,7 +16,7 @@ const FIXED_WIDTH_PCT = 78;
 const FIXED_SLOT_PCT = 15;
 
 export type DispenserType = 'pink' | 'silver' | 'black' | 'burgundy' | 'none' | 'custom';
-export type BgMode = 'green' | 'video';
+export type BgMode = 'blue' | 'video';
 export type SpeedPreset = 'fast' | 'normal' | 'slow';
 export type EasingMode = 'smooth' | 'printer' | 'linear';
 
@@ -309,8 +309,8 @@ function drawFrame(
   customOverlay: HTMLImageElement | null,
   video: HTMLVideoElement | null,
 ) {
-  // 1. Background (Always Pure Green Screen #00FF00)
-  ctx.fillStyle = GREEN;
+  // 1. Background (Always Pure Blue Screen #0000FF)
+  ctx.fillStyle = BLUE;
   ctx.fillRect(0, 0, W, H);
 
   const slotY = (H * FIXED_SLOT_PCT) / 100;
@@ -496,10 +496,10 @@ export default function ReceiptVideoTool({
   const [customOverlayUrl, setCustomOverlayUrl] = useState('');
 
   // Background state
-  const [bgMode, setBgMode] = useState<BgMode>('green');
+  const [bgMode, setBgMode] = useState<BgMode>('blue');
   const [bgVideoUrl, setBgVideoUrl] = useState('');
   const [videoDuration, setVideoDuration] = useState(0);
-  const [greenDuration, setGreenDuration] = useState(4);
+  const [blueDuration, setBlueDuration] = useState(4);
 
   // Animation parameters
   const [speed, setSpeed] = useState<SpeedPreset | 'custom'>('normal');
@@ -565,7 +565,7 @@ export default function ReceiptVideoTool({
   const clockRef = useRef<{ start: number; offset: number }>({ start: 0, offset: 0 });
   const cancelExportRef = useRef(false);
 
-  const totalDuration = bgMode === 'video' && videoDuration > 0 ? Math.min(videoDuration, 60) : greenDuration;
+  const totalDuration = bgMode === 'video' && videoDuration > 0 ? Math.min(videoDuration, 60) : blueDuration;
 
   const animSettings: AnimationSettings = {
     bgMode,
@@ -1395,7 +1395,7 @@ export default function ReceiptVideoTool({
               <div className="flex items-center gap-2 min-w-0">
                 <span className="text-xs font-semibold text-[var(--label)]">Durasi & Animasi</span>
                 <span className="text-[11px] text-[var(--label-3)] truncate">
-                  {greenDuration}s · {speed} · {fps}fps
+                  {blueDuration}s · {speed} · {fps}fps
                 </span>
               </div>
               <svg
@@ -1415,22 +1415,22 @@ export default function ReceiptVideoTool({
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-medium text-[var(--label-2)]">Durasi output video</span>
-                    <span className="flex items-center gap-1.5 text-[11px] text-[#00c950] font-medium bg-[#00FF00]/10 px-2 py-0.5 rounded-full">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#00FF00] border border-black/20" />
-                      Green Screen
+                    <span className="flex items-center gap-1.5 text-[11px] text-[#2997FF] font-medium bg-[#0000FF]/10 px-2 py-0.5 rounded-full">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#0000FF] border border-black/20" />
+                      Blue Screen
                     </span>
                   </div>
                   <div className="flex justify-between text-xs text-[var(--label-2)]">
                     <span>Slider durasi</span>
-                    <span className="tabular-nums font-semibold text-[var(--label)]">{greenDuration} detik</span>
+                    <span className="tabular-nums font-semibold text-[var(--label)]">{blueDuration} detik</span>
                   </div>
                   <input
                     type="range"
                     min={2}
                     max={15}
                     step={0.5}
-                    value={greenDuration}
-                    onChange={(e) => setGreenDuration(Number(e.target.value))}
+                    value={blueDuration}
+                    onChange={(e) => setBlueDuration(Number(e.target.value))}
                     className="w-full accent-[var(--tint)]"
                   />
                 </div>
