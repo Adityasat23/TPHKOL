@@ -760,45 +760,38 @@ export default function FakeCommentTool() {
                       <p
                         style={{
                           width: '100%',
-                          fontSize: '20px',
+                          fontSize: '18px',
                           lineHeight: 1.35,
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '2px',
                           fontWeight: 600,
-                          flexWrap: 'wrap',
                           color: isDark ? '#c0c0c0' : '#5a5a5a',
                           margin: 0,
+                          wordBreak: 'break-word',
+                          overflowWrap: 'break-word',
                           fontFamily: "'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
                         }}
                       >
                         <span>Reply to </span>
                         <span
                           style={{
-                            display: 'inline-block',
-                            maxWidth: 'max-content',
-                            overflowWrap: 'break-word',
-                            wordBreak: 'break-word',
+                            fontWeight: 700,
+                            color: isDark ? '#ffffff' : '#111827',
                           }}
                         >
                           {replyTo || 'username'}
                         </span>
-                        <span>{"'s "}</span>
                         {mainVerified && (
                           <span
                             style={{
                               backgroundColor: '#20D5EC',
-                              marginTop: '-2px',
-                              lineHeight: 1.1,
                               borderRadius: '9999px',
                               fontWeight: 500,
                               padding: '1px',
                               display: 'inline-flex',
                               justifyContent: 'center',
                               alignItems: 'center',
-                              textAlign: 'center',
-                              marginRight: '4px',
-                              marginLeft: '2px',
+                              verticalAlign: '-2px',
+                              marginRight: '2px',
+                              marginLeft: '3px',
                             }}
                           >
                             <svg
@@ -806,24 +799,24 @@ export default function FakeCommentTool() {
                               fill="currentColor"
                               style={{
                                 color: '#ffffff',
-                                width: '16px',
-                                height: '16px',
+                                width: '13px',
+                                height: '13px',
                               }}
                             >
                               <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z" />
                             </svg>
                           </span>
                         )}
-                        <span>comment</span>
+                        <span>&apos;s comment</span>
                       </p>
                       <div
                         style={{
-                          marginTop: '2px',
+                          marginTop: '6px',
                           color: isDark ? '#ffffff' : '#000000',
-                          fontSize: '31px',
+                          fontSize: '29px',
                           fontWeight: 700,
                           letterSpacing: '-0.025em',
-                          lineHeight: 1.2,
+                          lineHeight: 1.25,
                           width: '100%',
                           overflowWrap: 'break-word',
                           wordWrap: 'break-word',
