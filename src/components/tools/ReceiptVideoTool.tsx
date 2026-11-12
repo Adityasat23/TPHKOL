@@ -543,15 +543,12 @@ export default function ReceiptVideoTool({
     d3Number = `${kVal}`;
     d3Suffix = 'K-an';
   } else {
-    const spaceParts = priceWithoutCurr.match(/^(.+?)\s+(.+)$/);
-    const wordParts = !spaceParts ? priceWithoutCurr.match(/^([0-9.,?!~#\-_+]+)\s*([a-zA-Z가-힣/].*)$/) : null;
+    // Only split off suffix if user explicitly wrote a slash unit (e.g. "/pcs", "/bulan") at the end without using the Satuan box
+    const slashMatch = !productUnit ? priceWithoutCurr.match(/^(.+?)(\s*\/[a-zA-Z가-힣]+)$/) : null;
 
-    if (spaceParts) {
-      d3Number = spaceParts[1];
-      d3Suffix = spaceParts[2];
-    } else if (wordParts) {
-      d3Number = wordParts[1];
-      d3Suffix = wordParts[2];
+    if (slashMatch) {
+      d3Number = slashMatch[1];
+      d3Suffix = slashMatch[2];
     } else {
       d3Number = priceWithoutCurr || '50.000';
       d3Suffix = productUnit || '';
